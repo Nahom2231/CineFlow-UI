@@ -1,0 +1,112 @@
+<div class="movie-details-container">
+  <button class="back-btn" (click)="goBack()">← Back to Catalog</button>
+
+  <div *ngIf="loading" class="loading">Loading movie details...</div>
+
+  <div *ngIf="!loading && movie" class="movie-content">
+    <!-- Movie Header -->
+    <div class="movie-header">
+      <div class="poster-section">
+        <img [src]="movie.featuredImageUrl || 'assets/placeholder.jpg'" 
+             (error)="$event.target.src='https://via.placeholder.com/400x600?text=No+Poster'"
+             [alt]="movie.titleEnglish"
+             class="poster" />
+      </div>
+
+      <div class="info-section">
+        <h1>{{ movie.titleEnglish }}</h1>
+        <p class="subtitle">{{ movie.titleAmharic }}</p>
+
+        <div class="metadata">
+          <span class="badge genre">{{ movie.genre }}</span>
+          <span class="badge language">{{ movie.audioLanguage }}</span>
+          <span class="badge duration">{{ movie.durationMinutes }}min</span>
+        </div>
+
+        <div class="cast-crew">
+          <div class="crew-item" *ngIf="movie.directorName">
+            <strong>Director:</strong> {{ movie.directorName }}
+          </div>
+          <div class="crew-item" *ngIf="movie.starName && movie.starName.length">
+            <strong>Cast:</strong> {{ movie.starName.join(', ') }}
+          </div>
+        </div>
+
+        <div class="synopsis">
+          <h3>Synopsis</h3>
+          <p>{{ movie.descriptionEnglish }}</p>
+          <p *ngIf="movie.descriptionAmharic" class="synopsis-amharic">
+            {{ movie.descriptionAmharic }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gallery -->
+    <div class="gallery-section" *ngIf="movie.galleryImageUrl && movie.galleryImageUrl.length">
+      <h2>Photo Gallery</h2>
+      <div class="gallery">
+        <img *ngFor="let img of movie.galleryImageUrl" 
+             [src]="img" 
+             (error)="$event.target.src='https://via.placeholder.com/200x200?text=Image'"
+             [alt]="movie.titleEnglish"
+             class="gallery-img" />
+      </div>
+    </div>
+
+    <!-- Available Showtimes -->
+    <div class="showtimes-section" *ngIf="movie.schedules && movie.schedules.length">
+      <h2>Available Showtimes</h2>
+      <div class="showtimes-grid">
+        <div *ngFor="let schedule of movie.schedules"
+             class="showtime-card"
+             [class.selected]="selectedSchedule?.id === schedule.id"
+             (click)="selectSchedule(schedule)">
+          <div class="time">
+            {{ schedule.startTime | date:'HH:mm' }}
+          </div>
+          <div class="date">
+            {{ schedule.startTime | date:'MMM dd' }}
+          </div>
+          <div class="hall">
+            {{ schedule.cinemaHallName }}
+          </div>
+          <div class="price">
+            {{ schedule.price }} ETB
+          </div>
+        </div>
+      </div>
+
+      <!-- Selected Showtime Details -->
+      <div class="booking-section" *ngIf="selectedSchedule">
+        <div class="selected-details">
+          <div class="detail">
+            <span class="label">Selected Date & Time:</span>
+            <span class="value">{{ selectedSchedule.startTime | date:'medium' }}</span>
+          </div>
+          <div class="detail">
+            <span class="label">Cinema Hall:</span>
+            <span class="value">{{ selectedSchedule.cinemaHallName }}</span>
+          </div>
+          <div class="detail">
+            <span class="label">Price per Seat:</span>
+            <span class="value">{{ selectedSchedule.price }} ETB</span>
+          </div>
+        </div>
+
+        <button class="btn-book-now" (click)="bookNow()">
+          Proceed to Seat Selection →
+        </button>
+      </div>
+    </div>
+
+    <!-- No Showtimes Message -->
+    <div *ngIf="!movie.schedules || movie.schedules.length === 0" class="no-showtimes">
+      <p>No showtimes available for this movie at the moment.</p>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !movie" class="error">
+    <p>Movie not found</p>
+  </div>
+</div>

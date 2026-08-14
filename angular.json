@@ -2,7 +2,8 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "cli": {
-    "packageManager": "npm"
+    "packageManager": "npm",
+    "analytics": "178db6f8-7d17-48d6-9b3a-d3a2ecfba8a1"
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -20,6 +21,9 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+            "polyfills":[
+              "zone.js"
+            ],
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
@@ -30,7 +34,9 @@
               }
             ],
             "styles": [
-              "src/styles.scss"
+              
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+                "src/styles.scss"
             ]
           },
           "configurations": {

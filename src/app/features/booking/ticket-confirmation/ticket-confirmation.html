@@ -1,0 +1,102 @@
+<div class="ticket-confirmation-container">
+  <div class="confirmation-header">
+    <div class="success-badge">✓ Booking Confirmed</div>
+    <h1>Your Digital Pass</h1>
+  </div>
+
+  <!-- QR Code Section -->
+  <div class="qr-section">
+    <h2>Show this QR code at the cinema</h2>
+    <div class="qr-display">
+      <img [src]="qrCodeUrl" alt="Ticket QR Code" class="qr-code" />
+    </div>
+    <p class="qr-info">Present your phone with this code to the cinema staff for quick entry</p>
+  </div>
+
+  <!-- Ticket Details -->
+  <div class="ticket-details">
+    <div class="detail-section">
+      <h3>Movie</h3>
+      <div class="movie-info">
+        <p class="movie-title">{{ movieTitle }}</p>
+        <p class="movie-subtitle">{{ movieTitleAmharic }}</p>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h3>Seat Information</h3>
+      <div class="grid-2">
+        <div>
+          <p class="label">Seat:</p>
+          <p class="value">{{ seatNumber }}</p>
+        </div>
+        <div>
+          <p class="label">Price:</p>
+          <p class="value">{{ ticketPrice }} ETB</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h3>Cinema Information</h3>
+      <div class="grid-2">
+        <div>
+          <p class="label">Hall:</p>
+          <p class="value">{{ cinemaHall }}</p>
+        </div>
+        <div>
+          <p class="label">Location:</p>
+          <p class="value">{{ cinemaLocation }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h3>Show Time</h3>
+      <p class="value">{{ scheduleTime | date:'medium' }}</p>
+    </div>
+
+    <div class="detail-section">
+      <h3>Payment Details</h3>
+      <div class="grid-2">
+        <div>
+          <p class="label">Provider:</p>
+          <p class="value">{{ paymentProvider }}</p>
+        </div>
+        <div>
+          <p class="label">Transaction Ref:</p>
+          <p class="value ticket-ref">{{ transactionReference }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h3>Booking Time</h3>
+      <p class="value">{{ bookingDateTime | date:'medium' }}</p>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button class="btn btn-primary" (click)="downloadQRCode()">
+      📥 Download QR Code
+    </button>
+    <button class="btn btn-secondary" (click)="printTicket()">
+      🖨️ Print Ticket
+    </button>
+    <button class="btn btn-outline" (click)="goToMovies()">
+      Back to Movies
+    </button>
+  </div>
+
+  <!-- Important Info -->
+  <div class="info-box">
+    <h4>Important Information</h4>
+    <ul>
+      <li>Keep this QR code safe - it's your ticket to the cinema</li>
+      <li>Arrive 15 minutes before show time</li>
+      <li>The QR code is valid only for the selected date and time</li>
+      <li>One QR code per seat - cannot be used for multiple entries</li>
+    </ul>
+  </div>
+</div>

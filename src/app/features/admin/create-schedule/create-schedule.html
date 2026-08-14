@@ -1,0 +1,67 @@
+<div class="schedule-container">
+  <h2>Create Movie Schedule</h2>
+
+  <div *ngIf="message" [class]="isSuccess ? 'alert alert-success' : 'alert alert-danger'">
+    {{ message }}
+  </div>
+
+  <form (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="movie">Select Movie</label>
+      <select id="movie" [(ngModel)]="schedule.movieId" name="movieId" required>
+        <option value="" disabled selected>-- Select a Movie --</option>
+        <option *ngFor="let m of movies" [value]="m.id">
+          {{ m.titleEnglish || m.titleAmharic }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="cinemaHallId">Cinema Hall ID / Name</label>
+      <input 
+        type="text" 
+        id="cinemaHallId" 
+        [(ngModel)]="schedule.cinemaHallId" 
+        name="cinemaHallId" 
+        placeholder="e.g. Hall 1" 
+        required 
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="showtime">Showtime Date & Time</label>
+      <input 
+        type="datetime-local" 
+        id="showtime" 
+        [(ngModel)]="showtimeInput" 
+        name="showtimeInput" 
+        required 
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="ticketPrice">Ticket Price ($)</label>
+      <input 
+        type="number" 
+        id="ticketPrice" 
+        [(ngModel)]="schedule.ticketPrice" 
+        name="ticketPrice" 
+        min="1" 
+        required 
+      />
+    </div>
+    <div class="form-group">
+  <label for="cinemaHallId">Select Cinema Hall</label>
+  <select id="cinemaHallId" [(ngModel)]="schedule.cinemaHallId" name="cinemaHallId" class="form-control" required>
+    <option value="" disabled selected>-- Select Cinema Hall --</option>
+    <option *ngFor="let hall of cinemaHalls" [value]="hall.id">
+      {{ hall.hallName }} ({{ hall.branchName }})
+    </option>
+  </select>
+</div>
+
+    <button type="submit" [disabled]="loading" class="btn-submit">
+      {{ loading ? 'Creating...' : 'Create Schedule' }}
+    </button>
+  </form>
+</div>

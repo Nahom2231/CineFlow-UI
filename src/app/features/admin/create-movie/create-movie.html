@@ -1,0 +1,70 @@
+<div class="form-card">
+    <h2>Create New Movie </h2>
+    <p class="subtitle"> Add a new movie title to the CineFlow catalog </p>
+
+    <div *ngIf="errorMessage" class="alert alert-error"> {{errorMessage}}</div>
+    <div *ngIf="successMessage" class="alert alert-success">{{successMessage}} </div>
+
+    <form (ngSubmit)="onSubmit()">
+    <div class="form-group">
+    <label> English Title </label>
+    <input type="text" [(ngModel)]="movie.titleEnglish" name="titleEnglish" required placeholder="Inception" />
+
+    </div>
+
+    <div class="form-group">
+    <label> Amharic Title </label>
+    <input type="text" [(ngModel)]="movie.titleAmharic" name="titleAmharic" required placeholder="ኢንሴፕሽን" />
+    </div>
+    
+    <div class="form-group">
+     <label>Duration (Minutes) </label>
+     <input type="number" [(ngModel)]="movie.durationMinutes" name="durationMinutes" required min="1" />
+    </div>
+
+    <div class="form-group">
+        <label> Genre </label>
+        <select [(ngModel)]="movie.genre" name="genre">
+        <option value="Action"> Action </option>
+        <option value="Drama">Drama</option>
+        <option value="Comedy">Comedy</option>
+        <option value="Sci-Fi">Sci-Fi</option>
+        <option value="Romance">Romance</option>
+        </select>
+    </div>
+    <div class="form-group">
+     <label>Audio Language </label>
+     <select [(ngModel)]="movie.audioLanguage" name="audioLanguage">
+        <option value="English">English </option>
+        <option value="Amharic">Amharic</option>
+     </select>
+    </div>
+
+    <div class="form-group">
+        <label> Poster Image URL </label>
+        <input type="url" [(ngModel)]="movie.featuredImageUrl" name="featuredImageUrl" placeholder="https://example.com/poster.jpg" />
+    </div>
+
+    <div class="form-group">
+      <label>English Description </label>
+      <textarea [(ngModel)]="movie.descriptionEnglish" name="descriptionEnglish" rows="3"></textarea>
+    </div>
+      <div class="form-group">
+  <label>Amharic Description</label>
+  <textarea [(ngModel)]="movie.descriptionAmharic"  name="descriptionAmharic"  rows="3"  placeholder="Enter description in Amharic...">
+  </textarea>
+</div>
+<div class="form-group">
+  <label>Director</label>
+  <select
+   [(ngModel)]="movie.directorId" name="directorId">
+    <option [ngValue]="null">-- Select Director --</option>
+    <!-- Bind from your component's directors list -->
+    <option *ngFor="let d of directors" [value]="d.id">{{ d.name }}</option>
+  </select>
+</div>
+    <button type="submit" class="btn-primary" [disabled]="loading">
+        {{loading ? 'Saving...': 'Create Movie'}}
+    </button>
+    </form>
+</div>

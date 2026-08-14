@@ -1,0 +1,41 @@
+<div class="auth-container
+">
+    <div class="auth-card">
+    <h2>Welcome to Cinema Scheduling and Booking Tickets System</h2>
+    <p class = "subtitle"> Log in to manage bookings and purchase tickets </p>
+
+    <form (ngSubmit)="onLogin()">
+        <div class = "form-group">
+        <label for = "loginEmail">Email Address </label>
+        <input 
+        type="email"
+        id="loginEmail"
+        [(ngModel)]= "email"
+        name="email"
+        placeholder="user@cineflow.com"
+        required
+        />
+        </div>
+        <div class ="form-group">
+        <label for="loginPassword">Password</label>
+        <input
+        type="password"
+        id="loginPassword"
+        [(ngModel)]="password"
+        name="password"
+        placeholder=".........."
+        required
+        />
+        </div>
+        <button type="submit" [disabled]="loading" class="btn-primary">
+            {{loading ? 'Signing in...': 'Sign in'}}
+        </button>
+    </form>
+   <div class="auth-footer">
+  <p>Don't have an account?</p>
+  <button type="button" class="btn-secondary" [routerLink]="'/auth/register'">
+    Register here
+  </button>
+</div>
+    </div>
+</div>

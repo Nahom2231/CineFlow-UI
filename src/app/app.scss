@@ -1,0 +1,38 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background-color: #1e272e;
+    color: #ffffff;
+
+
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+nav{
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    
+    a{
+        color: #dcdde1;
+        text-decoration: none;
+        font-weight: 500;
+
+        &:hover {
+            color: #00a8ff;
+        }
+    }
+    .nav-btn {
+        background-color: #00a8ff;
+        padding: 6px 14px;
+        color: white;
+    }
+   }
+}
+.main-content{
+    padding: 20px;
+}

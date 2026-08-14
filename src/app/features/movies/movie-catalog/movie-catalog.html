@@ -1,0 +1,70 @@
+<div class="catalog-container">
+    <div class="catalog-header">
+        <h1>🎬 CineFlow</h1>
+        <p class="subtitle">Your Digital Movie Pass</p>
+        <div class="quick-links">
+            <a href="/booking-history" class="link">📅 My Bookings</a>
+        </div>
+    </div>
+
+    <h2>Currently showing </h2>
+    <div class="filter-bar">
+        <input
+            type="text"
+            [(ngModel)]="filters.searchTitle"
+            (input)="onSearch()"
+            placeholder="Search movie title..."
+            class="search-input"
+        />
+        <select [(ngModel)]="filters.genre" (change)="onSearch()" class="filter-select">
+            <option value="">All Genres </option>
+            <option value="Action"> Action </option>
+            <option value="Drama"> Drama </option>
+            <option value="Comedy">Comedy</option>
+            <option value="Sci-Fi">Sci-Fi</option>
+        </select>
+        <select [(ngModel)]="filters.audioLanguage" (change)="onSearch()" class="filter-select">
+            <option value =" ">All Languages</option>
+            <option value="Amharic"> Amharic</option>
+            <option value="English">English </option>
+        </select>
+    </div>
+    
+    <div *ngIf="loading" class="loader">
+        <div class="spinner"></div>
+        <p>Loading catalog...</p>
+    </div>
+
+    <div *ngIf="!loading && movies.length > 0" class="movie-grid">
+        <div *ngFor="let movie of movies" class="movie-card">
+            <div class="movie-image-container">
+                <img [src]="movie.featuredImageUrl||'assets/placeholder.jpg'" 
+                     (error)="$event.target.src='https://via.placeholder.com/300x450?text=No+Poster'"
+                     [alt]="movie.titleEnglish"
+                     class="movie-poster"/>
+                <div class="overlay">
+                    <a [routerLink]="['/movie', movie.id]" class="view-details">
+                        View Details & Showtimes →
+                    </a>
+                </div>
+            </div>
+            <div class="movie-info">
+                <h3> {{movie.titleEnglish }} </h3>
+                <p class="subtitle">{{movie.titleAmharic }} </p>
+                <div class="badges">
+                    <span class="badge">{{ movie.genre }} </span>
+                    <span class="badge lang"> {{movie.audioLanguage }} </span>
+                </div>
+                <p class="desc">{{ movie.descriptionEnglish | slice:0:100 }}...</p>
+                <a [routerLink]="['/movie', movie.id]" class="btn-book">Book Tickets</a>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="!loading && movies.length ===0" class="empty-msg">
+        <div class="empty-icon">🎬</div>
+        <p>No movies found matching your filters.</p>
+        <a href="/movies" class="btn-reset">Reset Filters</a>
+    </div>
+</div>
+

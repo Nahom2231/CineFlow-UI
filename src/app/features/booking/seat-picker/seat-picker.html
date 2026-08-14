@@ -1,0 +1,39 @@
+<div class ="seat-picker-container">
+    <h2>Select Your Seat </h2>
+
+    <div *ngIf="holdActive" class ="timer-banner">
+        Seat <strong>{{ selectedSeat }} </strong> held for: <strong> {{ formattedTimer }} </strong>
+    </div>
+    <div class ="screen-indicator">SCREEN</div>
+    <div class="seat-layout">
+        <div *ngFor="let row of seatRows" class="seat-row">
+            <span class="row-label"> {{row.rowLabel }} </span>
+            <div class="seats-group">
+            <button
+            *ngFor="let seat of row.seats"
+            [class.selected]="seat===selectedSeat"
+            [disabled] ="holdActive && seat!== selectedSeat"
+            (click)="selectSeat(seat)">
+                  {{seat}}
+              </button>
+            </div>
+        </div>
+
+    <div class="payment-panel">
+    <h3>Complete Mobile Payment </h3>
+    <div class ="form-group">
+        <label> Provider :</label>
+        <select [(ngModel)]="paymentProvider">
+        <option value="Telebirr">Telebirr</option>
+        <option value="CBEBirr"> CBE Birr</option>
+        <option value="chapa">Chapa</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Phone Number:</label>
+        <input type="text" [(ngModel)]="phoneNumber" placeholder="0941211607" />
+    </div>
+    <button (click)="confirmBooking()" class="btn-confirm">Pay & Confirm </button>
+    </div>
+
+

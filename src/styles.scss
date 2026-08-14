@@ -1,1 +1,109 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fornts.googleapis.com/css2?family=Inter:wght@300; 400; 500; 600; 700$display=swap');
+
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', -apple-system, BlikMacSystemFont, sans-serif;
+}
+
+body{
+    background-color: #0f172a;
+    color: #f8fafc;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    .app-container{
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        width: 100%;
+    }
+}
+.form-card {
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 32px;
+    background: #1e293b;
+    border-radius: 12px;
+    border: 1px solid #334155;
+    box-shadow: 0 10px 25px  -5px rgba(0, 0, 0, 0.3);
+
+}
+h2{
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #f8fafc
+}
+.subtitle{
+    color: #94a3b8;
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+   }
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    color: #cbd5e1;
+}
+input, select, textarea {
+width:100%;
+padding:0.75rem  1rem;
+background-color: #0f172a;
+border: 1px solid #334155;
+border-radius: 8px;
+color: #f8fafc;
+font-size: 0.95rem;
+transition: border-color 0.2s, box-shadow 0.2s;
+
+&:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+}
+.btn-primary{
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    background-color: #2563eb;
+    color:#ffffff;
+    border: none;
+    border-radius:8px;
+    font-weight:600;
+    font-size: 1rem ;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &.hover {
+        background-color: #1d4ed8;
+    }
+    &:disabled{
+        background-color: #475569;
+        cursor: not-alllowed;
+    }
+}
+.alert {
+    padding:0.75rem 1 rem;
+    border-radius: 8px;
+    margin-bottom: 1 rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+
+    &.alert-error {
+        background-color: rgba(239, 68, 68, 0.15);
+        color: #fca5a5;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    &.alert-success {
+        background-color: rgba(34, 197, 94, 0.15);
+        color: #86efac;
+        border: 1px solid rgba (34, 197, 94, 0.3);
+    }
+}

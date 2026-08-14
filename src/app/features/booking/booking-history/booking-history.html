@@ -1,0 +1,111 @@
+<div class="booking-history-container">
+  <div class="header">
+    <h1>My Bookings</h1>
+    <p class="subtitle">View your ticket history and manage upcoming shows</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button 
+      class="tab"
+      [class.active]="activeTab === 'upcoming'"
+      (click)="activeTab = 'upcoming'">
+      📅 Upcoming Shows
+    </button>
+    <button 
+      class="tab"
+      [class.active]="activeTab === 'completed'"
+      (click)="activeTab = 'completed'">
+      ✓ Attended Shows
+    </button>
+    <button 
+      class="tab"
+      [class.active]="activeTab === 'all'"
+      (click)="activeTab = 'all'">
+      📋 All Bookings
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Loading your bookings...</p>
+  </div>
+
+  <!-- Bookings List -->
+  <div *ngIf="!loading && filteredBookings.length > 0" class="bookings-list">
+    <div *ngFor="let booking of filteredBookings" 
+         class="booking-card"
+         [class]="'status-' + booking.status">
+      
+      <div class="booking-header">
+        <div class="status-badge" [class]="booking.status">
+          {{ booking.status === 'upcoming' ? '📅 Upcoming' : 
+             booking.status === 'completed' ? '✓ Attended' : '✗ Cancelled' }}
+        </div>
+        <div class="booking-id">
+          Ticket ID: {{ booking.ticketId }}
+        </div>
+      </div>
+
+      <div class="booking-main">
+        <div class="movie-info">
+          <h3>{{ booking.movieTitle }}</h3>
+          <p class="movie-subtitle">{{ booking.movieTitleAmharic }}</p>
+        </div>
+
+        <div class="booking-details">
+          <div class="detail-item">
+            <span class="label">📍 Seat</span>
+            <span class="value">{{ booking.seatNumber }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">🕐 Date & Time</span>
+            <span class="value">{{ booking.scheduleTime | date:'medium' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">🎬 Cinema Hall</span>
+            <span class="value">{{ booking.cinemaHall }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">📍 Location</span>
+            <span class="value">{{ booking.cinemaLocation }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">💰 Price</span>
+            <span class="value price">{{ booking.price }} ETB</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">📅 Booked On</span>
+            <span class="value">{{ booking.bookingDate | date:'short' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="booking-actions">
+        <button 
+          *ngIf="booking.status === 'upcoming' && booking.qrCodeUrl"
+          class="btn btn-primary"
+          (click)="downloadQR(booking)">
+          📥 Download QR
+        </button>
+        <button 
+          class="btn btn-secondary"
+          (click)="viewTicket(booking)">
+          View Details
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && filteredBookings.length === 0" class="empty-state">
+    <div class="empty-icon">🎬</div>
+    <h2>No {{ activeTab === 'upcoming' ? 'Upcoming' : 
+                  activeTab === 'completed' ? 'Attended' : '' }} Bookings</h2>
+    <p>Start booking your favorite movies to see them here</p>
+    <button class="btn btn-primary" routerLink="/movies">
+      Browse Movies
+    </button>
+  </div>
+</div>

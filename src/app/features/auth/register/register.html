@@ -1,0 +1,45 @@
+<div class=" auth-container">
+    <div class ="auth-card">
+        <h2> Create a CineFlow Account </h2>
+        <p class= "subtitle"> Join to reserve seats and book movie tickets </p>
+
+        <form (ngSubmit)="onRegister()">
+            <div class ="form-group">
+            <label for="email"> Email Address</label>
+            <input
+            type="email"
+            id="email"
+            [(ngModel)]="email"
+            name="email"
+            placeholder="e.g. user@cineflow.com"
+            required
+            />
+            </div>
+            <div class ="form-group">
+            <label for ="password">Password</label>
+            <input
+            type="password"
+            id="password"
+            [(ngModel)]="password"
+            name="password"
+            placeholder="........."
+            required
+            />
+            </div>
+            <div class="form-group">
+            <label for ="confirmPassword">Confirm Password</label>
+            <input
+            type="password"
+            id="confirmPassword"
+            [(ngModel)]="confirmPassword"
+            name="confirmPassword"
+            placeholder="........."
+            required
+            />
+            </div>
+            <button type ="submit" [disabled]="loading " class ="btn-primary">
+                {{loading? 'Creating Account...' : 'Register' }}
+            </button>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,15 @@
+<div class=" validator-card">
+    <h2>Ticket Entry Verification </h2>
+    <div id="qr-reader" style="width:100%; margin-bottom: 20px; "></div>
+    <p>Enter the customer's transaction reference manually: </p>
+
+    <input 
+    type="text"
+    [(ngModel)]="txnRef"
+    placeholder="Enter Mock Transaction Reference..."
+    />
+    <button (click)="validate()">Verify Ticket </button>
+    <div *ngIf="message" [class.success]="isSuccess" [class.error]="!isSuccess" class="result-box">
+    {{message }}
+</div>
+</div>
