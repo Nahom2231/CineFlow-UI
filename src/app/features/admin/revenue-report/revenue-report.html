@@ -1,0 +1,129 @@
+<div class="revenue-report">
+  <div class="report-header">
+    <h1>📊 Revenue & Sales Report</h1>
+    <p>Track your earnings and ticket sales performance</p>
+  </div>
+
+  <!-- Filter Controls -->
+  <div class="filters-card">
+    <div class="filter-group">
+      <label>Report Period:</label>
+      <select [(ngModel)]="filterType" (change)="onFilterChange()" class="filter-select">
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Month/Year:</label>
+      <input 
+        type="month" 
+        [(ngModel)]="filterMonthYear"
+        (change)="onFilterChange()"
+        class="filter-select"
+      />
+    </div>
+
+    <div class="filter-actions">
+      <button class="btn btn-export" (click)="exportReport()">
+        📥 Export CSV
+      </button>
+      <button class="btn btn-print" (click)="printReport()">
+        🖨️ Print
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div *ngIf="!loading" class="summary-grid">
+    <div class="summary-card primary">
+      <div class="icon">💰</div>
+      <h3>Total Revenue</h3>
+      <p class="value">{{ formatCurrency(summary.totalRevenue) }}</p>
+    </div>
+
+    <div class="summary-card accent">
+      <div class="icon">🎫</div>
+      <h3>Total Tickets</h3>
+      <p class="value">{{ summary.totalTickets }}</p>
+    </div>
+
+    <div class="summary-card success">
+      <div class="icon">💵</div>
+      <h3>Avg Ticket Price</h3>
+      <p class="value">{{ formatCurrency(summary.averageTicketPrice) }}</p>
+    </div>
+
+    <div class="summary-card warning">
+      <div class="icon">⭐</div>
+      <h3>Top Movie</h3>
+      <p class="value">{{ summary.topMovie || 'N/A' }}</p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Loading report...</p>
+  </div>
+
+  <!-- Revenue Details -->
+  <div *ngIf="!loading" class="report-section">
+    <h2>Daily Revenue Breakdown</h2>
+    <div class="table-container">
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th class="text-right">Revenue</th>
+            <th class="text-right">Tickets</th>
+            <th class="text-right">Avg Price</th>
+            <th>Top Movie</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of revenueReport; let even = even" [class.even]="even">
+            <td>{{ formatDate(row.date) }}</td>
+            <td class="text-right value">{{ formatCurrency(row.totalRevenue) }}</td>
+            <td class="text-right">{{ row.totalTickets }}</td>
+            <td class="text-right">{{ formatCurrency(row.averageTicketPrice) }}</td>
+            <td>{{ row.topMovie }}</td>
+          </tr>
+          <tr *ngIf="revenueReport.length === 0" class="empty-row">
+            <td colspan="5" class="text-center">No data available</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Movie Stats -->
+  <div *ngIf="!loading && movieStats.length > 0" class="report-section">
+    <h2>Movie Performance</h2>
+    <div class="movies-grid">
+      <div *ngFor="let movie of movieStats; let i = index" class="movie-stat-card">
+        <div class="rank">
+          <span class="rank-number">{{ i + 1 }}</span>
+        </div>
+        <div class="movie-details">
+          <h3>{{ movie.movieName }}</h3>
+          <div class="stats">
+            <div class="stat-item">
+              <span class="label">Tickets:</span>
+              <span class="value">{{ movie.ticketsSold }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="label">Revenue:</span>
+              <span class="value strong">{{ formatCurrency(movie.totalRevenue) }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="label">Screenings:</span>
+              <span class="value">{{ movie.screenings }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

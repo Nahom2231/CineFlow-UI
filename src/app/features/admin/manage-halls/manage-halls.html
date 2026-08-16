@@ -1,0 +1,134 @@
+<div class="manage-halls">
+  <div class="header">
+    <h1>🏛️ Manage Cinema Halls</h1>
+    <p>Create and manage your theater screens and seat layouts</p>
+    <button class="btn-add" (click)="toggleAddForm()">
+      {{ showAddForm ? '✕ Cancel' : '+ Add New Hall' }}
+    </button>
+  </div>
+
+  <!-- Message Alert -->
+  <div *ngIf="message" class="message-alert" [class.success]="isSuccess" [class.error]="!isSuccess">
+    {{ message }}
+  </div>
+
+  <!-- Add/Edit Form -->
+  <div *ngIf="showAddForm" class="form-card">
+    <h2>{{ editingId ? 'Edit Cinema Hall' : 'Add New Cinema Hall' }}</h2>
+    
+    <div class="form-group">
+      <label>Branch Name (Location)</label>
+      <input 
+        type="text" 
+        [(ngModel)]="newHall.branchName" 
+        placeholder="e.g., Addis Ababa, Dire Dawa, Hawassa"
+        class="form-input"
+      />
+    </div>
+
+    <div class="form-group">
+      <label>Hall Name</label>
+      <input 
+        type="text" 
+        [(ngModel)]="newHall.hallName" 
+        placeholder="e.g., Hall 1, IMAX Screen, Premium Screen"
+        class="form-input"
+      />
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Number of Rows</label>
+        <select 
+          class="form-input"
+          (change)="calculateSeats($event.target.value | number, 6)"
+        >
+          <option value="5">5 Rows (A-E)</option>
+          <option value="6">6 Rows (A-F)</option>
+          <option value="7">7 Rows (A-G)</option>
+          <option value="8">8 Rows (A-H)</option>
+          <option value="10">10 Rows (A-J)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+  <label>Seats per Row</label>
+  <select
+    class="form-input"
+    (change)="onSeatsChange(5, $event)"
+  >
+    <option value="6">6 Seats</option>
+    <option value="8">8 Seats</option>
+    <option value="10">10 Seats</option>
+    <option value="12">12 Seats</option>
+  </select>
+</div>
+
+    <div class="form-group">
+      <label>Total Capacity</label>
+      <input 
+        type="number" 
+        [(ngModel)]="newHall.totalCapacity" 
+        class="form-input"
+        disabled
+      />
+      <small>Auto-calculated based on rows × seats</small>
+    </div>
+
+    <div class="form-actions">
+      <button 
+        class="btn btn-primary"
+        (click)="editingId ? updateHall() : submitHall()"
+      >
+        {{ editingId ? '💾 Update Hall' : '✓ Create Hall' }}
+      </button>
+      <button class="btn btn-secondary" (click)="toggleAddForm()">
+        Cancel
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Loading halls...</p>
+  </div>
+
+  <!-- Halls List -->
+  <div *ngIf="!loading && halls.length > 0" class="halls-grid">
+    <div *ngFor="let hall of halls" class="hall-card">
+      <div class="hall-header">
+        <h3>{{ hall.hallName }}</h3>
+        <span class="location">📍 {{ hall.branchName }}</span>
+      </div>
+
+      <div class="hall-details">
+        <div class="detail">
+          <span class="label">Capacity:</span>
+          <span class="value">{{ hall.totalCapacity }} seats</span>
+        </div>
+        <div class="detail">
+          <span class="label">Layout:</span>
+          <span class="value">{{ getSeatsInfo(hall.seatMapMatrixJson) }}</span>
+        </div>
+      </div>
+
+      <div class="hall-actions">
+        <button class="btn-edit" (click)="editHall(hall)" title="Edit hall">
+          ✏️ Edit
+        </button>
+        <button class="btn-delete" (click)="deleteHall(hall.id)" title="Delete hall">
+          🗑️ Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && halls.length === 0" class="empty-state">
+    <p>No cinema halls found</p>
+    <button class="btn btn-primary" (click)="toggleAddForm()">
+      + Create First Hall
+    </button>
+  </div>
+</div>

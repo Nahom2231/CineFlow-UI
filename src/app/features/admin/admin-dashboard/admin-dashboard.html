@@ -1,0 +1,119 @@
+<div class="admin-dashboard">
+  <div class="dashboard-header">
+    <h1>🏢 Admin Dashboard</h1>
+    <p class="subtitle">Cinema Management & Revenue Tracking</p>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Loading dashboard...</p>
+  </div>
+
+  <div *ngIf="!loading" class="dashboard-content">
+    <!-- Key Metrics Row -->
+    <div class="metrics-grid">
+      <div class="metric-card primary">
+        <div class="icon">💰</div>
+        <div class="content">
+          <h3>Total Revenue</h3>
+          <p class="value">{{ formatCurrency(stats.totalRevenue) }}</p>
+          <p class="label">All time earnings</p>
+        </div>
+      </div>
+
+      <div class="metric-card accent">
+        <div class="icon">📅</div>
+        <div class="content">
+          <h3>Today's Revenue</h3>
+          <p class="value">{{ formatCurrency(stats.todayRevenue) }}</p>
+          <p class="label">{{ stats.todayTickets }} tickets sold</p>
+        </div>
+      </div>
+
+      <div class="metric-card success">
+        <div class="icon">🎫</div>
+        <div class="content">
+          <h3>Total Tickets</h3>
+          <p class="value">{{ stats.totalTicketsSold }}</p>
+          <p class="label">Avg: {{ formatCurrency(stats.averageTicketPrice) }}/ticket</p>
+        </div>
+      </div>
+
+      <div class="metric-card warning">
+        <div class="icon">🎬</div>
+        <div class="content">
+          <h3>Upcoming Shows</h3>
+          <p class="value">{{ stats.upcomingShowsCount }}</p>
+          <p class="label">Scheduled screenings</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Most Popular Movie -->
+    <div class="featured-section">
+      <div class="feature-card">
+        <div class="feature-icon">⭐</div>
+        <h2>Most Popular Movie</h2>
+        <p class="feature-title">{{ stats.mostPopularMovie || 'No data yet' }}</p>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="admin-actions">
+      <a routerLink="/admin/manage-halls" class="action-btn halls">
+        <span class="icon">🏛️</span>
+        <span class="text">Manage Cinema Halls</span>
+      </a>
+      <a routerLink="/admin/create-schedule" class="action-btn schedule">
+        <span class="icon">📅</span>
+        <span class="text">Create Schedules</span>
+      </a>
+      <a routerLink="/admin/validate-ticket" class="action-btn scan">
+        <span class="icon">📱</span>
+        <span class="text">Scan QR Code</span>
+      </a>
+      <a routerLink="/admin/revenue-report" class="action-btn report">
+        <span class="icon">📊</span>
+        <span class="text">View Reports</span>
+      </a>
+    </div>
+
+    <!-- Weekly Revenue Chart (Simple Table View) -->
+    <div class="chart-section" *ngIf="weeklyRevenue.length > 0">
+      <h2>📈 Weekly Revenue Trend</h2>
+      <div class="revenue-table">
+        <div class="table-header">
+          <div class="col-date">Date</div>
+          <div class="col-tickets">Tickets</div>
+          <div class="col-revenue">Revenue</div>
+        </div>
+        <div *ngFor="let day of weeklyRevenue" class="table-row">
+          <div class="col-date">{{ day.date | date:'MMM dd' }}</div>
+          <div class="col-tickets">{{ day.ticketsSold }} tickets</div>
+          <div class="col-revenue">{{ formatCurrency(day.revenue) }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Movies This Week -->
+    <div class="top-movies-section" *ngIf="topMovies.length > 0">
+      <h2>🎬 Top Performing Movies</h2>
+      <div class="movies-grid">
+        <div *ngFor="let movie of topMovies; let i = index" class="movie-rank">
+          <div class="rank-badge">{{ i + 1 }}</div>
+          <div class="movie-info">
+            <h3>{{ movie.name }}</h3>
+            <div class="stats">
+              <span class="stat">
+                <strong>{{ movie.ticketsSold }}</strong> tickets
+              </span>
+              <span class="stat">
+                <strong>{{ formatCurrency(movie.revenue) }}</strong> earned
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

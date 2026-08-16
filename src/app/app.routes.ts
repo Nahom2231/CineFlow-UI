@@ -9,6 +9,9 @@ import { BookingHistory } from './features/booking/booking-history/booking-histo
 import { TicketValidator } from './features/admin/ticket-validator/ticket-validator';
 import {CreateSchedule} from './features/admin/create-schedule/create-schedule'
 import { CreateMovie} from './features/admin/create-movie/create-movie';
+import { AdminDashboard } from './features/admin/admin-dashboard/admin-dashboard';
+import { ManageHalls } from './features/admin/manage-halls/manage-halls';
+import { RevenueReport } from './features/admin/revenue-report/revenue-report';
 
 export const routes: Routes = [
     {path:'', redirectTo: 'movies', pathMatch:'full'},
@@ -20,7 +23,10 @@ export const routes: Routes = [
     {path:'ticket-confirmation', component: TicketConfirmation},
     {path:'booking-history', component: BookingHistory},
     {path:'booking-details/:ticketId', component: TicketConfirmation},
+    {path:'admin/dashboard', component: AdminDashboard},
     {path:'admin/validate-ticket', component: TicketValidator},
+    {path:'admin/manage-halls', component: ManageHalls},
+    {path:'admin/revenue-report', component: RevenueReport},
     {path: 'admin/create-movie', component: CreateMovie},
     {path: 'admin/create-schedule', component: CreateSchedule},
     { path: '**', redirectTo: 'movies' }

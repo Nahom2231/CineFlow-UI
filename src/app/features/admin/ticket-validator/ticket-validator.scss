@@ -1,71 +1,359 @@
-.validator-card {
-    max-width : 480px;
-    margin: 50px auto;
-    padding: 30px;
-    background: #ffffff;
+.ticket-validator-container {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 30px 20px;
+  color: white;
+
+  .validator-header {
+    text-align: center;
+    margin-bottom: 40px;
+
+    h1 {
+      font-size: 2.5rem;
+      margin: 0 0 10px 0;
+    }
+
+    p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      margin: 0;
+    }
+  }
+
+  // Scanner Card
+  .scanner-card {
+    background: white;
     border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    border: 1px solid #e2e8f0;
+    padding: 30px;
+    margin-bottom: 30px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    color: #333;
 
-    h2{
-        margin-top:0;
-        margin-bottom: 8px;
-        font-size: 22px;
-        color:#1e293b;
-        font-weight: 700;
-    }
-    p{
-        font-size:14px;
-        color: #64748b;
-        margin-bottom: 20px;
+    h2 {
+      margin: 0 0 20px 0;
+      color: #333;
+      font-size: 1.3rem;
     }
 
-    input{
-        width:100%;
-        padding:12px 16px;
-        font-size: 15px;
-        border:1px solid #cbd5e1;
-        border-radius: 6px;
-        outline: none;
-        box-sizing: border-box;
-        margin-bottom: 16px;
-        transition: border-color 0.2s;
-        &:focus{
-            border-color: #2563eb
-        }
-    }
-    button {
-        width: 100%;
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+
+      .qr-input {
+        flex: 1;
         padding: 12px;
-        background-color: #2563eb;
-        color: #ffffff;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+
+        &:focus {
+          outline: none;
+          border-color: #667eea;
+        }
+
+        &:disabled {
+          background: #f5f5f5;
+          cursor: not-allowed;
+        }
+      }
+
+      .btn-validate {
+        padding: 12px 24px;
+        background: #667eea;
+        color: white;
         border: none;
         border-radius: 6px;
-        font-size: 15px;
         font-weight: 600;
         cursor: pointer;
-        transition: background-color 0.2s;
+        transition: all 0.3s ease;
+        white-space: nowrap;
 
-        &.hover {
-            background-color: #1d4ed8;
+        &:hover:not(:disabled) {
+          background: #764ba2;
+          transform: translateY(-2px);
         }
-      }
-      .result_box {
-        margin-top: 20px;
-        padding: 12px 16px;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 14px;
-        &.success{
-            background-color: #dcfce7;
-            color: #15803d;
-            border:1px solid #bbf7d0;
 
-        }
-        &.error {
-            background-color: #fee2e2;
-            color: #b91c1c;
-            border : 1px solid #fecaca;
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
         }
       }
     }
+
+    .divider {
+      text-align: center;
+      margin: 20px 0;
+      color: #999;
+      font-weight: 600;
+      position: relative;
+
+      &::before,
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: 40%;
+        height: 1px;
+        background: #e0e0e0;
+      }
+
+      &::before {
+        left: 0;
+      }
+
+      &::after {
+        right: 0;
+      }
+    }
+
+    .file-upload {
+      text-align: center;
+      margin-bottom: 20px;
+
+      .upload-label {
+        display: inline-block;
+        padding: 15px 30px;
+        background: #f5f5f5;
+        border: 2px dashed #667eea;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        color: #667eea;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: #667eea;
+          color: white;
+        }
+      }
+
+      .processing {
+        color: #667eea;
+        margin: 10px 0 0 0;
+        font-weight: 600;
+      }
+    }
+
+    .message-alert {
+      padding: 15px;
+      border-radius: 8px;
+      font-weight: 600;
+      margin-top: 20px;
+      animation: slideIn 0.3s ease;
+
+      &.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      &.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+    }
+  }
+
+  // Ticket Details Card
+  .ticket-details-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 30px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    color: #333;
+    border-left: 5px solid #4caf50;
+    animation: slideIn 0.3s ease;
+
+    .ticket-header {
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #e0e0e0;
+
+      h2 {
+        margin: 0 0 8px 0;
+        color: #4caf50;
+        font-size: 1.3rem;
+      }
+
+      .timestamp {
+        margin: 0;
+        color: #999;
+        font-size: 0.9rem;
+      }
+    }
+
+    .ticket-info {
+      margin-bottom: 20px;
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+
+        .label {
+          font-weight: 600;
+          color: #666;
+        }
+
+        .value {
+          color: #333;
+          font-weight: 500;
+        }
+      }
+    }
+
+    .staff-info {
+      background: #f5f5f5;
+      padding: 12px;
+      border-radius: 6px;
+      text-align: center;
+      color: #666;
+      font-size: 0.9rem;
+
+      p {
+        margin: 0;
+      }
+    }
+  }
+
+  // History Card
+  .history-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    color: #333;
+
+    h2 {
+      margin: 0 0 20px 0;
+      color: #333;
+      font-size: 1.3rem;
+    }
+
+    .history-table {
+      background: #f5f5f5;
+      border-radius: 8px;
+      overflow: hidden;
+
+      .table-header {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr 1fr 2fr 1fr;
+        background: #667eea;
+        color: white;
+        padding: 15px;
+        font-weight: 600;
+        gap: 15px;
+      }
+
+      .table-row {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr 1fr 2fr 1fr;
+        padding: 15px;
+        border-bottom: 1px solid #e0e0e0;
+        gap: 15px;
+        align-items: center;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &:hover {
+          background: #ffffff;
+        }
+
+        div {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .col-status {
+          .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+
+            &.success {
+              background: #d4edda;
+              color: #155724;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Empty State
+  .empty-state {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 60px 20px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+
+    p {
+      margin: 0;
+      font-size: 1.1rem;
+
+      &.subtitle {
+        font-size: 1rem;
+        opacity: 0.8;
+        margin-top: 10px;
+      }
+    }
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .ticket-validator-container {
+    .validator-header h1 {
+      font-size: 1.8rem;
+    }
+
+    .history-card {
+      .history-table {
+        .table-header,
+        .table-row {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+
+        .table-header::before,
+        .table-row::before {
+          content: attr(data-label);
+          font-weight: 600;
+          color: #667eea;
+        }
+      }
+    }
+  }
+}

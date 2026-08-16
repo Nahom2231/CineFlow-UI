@@ -92,4 +92,65 @@ export class CineFlowApiService{
     }> {
         return this.http.post<any>(`${this.baseUrl}/Tickets/book-with-details`, command);
     }
+
+    // ADMIN METHODS
+
+    // Create new cinema hall
+    createCinemaHall(hall: any): Observable<{hallId: string; message: string}> {
+        return this.http.post<{hallId: string; message: string}>(`${this.baseUrl}/CinemaHall`, hall);
+    }
+
+    // Update existing cinema hall
+    updateCinemaHall(hallId: string, hall: any): Observable<{message: string}> {
+        return this.http.put<{message: string}>(`${this.baseUrl}/CinemaHall/${hallId}`, hall);
+    }
+
+    // Delete cinema hall
+    deleteCinemaHall(hallId: string): Observable<{message: string}> {
+        return this.http.delete<{message: string}>(`${this.baseUrl}/CinemaHall/${hallId}`);
+    }
+
+    // Get dashboard statistics
+    getDashboardStats(): Observable<any> {
+        return this.http.get<any>(`${this.baseUrl}/Admin/dashboard-stats`);
+    }
+
+    // Get weekly revenue data
+    getWeeklyRevenue(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.baseUrl}/Admin/weekly-revenue`);
+    }
+
+    // Get top performing movies
+    getTopMovies(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.baseUrl}/Admin/top-movies`);
+    }
+
+    // Get detailed revenue report
+    getRevenueReport(filters: any): Observable<any> {
+        let params = new HttpParams();
+        if (filters.filterType) params = params.set('filterType', filters.filterType);
+        if (filters.monthYear) params = params.set('monthYear', filters.monthYear);
+
+        return this.http.get<any>(`${this.baseUrl}/Admin/revenue-report`, { params });
+    }
+
+    // Get all schedules for admin
+    getAllSchedules(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.baseUrl}/Schedules/all`);
+    }
+
+    // Get schedule details
+    getScheduleDetails(scheduleId: string): Observable<any> {
+        return this.http.get<any>(`${this.baseUrl}/Schedules/${scheduleId}`);
+    }
+
+    // Update schedule
+    updateSchedule(scheduleId: string, schedule: any): Observable<{message: string}> {
+        return this.http.put<{message: string}>(`${this.baseUrl}/Schedules/${scheduleId}`, schedule);
+    }
+
+    // Delete schedule
+    deleteSchedule(scheduleId: string): Observable<{message: string}> {
+        return this.http.delete<{message: string}>(`${this.baseUrl}/Schedules/${scheduleId}`);
+    }
 }
