@@ -1,70 +1,208 @@
-<div class="form-card">
-    <h2>Create New Movie </h2>
-    <p class="subtitle"> Add a new movie title to the CineFlow catalog </p>
+<div class="create-movie-page">
+  <!-- Header Bar -->
+  <div class="page-header">
+    <div class="header-inner">
+      <div class="title-group">
+        <a routerLink="/admin/dashboard" class="btn-back">
+          <span>‹</span> Back to Admin Hub
+        </a>
+        <h1>🎬 Create & Publish Movie</h1>
+        <p class="subtitle">Add a new movie title to the CineFlow ticketing catalog</p>
+      </div>
+      <div class="header-actions">
+        <a routerLink="/movies" class="btn-catalog">
+          <span>🍿</span> View Live Catalog
+        </a>
+      </div>
+    </div>
+  </div>
 
-    <div *ngIf="errorMessage" class="alert alert-error"> {{errorMessage}}</div>
-    <div *ngIf="successMessage" class="alert alert-success">{{successMessage}} </div>
+  <div class="content-grid">
+    <!-- Left Column: Movie Creation Form -->
+    <div class="form-container">
+      <!-- Success / Error Banners -->
+      <div *ngIf="successMessage" class="alert-banner success animate-pop">
+        <span>✓</span> {{ successMessage }}
+      </div>
+      <div *ngIf="errorMessage" class="alert-banner error animate-pop">
+        <span>⚠️</span> {{ errorMessage }}
+      </div>
 
-    <form (ngSubmit)="onSubmit()">
-    <div class="form-group">
-    <label> English Title </label>
-    <input type="text" [(ngModel)]="movie.titleEnglish" name="titleEnglish" required placeholder="Inception" />
+      <form (ngSubmit)="onSubmit()" class="movie-form">
+        <!-- Titles Section -->
+        <div class="form-section">
+          <h3 class="section-title"><span>🏷️</span> Basic Information</h3>
 
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label for="titleEn">English Title <span class="required">*</span></label>
+              <input
+                id="titleEn"
+                type="text"
+                [(ngModel)]="movie.titleEnglish"
+                name="titleEnglish"
+                required
+                placeholder="e.g. Gladiator II"
+              />
+            </div>
+
+            <div class="form-group flex-1">
+              <label for="titleAm">Amharic Title</label>
+              <input
+                id="titleAm"
+                type="text"
+                [(ngModel)]="movie.titleAmharic"
+                name="titleAmharic"
+                placeholder="e.g. ግላዲያተር ፪"
+              />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="genre">Genre</label>
+              <select id="genre" [(ngModel)]="movie.genre" name="genre">
+                <option *ngFor="let g of genres" [value]="g">{{ g }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="audioLanguage">Audio Language</label>
+              <select id="audioLanguage" [(ngModel)]="movie.audioLanguage" name="audioLanguage">
+                <option *ngFor="let lang of languages" [value]="lang">{{ lang }}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="duration">Duration (Minutes)</label>
+              <input
+                id="duration"
+                type="number"
+                [(ngModel)]="movie.durationMinutes"
+                name="durationMinutes"
+                min="10"
+                max="360"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Media & Poster Section -->
+        <div class="form-section">
+          <h3 class="section-title"><span>🖼️</span> Movie Poster & Media</h3>
+
+          <div class="form-group">
+            <label>Poster Image URL</label>
+            <input
+              type="url"
+              [(ngModel)]="movie.featuredImageUrl"
+              (ngModelChange)="onImageUrlChange()"
+              name="featuredImageUrl"
+              placeholder="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&auto=format&fit=crop&q=80"
+            />
+            <span class="field-hint">Paste an image link or choose a local file below</span>
+          </div>
+
+          <div class="form-group">
+            <label>Or Upload Poster File</label>
+            <div class="file-upload-box">
+              <input type="file" id="posterFile" (change)="onFileSelected($event)" accept="image/*" />
+              <label for="posterFile" class="file-upload-label">
+                <span>📁</span> Choose image file from device
+              </label>
+              <span *ngIf="selectedFile" class="file-chosen-name">Selected: {{ selectedFile.name }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Director & Cast Section -->
+        <div class="form-section">
+          <h3 class="section-title"><span>🎬</span> Director & Credits</h3>
+
+          <div class="form-group">
+            <label>Select Director</label>
+            <select [(ngModel)]="movie.directorId" name="directorId">
+              <option [ngValue]="null">-- Select Registered Director --</option>
+              <option *ngFor="let d of directors" [value]="d.id">{{ d.name }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Synopsis / Descriptions Section -->
+        <div class="form-section">
+          <h3 class="section-title"><span>📝</span> Movie Synopsis</h3>
+
+          <div class="form-group">
+            <label>English Synopsis</label>
+            <textarea
+              [(ngModel)]="movie.descriptionEnglish"
+              name="descriptionEnglish"
+              rows="3"
+              placeholder="Write a captivating summary for cinema audiences..."
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Amharic Synopsis</label>
+            <textarea
+              [(ngModel)]="movie.descriptionAmharic"
+              name="descriptionAmharic"
+              rows="3"
+              placeholder="የፊልሙን አጭር መግለጫ በአማርኛ ያስገቡ..."
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="submit" [disabled]="loading || !movie.titleEnglish" class="btn-submit">
+            <span *ngIf="!loading">🚀 Publish Movie to Catalog</span>
+            <span *ngIf="loading" class="btn-spinner-wrap">
+              <span class="spinner-sm"></span> Publishing Movie...
+            </span>
+          </button>
+        </div>
+      </form>
     </div>
 
-    <div class="form-group">
-    <label> Amharic Title </label>
-    <input type="text" [(ngModel)]="movie.titleAmharic" name="titleAmharic" required placeholder="ኢንሴፕሽን" />
-    </div>
-    
-    <div class="form-group">
-     <label>Duration (Minutes) </label>
-     <input type="number" [(ngModel)]="movie.durationMinutes" name="durationMinutes" required min="1" />
-    </div>
+    <!-- Right Column: Live Poster & Card Preview -->
+    <div class="preview-column">
+      <div class="preview-sticky">
+        <h3 class="preview-heading"><span>👁️</span> Live Cinema Card Preview</h3>
 
-    <div class="form-group">
-        <label> Genre </label>
-        <select [(ngModel)]="movie.genre" name="genre">
-        <option value="Action"> Action </option>
-        <option value="Drama">Drama</option>
-        <option value="Comedy">Comedy</option>
-        <option value="Sci-Fi">Sci-Fi</option>
-        <option value="Romance">Romance</option>
-        </select>
-    </div>
-    <div class="form-group">
-     <label>Audio Language </label>
-     <select [(ngModel)]="movie.audioLanguage" name="audioLanguage">
-        <option value="English">English </option>
-        <option value="Amharic">Amharic</option>
-     </select>
-    </div>
+        <div class="preview-card">
+          <div class="poster-box">
+            <img
+              [src]="imagePreviewUrl || movie.featuredImageUrl || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&auto=format&fit=crop&q=80'"
+              (error)="onImageError($event)"
+              [alt]="movie.titleEnglish || 'Movie Poster'"
+            />
+            <div class="poster-badges">
+              <span class="badge genre">{{ movie.genre || 'Action' }}</span>
+              <span class="badge lang">{{ movie.audioLanguage || 'English' }}</span>
+            </div>
+          </div>
 
-    <div class="form-group">
-        <label> Poster Image URL </label>
-        <input type="url" [(ngModel)]="movie.featuredImageUrl" name="featuredImageUrl" placeholder="https://example.com/poster.jpg" />
-    </div>
+          <div class="card-details">
+            <h4 class="preview-title">{{ movie.titleEnglish || 'Movie Title (English)' }}</h4>
+            <h5 class="preview-title-am" *ngIf="movie.titleAmharic">{{ movie.titleAmharic }}</h5>
 
-    <div class="form-group">
-      <label>English Description </label>
-      <textarea [(ngModel)]="movie.descriptionEnglish" name="descriptionEnglish" rows="3"></textarea>
+            <div class="preview-meta-row">
+              <span>⏱️ {{ movie.durationMinutes || 120 }} min</span>
+              <span>⭐ 5.0 (New)</span>
+            </div>
+
+            <p class="preview-desc">
+              {{ movie.descriptionEnglish || 'Enter a synopsis to preview how this movie will appear to audience members in the CineFlow mobile and desktop catalog.' | slice:0:140 }}...
+            </p>
+
+            <button type="button" class="btn-mock-book" disabled>
+              <span>🎟️</span> Book Seats (Preview)
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-      <div class="form-group">
-  <label>Amharic Description</label>
-  <textarea [(ngModel)]="movie.descriptionAmharic"  name="descriptionAmharic"  rows="3"  placeholder="Enter description in Amharic...">
-  </textarea>
-</div>
-<div class="form-group">
-  <label>Director</label>
-  <select
-   [(ngModel)]="movie.directorId" name="directorId">
-    <option [ngValue]="null">-- Select Director --</option>
-    <!-- Bind from your component's directors list -->
-    <option *ngFor="let d of directors" [value]="d.id">{{ d.name }}</option>
-  </select>
-</div>
-    <button type="submit" class="btn-primary" [disabled]="loading">
-        {{loading ? 'Saving...': 'Create Movie'}}
-    </button>
-    </form>
+  </div>
 </div>

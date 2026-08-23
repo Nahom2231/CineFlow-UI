@@ -41,28 +41,31 @@
         <label>Number of Rows</label>
         <select 
           class="form-input"
-          (change)="calculateSeats($event.target.value | number, 6)"
+          [(ngModel)]="selectedRows"
+          (ngModelChange)="onLayoutChange()"
         >
-          <option value="5">5 Rows (A-E)</option>
-          <option value="6">6 Rows (A-F)</option>
-          <option value="7">7 Rows (A-G)</option>
-          <option value="8">8 Rows (A-H)</option>
-          <option value="10">10 Rows (A-J)</option>
+          <option [ngValue]="5">5 Rows (A-E)</option>
+          <option [ngValue]="6">6 Rows (A-F)</option>
+          <option [ngValue]="7">7 Rows (A-G)</option>
+          <option [ngValue]="8">8 Rows (A-H)</option>
+          <option [ngValue]="10">10 Rows (A-J)</option>
         </select>
       </div>
 
       <div class="form-group">
-  <label>Seats per Row</label>
-  <select
-    class="form-input"
-    (change)="onSeatsChange(5, $event)"
-  >
-    <option value="6">6 Seats</option>
-    <option value="8">8 Seats</option>
-    <option value="10">10 Seats</option>
-    <option value="12">12 Seats</option>
-  </select>
-</div>
+        <label>Seats per Row</label>
+        <select
+          class="form-input"
+          [(ngModel)]="selectedSeatsPerRow"
+          (ngModelChange)="onLayoutChange()"
+        >
+          <option [ngValue]="6">6 Seats</option>
+          <option [ngValue]="8">8 Seats</option>
+          <option [ngValue]="10">10 Seats</option>
+          <option [ngValue]="12">12 Seats</option>
+        </select>
+      </div>
+    </div>
 
     <div class="form-group">
       <label>Total Capacity</label>

@@ -1,32 +1,26 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
 import { CineFlowApiService } from '../../../core/services/cineflow-api.service';
-
-export interface CinemaHall {
-  id: string;
-  branchName: string;
-  hallName: string;
-  totalCapacity: number;
-  seatMapMatrixJson: string;
-}
+import { CinemaHall } from '../../../core/models/CineFlow.model';
 
 @Component({
   selector: 'app-manage-halls',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './manage-halls.html',
   styleUrl: './manage-halls.scss'
 })
 export class ManageHalls implements OnInit {
   private apiService = inject(CineFlowApiService);
-  private router = inject(Router);
 
   halls: CinemaHall[] = [];
   loading: boolean = true;
   showAddForm: boolean = false;
   editingId: string | null = null;
+
+  selectedRows: number = 6;
+  selectedSeatsPerRow: number = 6;
 
   newHall: Partial<CinemaHall> = {
     branchName: '',
@@ -39,6 +33,7 @@ export class ManageHalls implements OnInit {
   isSuccess: boolean = false;
 
   ngOnInit(): void {
+    this.calculateSeats();
     this.loadHalls();
   }
 
@@ -64,37 +59,35 @@ export class ManageHalls implements OnInit {
   }
 
   resetForm(): void {
+    this.selectedRows = 6;
+    this.selectedSeatsPerRow = 6;
     this.newHall = {
       branchName: '',
       hallName: '',
       totalCapacity: 36,
       seatMapMatrixJson: ''
     };
+    this.calculateSeats();
     this.editingId = null;
     this.message = '';
   }
 
-  
+  onLayoutChange(): void {
+    this.calculateSeats();
+  }
 
-calculateSeats(rows: number, seatsPerRow: number): void {
-  const seatMatrix = {
-    rows: this.generateRows(rows),
-    seatsPerRow: seatsPerRow
-  };
+  calculateSeats(rows: number = this.selectedRows, seatsPerRow: number = this.selectedSeatsPerRow): void {
+    const seatMatrix = {
+      rows: this.generateRows(rows),
+      seatsPerRow: seatsPerRow
+    };
 
-  this.newHall.seatMapMatrixJson = JSON.stringify(seatMatrix);
-  this.newHall.totalCapacity = rows * seatsPerRow;
-}
-
-
-onSeatsChange(rows: number, event: Event): void {
-  const selectElement = event.target as HTMLSelectElement;
-  const seatsPerRow = Number(selectElement.value);
-  this.calculateSeats(rows, seatsPerRow);
-}
+    this.newHall.seatMapMatrixJson = JSON.stringify(seatMatrix);
+    this.newHall.totalCapacity = rows * seatsPerRow;
+  }
 
   generateRows(count: number): string[] {
-    const rows = [];
+    const rows: string[] = [];
     for (let i = 0; i < count; i++) {
       rows.push(String.fromCharCode(65 + i)); // A, B, C, D, E...
     }
@@ -108,10 +101,8 @@ onSeatsChange(rows: number, event: Event): void {
       return;
     }
 
-    // If seatMapMatrixJson is empty, create a default one
     if (!this.newHall.seatMapMatrixJson) {
-      const rows = Math.ceil(this.newHall.totalCapacity! / 6);
-      this.calculateSeats(rows, 6);
+      this.calculateSeats();
     }
 
     this.apiService.createCinemaHall(this.newHall as CinemaHall).subscribe({
@@ -151,6 +142,19 @@ onSeatsChange(rows: number, event: Event): void {
     this.newHall = { ...hall };
     this.editingId = hall.id;
     this.showAddForm = true;
+
+    try {
+      if (hall.seatMapMatrixJson) {
+        const seatMap = JSON.parse(hall.seatMapMatrixJson);
+        this.selectedRows = seatMap.rows?.length || 6;
+        this.selectedSeatsPerRow = seatMap.seatsPerRow || 6;
+      }
+    } catch {
+      this.selectedRows = 6;
+      this.selectedSeatsPerRow = 6;
+    }
+
+    this.calculateSeats();
     window.scrollTo(0, 0);
   }
 

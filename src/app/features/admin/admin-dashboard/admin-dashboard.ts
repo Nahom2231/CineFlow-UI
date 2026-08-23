@@ -1,6 +1,7 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { forkJoin, finalize } from 'rxjs';
 import { CineFlowApiService } from '../../../core/services/cineflow-api.service';
 
 export interface DashboardStats {
@@ -28,6 +29,7 @@ export interface RevenueData {
 })
 export class AdminDashboard implements OnInit {
   private apiService = inject(CineFlowApiService);
+  private cdr = inject(ChangeDetectorRef);
 
   stats: DashboardStats = {
     totalTicketsSold: 0,
@@ -49,39 +51,44 @@ export class AdminDashboard implements OnInit {
 
   loadDashboardStats(): void {
     this.loading = true;
-    
-    // Load statistics from backend
-    this.apiService.getDashboardStats().subscribe({
-      next: (data: any) => {
-        this.stats = data;
+
+    forkJoin({
+      stats: this.apiService.getDashboardStats(),
+      revenue: this.apiService.getWeeklyRevenue(),
+      movies: this.apiService.getTopMovies()
+    })
+    .pipe(
+      finalize(() => {
         this.loading = false;
+        this.cdr.detectChanges();
+      })
+    )
+    .subscribe({
+      next: (res: any) => {
+        if (res.stats) {
+          const s = res.stats;
+          this.stats = {
+            totalTicketsSold: s.totalTicketsSold ?? s.TotalTicketsSold ?? 0,
+            totalRevenue: s.totalRevenue ?? s.TotalRevenue ?? 0,
+            todayRevenue: s.todayRevenue ?? s.TodayRevenue ?? 0,
+            upcomingShowsCount: s.upcomingShowsCount ?? s.UpcomingShowsCount ?? 0,
+            mostPopularMovie: s.mostPopularMovie ?? s.MostPopularMovie ?? 'No data yet',
+            averageTicketPrice: s.averageTicketPrice ?? s.AverageTicketPrice ?? 0,
+            todayTickets: s.todayTickets ?? s.TodayTickets ?? 0
+          };
+        }
+        if (res.revenue) this.weeklyRevenue = res.revenue;
+        if (res.movies) this.topMovies = res.movies;
       },
       error: (err) => {
-        console.error('Failed to load dashboard stats', err);
-        this.loading = false;
+        console.error('Failed to load dashboard data:', err);
       }
-    });
-
-    // Load weekly revenue
-    this.apiService.getWeeklyRevenue().subscribe({
-      next: (data: any) => {
-        this.weeklyRevenue = data;
-      },
-      error: (err) => console.error('Failed to load weekly revenue', err)
-    });
-
-    // Load top movies
-    this.apiService.getTopMovies().subscribe({
-      next: (data: any) => {
-        this.topMovies = data;
-      },
-      error: (err) => console.error('Failed to load top movies', err)
     });
   }
 
-  // Format currency
-  formatCurrency(value: number): string {
-    return value.toLocaleString('en-ET', {
+  formatCurrency(value?: number): string {
+    const amount = value ?? 0;
+    return amount.toLocaleString('en-ET', {
       style: 'currency',
       currency: 'ETB',
       minimumFractionDigits: 0,

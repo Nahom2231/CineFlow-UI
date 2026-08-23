@@ -1,6 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { CineFlowApiService } from '../../../core/services/cineflow-api.service';
 
 export interface RevenueReport {
@@ -21,7 +22,7 @@ export interface MovieStats {
 @Component({
   selector: 'app-revenue-report',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './revenue-report.html',
   styleUrl: './revenue-report.scss'
 })

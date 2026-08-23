@@ -188,6 +188,10 @@
         transform: translateY(-3px);
       }
 
+      &.movie {
+        border-top-color: #e11d48;
+      }
+
       &.halls {
         border-top-color: #3498db;
       }
