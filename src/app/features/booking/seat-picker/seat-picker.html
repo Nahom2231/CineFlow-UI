@@ -1,39 +1,227 @@
-<div class ="seat-picker-container">
-    <h2>Select Your Seat </h2>
-
-    <div *ngIf="holdActive" class ="timer-banner">
-        Seat <strong>{{ selectedSeat }} </strong> held for: <strong> {{ formattedTimer }} </strong>
+<div class="booking-experience">
+  <!-- Top Navigation & Movie Header -->
+  <header class="booking-header">
+    <div class="header-inner">
+      <a routerLink="/movies" class="btn-back">
+        <span class="arrow">‹</span> Back to Catalog
+      </a>
+      <div class="movie-pill">
+        <span class="pulse-live"></span>
+        <span class="hall-badge">🏛️ {{ cinemaHall }}</span>
+        <span class="time-badge">🕒 {{ showTime | date:'EEEE, MMM d • h:mm a' }}</span>
+      </div>
     </div>
-    <div class ="screen-indicator">SCREEN</div>
-    <div class="seat-layout">
-        <div *ngFor="let row of seatRows" class="seat-row">
-            <span class="row-label"> {{row.rowLabel }} </span>
-            <div class="seats-group">
-            <button
-            *ngFor="let seat of row.seats"
-            [class.selected]="seat===selectedSeat"
-            [disabled] ="holdActive && seat!== selectedSeat"
-            (click)="selectSeat(seat)">
-                  {{seat}}
-              </button>
-            </div>
+  </header>
+
+  <main class="booking-main-grid">
+    <!-- Left Column: Theater Auditorium Seat Map -->
+    <section class="seat-picker-section">
+      <div class="auditorium-header">
+        <div class="title-wrap">
+          <h1 class="main-title">Select Your Seat</h1>
+          <p class="subtitle">Tap any available seat to reserve it for 10 minutes</p>
         </div>
 
-    <div class="payment-panel">
-    <h3>Complete Mobile Payment </h3>
-    <div class ="form-group">
-        <label> Provider :</label>
-        <select [(ngModel)]="paymentProvider">
-        <option value="Telebirr">Telebirr</option>
-        <option value="CBEBirr"> CBE Birr</option>
-        <option value="chapa">Chapa</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label>Phone Number:</label>
-        <input type="text" [(ngModel)]="phoneNumber" placeholder="0941211607" />
-    </div>
-    <button (click)="confirmBooking()" class="btn-confirm">Pay & Confirm </button>
-    </div>
+        <!-- 10-Minute Hold Status Banner -->
+        <div *ngIf="holdActive" class="timer-banner animate-pop">
+          <div class="timer-icon">⏳</div>
+          <div class="timer-info">
+            <span class="timer-label">Seat <strong>{{ selectedSeat }}</strong> is held exclusively for you</span>
+            <span class="timer-countdown">{{ formattedTimer }} remaining</span>
+          </div>
+        </div>
+      </div>
 
+      <!-- Projection Screen Display -->
+      <div class="screen-stage">
+        <div class="projector-glow"></div>
+        <div class="curved-screen"></div>
+        <div class="screen-label">
+          <span>FRONT CINEMA SCREEN • ፊት ለፊት መመልከቻ</span>
+        </div>
+      </div>
 
+      <!-- Interactive Seat Layout -->
+      <div class="seat-matrix">
+        <div *ngFor="let row of seatRows" class="matrix-row">
+          <span class="row-indicator">{{ row.rowLabel }}</span>
+          
+          <div class="seats-lane">
+            <button
+              *ngFor="let seat of row.seats"
+              type="button"
+              class="seat-btn"
+              [class.selected]="seat.id === selectedSeat"
+              [class.occupied]="seat.isOccupied"
+              [class.vip]="seat.type === 'vip'"
+              [disabled]="seat.isOccupied || (holdActive && selectedSeat !== null && seat.id !== selectedSeat)"
+              (click)="selectSeat(seat.id)"
+              [attr.aria-label]="'Seat ' + seat.id + (seat.isOccupied ? ' Occupied' : ' Available')"
+              [title]="seat.id + ' • ' + (seat.isOccupied ? 'Occupied' : seat.type === 'vip' ? 'VIP Seat' : 'Standard Seat')"
+            >
+              <span class="seat-icon">💺</span>
+              <span class="seat-num">{{ seat.label }}</span>
+            </button>
+          </div>
+
+          <span class="row-indicator">{{ row.rowLabel }}</span>
+        </div>
+      </div>
+
+      <!-- Seat Map Legend -->
+      <div class="seat-legend">
+        <div class="legend-item">
+          <span class="legend-box available"></span>
+          <span class="legend-text">Available</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-box selected"></span>
+          <span class="legend-text">Selected</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-box vip"></span>
+          <span class="legend-text">VIP Rows</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-box occupied"></span>
+          <span class="legend-text">Occupied / Booked</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Movie Summary & Instant Ethiopian Mobile Payment -->
+    <aside class="checkout-panel">
+      <!-- Movie Ticket Preview Card -->
+      <div class="ticket-preview-card">
+        <div class="preview-poster">
+          <img 
+            [src]="posterUrl" 
+            (error)="onImageError($event)" 
+            [alt]="movieTitle"
+          />
+        </div>
+        <div class="preview-meta">
+          <h2 class="preview-title-en">{{ movieTitle }}</h2>
+          <h3 class="preview-title-am" *ngIf="movieTitleAmharic">{{ movieTitleAmharic }}</h3>
+          
+          <div class="preview-specs">
+            <span class="spec-tag">📍 {{ cinemaLocation }}</span>
+            <span class="spec-tag">🎭 {{ cinemaHall }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selected Seat Summary -->
+      <div class="selection-summary">
+        <div class="summary-row">
+          <span class="summary-label">Chosen Seat</span>
+          <span class="seat-highlight" [class.unselected]="!selectedSeat">
+            {{ selectedSeat ? selectedSeat : 'None Selected' }}
+          </span>
+        </div>
+
+        <div class="summary-row">
+          <span class="summary-label">Base Ticket Price</span>
+          <span class="summary-val">{{ ticketPrice }} ETB</span>
+        </div>
+
+        <div class="summary-row">
+          <span class="summary-label">VAT & Service Fee (15%)</span>
+          <span class="summary-val">{{ vatAmount }} ETB</span>
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <div class="summary-row total-row">
+          <span class="total-label">Total Payment</span>
+          <span class="total-price">{{ totalAmount }} ETB</span>
+        </div>
+      </div>
+
+      <!-- Mobile Payment Options -->
+      <div class="payment-box">
+        <h3 class="payment-title">
+          <span>💳</span> Instant Mobile Payment
+        </h3>
+
+        <!-- Provider Select Tabs -->
+        <div class="provider-selector">
+          <button 
+            type="button" 
+            class="provider-tab" 
+            [class.active]="paymentProvider === 'Telebirr'"
+            (click)="paymentProvider = 'Telebirr'"
+          >
+            <span class="provider-icon">📱</span>
+            <span class="provider-name">Telebirr</span>
+            <span class="provider-badge">Popular</span>
+          </button>
+
+          <button 
+            type="button" 
+            class="provider-tab" 
+            [class.active]="paymentProvider === 'CBEBirr'"
+            (click)="paymentProvider = 'CBEBirr'"
+          >
+            <span class="provider-icon">🏦</span>
+            <span class="provider-name">CBE Birr</span>
+          </button>
+
+          <button 
+            type="button" 
+            class="provider-tab" 
+            [class.active]="paymentProvider === 'chapa'"
+            (click)="paymentProvider = 'chapa'"
+          >
+            <span class="provider-icon">⚡</span>
+            <span class="provider-name">Chapa</span>
+          </button>
+        </div>
+
+        <!-- Phone Number Input -->
+        <div class="phone-input-group">
+          <label for="bookingPhone">
+            {{ paymentProvider }} Account / Mobile Number
+          </label>
+          <div class="input-wrapper">
+            <span class="country-prefix">🇪🇹 +251</span>
+            <input 
+              id="bookingPhone"
+              type="tel" 
+              [(ngModel)]="phoneNumber" 
+              placeholder="0911223344"
+              maxlength="13"
+            />
+          </div>
+          <p class="input-hint">Enter your 10-digit mobile wallet number</p>
+        </div>
+
+        <!-- Error Message Alert -->
+        <div *ngIf="errorMessage" class="error-banner animate-fade-in">
+          <span>⚠️</span> {{ errorMessage }}
+        </div>
+
+        <!-- Submit & Pay Button -->
+        <button 
+          type="button"
+          class="btn-checkout" 
+          [disabled]="!selectedSeat || isBooking"
+          (click)="confirmBooking()"
+        >
+          <span *ngIf="!isBooking">
+            🔒 Pay {{ totalAmount }} ETB & Confirm
+          </span>
+          <span *ngIf="isBooking" class="btn-spinner-wrap">
+            <span class="spinner-sm"></span> Processing Secure Payment...
+          </span>
+        </button>
+
+        <!-- Digital Ticket Guarantee -->
+        <div class="guarantee-badge">
+          <span class="badge-icon">🎟️</span>
+          <span>Instant Digital QR Pass issued directly to your device after payment</span>
+        </div>
+      </div>
+    </aside>
+  </main>
+</div>

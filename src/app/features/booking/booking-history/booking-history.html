@@ -2,6 +2,15 @@
   <div class="header">
     <h1>My Bookings</h1>
     <p class="subtitle">View your ticket history and manage upcoming shows</p>
+    
+    <div *ngIf="!isLoggedIn" class="guest-sync-banner" style="margin-top: 1rem; padding: 0.75rem 1.25rem; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; display: inline-flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; color: #bae6fd;">
+      <span>📱 Viewing digital tickets saved on this device.</span>
+      <a routerLink="/auth/login" style="color: #ffffff; font-weight: 700; text-decoration: underline;">Sign In to sync account →</a>
+    </div>
+    
+    <div *ngIf="isLoggedIn" class="user-sync-banner" style="margin-top: 0.75rem; font-size: 0.85rem; color: #34d399;">
+      <span>✓ Synced with account: <strong>{{ userEmail }}</strong></span>
+    </div>
   </div>
 
   <!-- Tabs -->
