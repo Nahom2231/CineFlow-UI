@@ -12,6 +12,7 @@ import { CreateMovie} from './features/admin/create-movie/create-movie';
 import { AdminDashboard } from './features/admin/admin-dashboard/admin-dashboard';
 import { ManageHalls } from './features/admin/manage-halls/manage-halls';
 import { RevenueReport } from './features/admin/revenue-report/revenue-report';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
     {path:'', redirectTo: 'movies', pathMatch:'full'},
@@ -19,11 +20,13 @@ export const routes: Routes = [
     {path:'auth/register', component: Register},
     {path:'movies', component: MovieCatalog},
     {path:'movie/:movieId', component: MovieDetails},
+    {path:'movie/:id', component: MovieDetails},
+    {path:'movies/:id', component: MovieDetails},
     {path:'book/:scheduleId', component:SeatPicker},
     {path:'ticket-confirmation', component: TicketConfirmation},
     {path:'booking-history', component: BookingHistory},
     {path:'booking-details/:ticketId', component: TicketConfirmation},
-    {path:'admin/dashboard', component: AdminDashboard},
+    {path:'admin/dashboard', component: AdminDashboard, canActivate: [adminGuard]},
     {path:'admin/validate-ticket', component: TicketValidator},
     {path:'admin/manage-halls', component: ManageHalls},
     {path:'admin/revenue-report', component: RevenueReport},

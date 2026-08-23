@@ -1,12 +1,148 @@
-<header class="navbar">
-    <div class="Logo" routerLink="/movies"> CineFlow</div>
-    <nav>
-        <a routerLink="/movies"> Catalog </a>
-        <a routerLink="/admin/validate-ticket">validate Ticket </a>
-        <a routerLink="/auth/login" class="nav-btn">Sign In </a>
-    </nav>
-</header>
-<main class="main-content">
+<header class="app-header">
+  <div class="header-container">
+    <!-- Brand Logo -->
+    <a routerLink="/movies" class="brand-logo" (click)="closeMobileMenu()">
+      <div class="logo-icon">
+        <span class="reel-dot"></span>
+        🎬
+      </div>
+      <div class="logo-text">
+        <span class="title">Cine<span class="highlight">Flow</span></span>
+        <span class="tagline">Cinema & Ticketing</span>
+      </div>
+    </a>
 
-<router-outlet></router-outlet>
+    <!-- Desktop Navigation Links -->
+    <nav class="desktop-nav">
+      <a routerLink="/movies" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+        <span class="icon">🍿</span> Movies & Shows
+      </a>
+      <a routerLink="/booking-history" routerLinkActive="active" class="nav-link">
+        <span class="icon">🎫</span> My Tickets
+      </a>
+      <a *ngIf="isAdmin()" routerLink="/admin/create-movie" routerLinkActive="active" class="nav-link">
+        <span class="icon">🎬</span> Add Movie
+      </a>
+      <a *ngIf="isAdmin()" routerLink="/admin/manage-halls" routerLinkActive="active" class="nav-link">
+        <span class="icon">🏛️</span> Cinema Halls
+      </a>
+      <a *ngIf="isAdmin()" routerLink="/admin/dashboard" routerLinkActive="active" class="nav-link admin-pill">
+        <span class="icon">⚡</span> Admin Hub
+      </a>
+    </nav>
+
+    <!-- Auth Actions -->
+    <div class="header-actions">
+      <ng-container *ngIf="isLoggedIn$ | async; else guestActions">
+        <div class="user-badge" [class.admin-user]="isAdmin()">
+          <div class="user-avatar">{{ isAdmin() ? '👑' : '👤' }}</div>
+          <span class="user-name">{{ getUserEmail() }}</span>
+        </div>
+        <button (click)="logout()" class="btn-logout" title="Sign out">
+          <span>Sign Out</span> 🚪
+        </button>
+      </ng-container>
+
+      <ng-template #guestActions>
+        <a routerLink="/auth/login" class="btn-signin" (click)="closeMobileMenu()">
+          <span>Sign In</span>
+        </a>
+        <a routerLink="/auth/register" class="btn-register" (click)="closeMobileMenu()">
+          <span>Join Free</span>
+        </a>
+      </ng-template>
+
+      <!-- Mobile Hamburger Toggle -->
+      <button class="mobile-toggle" (click)="toggleMobileMenu()" aria-label="Toggle Menu">
+        <span class="bar" [class.open]="mobileMenuOpen"></span>
+        <span class="bar" [class.open]="mobileMenuOpen"></span>
+        <span class="bar" [class.open]="mobileMenuOpen"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Dropdown Menu -->
+  <div class="mobile-menu" *ngIf="mobileMenuOpen">
+    <a routerLink="/movies" (click)="closeMobileMenu()" class="mobile-link">🍿 Movies & Shows</a>
+    <a routerLink="/booking-history" (click)="closeMobileMenu()" class="mobile-link">🎫 My Tickets</a>
+    <ng-container *ngIf="isAdmin()">
+      <a routerLink="/admin/create-movie" (click)="closeMobileMenu()" class="mobile-link">🎬 Add New Movie</a>
+      <a routerLink="/admin/manage-halls" (click)="closeMobileMenu()" class="mobile-link">🏛️ Cinema Halls</a>
+      <a routerLink="/admin/dashboard" (click)="closeMobileMenu()" class="mobile-link admin-link">⚡ Admin Dashboard</a>
+      <a routerLink="/admin/create-schedule" (click)="closeMobileMenu()" class="mobile-link">📅 Create Schedule</a>
+      <a routerLink="/admin/validate-ticket" (click)="closeMobileMenu()" class="mobile-link">🔍 Ticket Scanner</a>
+    </ng-container>
+    
+    <div class="mobile-auth" *ngIf="!(isLoggedIn$ | async)">
+      <a routerLink="/auth/login" (click)="closeMobileMenu()" class="btn-signin w-100">Sign In</a>
+      <a routerLink="/auth/register" (click)="closeMobileMenu()" class="btn-register w-100">Create Account</a>
+    </div>
+    <div class="mobile-auth" *ngIf="isLoggedIn$ | async">
+      <button (click)="logout()" class="btn-logout w-100">Sign Out</button>
+    </div>
+  </div>
+</header>
+
+<main class="app-main">
+  <router-outlet></router-outlet>
 </main>
+
+<footer class="app-footer">
+  <div class="footer-container">
+    <div class="footer-brand">
+      <div class="brand-logo footer-logo">
+        <div class="logo-icon">🎬</div>
+        <div class="logo-text">
+          <span class="title">Cine<span class="highlight">Flow</span></span>
+        </div>
+      </div>
+      <p class="footer-desc">
+        Ethiopia's premier next-generation cinema ticketing platform. Experience IMAX, Dolby Atmos sound, and instant QR gate passes seamlessly.
+      </p>
+      <div class="payment-badges">
+        <span class="pay-pill">📱 Telebirr</span>
+        <span class="pay-pill">🏦 CBE Birr</span>
+        <span class="pay-pill">💳 Chapa</span>
+        <span class="pay-pill">💳 Visa / Mastercard</span>
+      </div>
+    </div>
+
+    <div class="footer-links-group">
+      <h4>Quick Navigation</h4>
+      <ul>
+        <li><a routerLink="/movies">Now Showing</a></li>
+        <li><a routerLink="/movies">Upcoming Releases</a></li>
+        <li><a routerLink="/booking-history">My Booking History</a></li>
+        <li><a routerLink="/admin/manage-halls">Cinema Locations</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-links-group">
+      <h4>Cinema Branches</h4>
+      <ul>
+        <li>📍 Addis Ababa (Bole Medhanialem)</li>
+        <li>📍 Addis Ababa (Edna Mall)</li>
+        <li>📍 Hawassa Lake Screen</li>
+        <li>📍 Dire Dawa Grand Hall</li>
+      </ul>
+    </div>
+
+    <div class="footer-links-group">
+      <h4>Admin & Staff</h4>
+      <ul>
+        <li><a routerLink="/admin/dashboard">Admin Dashboard</a></li>
+        <li><a routerLink="/admin/validate-ticket">Gate QR Scanner</a></li>
+        <li><a routerLink="/admin/create-movie">Add New Movie</a></li>
+        <li><a routerLink="/admin/create-schedule">Manage Schedules</a></li>
+        <li><a routerLink="/admin/revenue-report">Revenue Analytics</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2026 CineFlow Digital Cinema Network. All rights reserved.</p>
+    <div class="status-indicator">
+      <span class="status-dot"></span> Online & Booking Live
+    </div>
+  </div>
+</footer>
