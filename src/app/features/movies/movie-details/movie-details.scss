@@ -1,317 +1,493 @@
-.movie-details-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  background: #f5f5f5;
+.movie-details-page {
   min-height: 100vh;
+  padding: 1.5rem 1.5rem 5rem;
+  max-width: 1300px;
+  margin: 0 auto;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: #f8fafc;
+}
 
-  .back-btn {
-    background: none;
-    border: none;
-    color: #1976d2;
-    font-size: 1rem;
-    cursor: pointer;
-    padding: 10px 0;
+.top-nav-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #e2e8f0;
+    padding: 0.6rem 1.1rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
     font-weight: 600;
-    transition: color 0.3s;
+    cursor: pointer;
+    transition: all 0.2s ease;
 
     &:hover {
-      color: #1565c0;
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+      color: #38bdf8;
+      transform: translateX(-3px);
     }
   }
 
-  .loading,
-  .error {
-    text-align: center;
-    padding: 60px 20px;
-    font-size: 1.1rem;
-    color: #666;
-  }
+  .quick-admin-actions {
+    display: flex;
+    gap: 0.75rem;
 
-  .error {
-    color: #d32f2f;
-  }
-
-  .movie-content {
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 30px;
-  }
-
-  .movie-header {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 40px;
-    padding: 40px;
-    align-items: start;
-
-    .poster-section {
-      text-align: center;
-
-      .poster {
-        width: 100%;
-        max-width: 350px;
-        height: auto;
-        border-radius: 8px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      }
-    }
-
-    .info-section {
-      h1 {
-        margin: 0 0 10px 0;
-        color: #333;
-        font-size: 2.5rem;
-      }
-
-      .subtitle {
-        color: #999;
-        font-size: 1.1rem;
-        margin: 0 0 20px 0;
-      }
-
-      .metadata {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-        flex-wrap: wrap;
-
-        .badge {
-          display: inline-block;
-          padding: 6px 12px;
-          border-radius: 20px;
-          font-size: 0.85rem;
-          font-weight: 600;
-
-          &.genre {
-            background: #e1f5fe;
-            color: #0277bd;
-          }
-
-          &.language {
-            background: #f3e5f5;
-            color: #6a1b9a;
-          }
-
-          &.duration {
-            background: #ffe0b2;
-            color: #e65100;
-          }
-        }
-      }
-
-      .cast-crew {
-        margin-bottom: 25px;
-
-        .crew-item {
-          padding: 8px 0;
-          color: #555;
-          font-size: 0.95rem;
-
-          strong {
-            color: #333;
-          }
-        }
-      }
-
-      .synopsis {
-        h3 {
-          color: #1976d2;
-          margin: 20px 0 10px 0;
-          font-size: 1.1rem;
-        }
-
-        p {
-          color: #666;
-          line-height: 1.6;
-          margin-bottom: 10px;
-
-          &.synopsis-amharic {
-            font-size: 0.95rem;
-            color: #888;
-            font-style: italic;
-          }
-        }
-      }
-    }
-  }
-
-  .gallery-section {
-    padding: 40px;
-    border-top: 1px solid #e0e0e0;
-
-    h2 {
-      color: #333;
-      margin: 0 0 20px 0;
-      font-size: 1.4rem;
-    }
-
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 15px;
-
-      .gallery-img {
-        width: 100%;
-        height: 200px;
-        object-fit: cover;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: transform 0.3s ease;
-
-        &:hover {
-          transform: scale(1.05);
-        }
-      }
-    }
-  }
-
-  .showtimes-section {
-    padding: 40px;
-    border-top: 1px solid #e0e0e0;
-
-    h2 {
-      color: #333;
-      margin: 0 0 25px 0;
-      font-size: 1.4rem;
-    }
-
-    .showtimes-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 15px;
-      margin-bottom: 30px;
-
-      .showtime-card {
-        background: #f9f9f9;
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 15px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-
-        .time {
-          font-size: 1.8rem;
-          font-weight: bold;
-          color: #1976d2;
-          margin-bottom: 5px;
-        }
-
-        .date {
-          color: #666;
-          font-size: 0.85rem;
-          margin-bottom: 10px;
-        }
-
-        .hall {
-          color: #555;
-          font-size: 0.9rem;
-          margin-bottom: 10px;
-        }
-
-        .price {
-          color: #4caf50;
-          font-weight: 600;
-          font-size: 0.95rem;
-        }
-
-        &:hover {
-          border-color: #1976d2;
-          box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
-        }
-
-        &.selected {
-          background: #e3f2fd;
-          border-color: #1976d2;
-          box-shadow: 0 2px 12px rgba(25, 118, 210, 0.3);
-        }
-      }
-    }
-
-    .booking-section {
-      background: #e3f2fd;
-      border-left: 4px solid #1976d2;
-      padding: 20px;
+    .btn-schedule-shortcut,
+    .btn-movie-shortcut {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1rem;
       border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
 
-      .selected-details {
-        margin-bottom: 20px;
+    .btn-schedule-shortcut {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
 
-        .detail {
-          display: flex;
-          justify-content: space-between;
-          padding: 10px 0;
-          border-bottom: 1px solid #90caf9;
-
-          .label {
-            color: #555;
-            font-weight: 600;
-          }
-
-          .value {
-            color: #1565c0;
-            font-weight: 600;
-          }
-
-          &:last-child {
-            border-bottom: none;
-          }
-        }
-      }
-
-      .btn-book-now {
-        width: 100%;
-        padding: 15px;
-        background: #1976d2;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-
-        &:hover {
-          background: #1565c0;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
-        }
+      &:hover {
+        background: rgba(16, 185, 129, 0.25);
+        transform: translateY(-2px);
       }
     }
-  }
 
-  .no-showtimes {
-    padding: 40px;
-    text-align: center;
-    color: #999;
-    font-size: 1.1rem;
+    .btn-movie-shortcut {
+      background: rgba(225, 29, 72, 0.15);
+      border: 1px solid rgba(225, 29, 72, 0.35);
+      color: #fb7185;
+
+      &:hover {
+        background: rgba(225, 29, 72, 0.25);
+        transform: translateY(-2px);
+      }
+    }
   }
 }
 
-@media (max-width: 768px) {
-  .movie-details-container {
-    .movie-header {
-      grid-template-columns: 1fr;
-      gap: 20px;
-      padding: 20px;
+.loading-state {
+  text-align: center;
+  padding: 6rem 2rem;
+  color: #94a3b8;
+  font-size: 1.1rem;
 
-      .info-section {
-        h1 {
-          font-size: 1.8rem;
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #f43f5e;
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    animation: spin 0.9s linear infinite;
+  }
+}
+
+/* Hero Section */
+.movie-hero {
+  position: relative;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 2.5rem;
+  overflow: hidden;
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.45);
+  margin-bottom: 3rem;
+
+  .backdrop-glow {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(40px) brightness(0.2);
+    transform: scale(1.1);
+    z-index: 0;
+    opacity: 0.6;
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 3rem;
+    align-items: start;
+
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+
+  .poster-frame {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    aspect-ratio: 2/3;
+    max-width: 320px;
+    background: #1e293b;
+
+    .poster-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .poster-badge-row {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      display: flex;
+      gap: 0.5rem;
+
+      .badge {
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+
+        &.genre {
+          background: rgba(14, 165, 233, 0.95);
+          color: #ffffff;
+        }
+
+        &.lang {
+          background: rgba(225, 29, 72, 0.95);
+          color: #ffffff;
+        }
+      }
+    }
+  }
+
+  .movie-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+
+    .title-wrap {
+      .title-en {
+        font-size: 2.75rem;
+        font-weight: 900;
+        color: #ffffff;
+        margin: 0;
+        line-height: 1.1;
+        letter-spacing: -1px;
+      }
+
+      .title-am {
+        font-size: 1.5rem;
+        color: #f43f5e;
+        margin: 0.35rem 0 0;
+        font-weight: 700;
+      }
+    }
+
+    .meta-chips {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+
+      .chip {
+        padding: 6px 14px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #cbd5e1;
+      }
+    }
+
+    .crew-info-box {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+
+      .crew-item {
+        font-size: 0.9rem;
+        color: #e2e8f0;
+
+        .label {
+          color: #94a3b8;
+          font-weight: 600;
+          margin-right: 0.5rem;
+        }
+
+        .val {
+          font-weight: 700;
+          color: #ffffff;
         }
       }
     }
 
-    .gallery-section,
-    .showtimes-section {
-      padding: 20px;
-    }
+    .synopsis-box {
+      h3 {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #ffffff;
+        margin: 0 0 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
 
-    .showtimes-grid {
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+      .synopsis-text {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: #cbd5e1;
+        margin: 0 0 0.5rem;
+      }
+
+      .synopsis-amharic {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: #94a3b8;
+        margin: 0;
+      }
     }
   }
+}
+
+/* Showtimes Section */
+.showtimes-booking-container {
+  .section-title-wrap {
+    margin-bottom: 1.75rem;
+
+    h2 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    .section-sub {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      margin: 0.35rem 0 0;
+    }
+  }
+
+  .showtimes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .showtime-card {
+    background: rgba(15, 23, 42, 0.7);
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+
+    &:hover {
+      background: rgba(30, 41, 59, 0.8);
+      border-color: rgba(56, 189, 248, 0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    &.active {
+      background: rgba(14, 165, 233, 0.15);
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 1px #38bdf8, 0 12px 30px rgba(14, 165, 233, 0.25);
+    }
+
+    .hall-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+
+    .time-block {
+      display: flex;
+      flex-direction: column;
+
+      .time-val {
+        font-size: 1.75rem;
+        font-weight: 900;
+        color: #ffffff;
+        letter-spacing: -0.5px;
+      }
+
+      .date-val {
+        font-size: 0.85rem;
+        color: #38bdf8;
+        font-weight: 600;
+      }
+    }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+
+      .price-label {
+        font-size: 0.8rem;
+        color: #64748b;
+      }
+
+      .price-amount {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #34d399;
+      }
+    }
+
+    .select-indicator {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 0.35rem;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #94a3b8;
+    }
+  }
+
+  .no-showtimes-alert {
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    padding: 2.5rem;
+    text-align: center;
+
+    p {
+      color: #94a3b8;
+      font-size: 1rem;
+      margin: 0 0 1.25rem;
+    }
+
+    .btn-create-sch {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid #10b981;
+      border-radius: 10px;
+      color: #ffffff;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #10b981;
+      }
+    }
+  }
+
+  /* Booking Action Bar */
+  .booking-action-bar {
+    position: sticky;
+    bottom: 20px;
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    border-radius: 20px;
+    padding: 1.25rem 2rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    z-index: 50;
+
+    .booking-summary {
+      display: flex;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+
+      .summary-col {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+
+        .summary-label {
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          color: #94a3b8;
+          font-weight: 700;
+        }
+
+        .summary-val {
+          font-size: 1rem;
+          color: #ffffff;
+          font-weight: 700;
+
+          &.price-highlight {
+            color: #34d399;
+            font-size: 1.2rem;
+          }
+        }
+      }
+    }
+
+    .btn-proceed-seats {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.95rem 2rem;
+      background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+      border: none;
+      border-radius: 12px;
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(225, 29, 72, 0.35);
+      transition: all 0.25s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(225, 29, 72, 0.5);
+        filter: brightness(1.1);
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }

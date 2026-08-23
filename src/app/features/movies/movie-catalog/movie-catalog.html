@@ -1,70 +1,303 @@
-<div class="catalog-container">
-    <div class="catalog-header">
-        <h1>🎬 CineFlow</h1>
-        <p class="subtitle">Your Digital Movie Pass</p>
-        <div class="quick-links">
-            <a href="/booking-history" class="link">📅 My Bookings</a>
+<div class="landing-page">
+  <!-- Cinematic Hero Showcase -->
+  <section class="hero-section" *ngIf="heroMovies.length > 0">
+    <div 
+      class="hero-slide" 
+      *ngFor="let movie of heroMovies; let i = index"
+      [class.active]="i === currentHeroIndex"
+      [style.background-image]="'linear-gradient(to right, rgba(7,9,14,0.95) 20%, rgba(7,9,14,0.7) 60%, rgba(7,9,14,0.3) 100%), linear-gradient(to top, rgba(7,9,14,1) 0%, transparent 40%), url(' + (movie.featuredImageUrl || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1600&auto=format&fit=crop&q=80') + ')'"
+    >
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="pulse-dot"></span>
+          🔥 NOW SCREENING • IMAX & DOLBY ATMOS
         </div>
+
+        <h1 class="hero-title">
+          {{ movie.titleEnglish }}
+        </h1>
+        <p class="hero-title-amharic" *ngIf="movie.titleAmharic">
+          {{ movie.titleAmharic }}
+        </p>
+
+        <div class="hero-meta">
+          <span class="meta-pill rating">⭐ 4.9 / 5.0</span>
+          <span class="meta-pill genre">{{ movie.genre }}</span>
+          <span class="meta-pill language">🗣️ {{ movie.audioLanguage }}</span>
+          <span class="meta-pill duration">⏱️ {{ movie.durationMinutes }} min</span>
+          <span class="meta-pill director" *ngIf="movie.directorName">🎬 Dir. {{ movie.directorName }}</span>
+        </div>
+
+        <p class="hero-synopsis">
+          {{ movie.descriptionEnglish | slice:0:190 }}...
+        </p>
+
+        <div class="hero-actions">
+          <button class="btn-hero-primary" (click)="bookMovie(movie)">
+            <span class="btn-icon">🎟️</span> Book Tickets Now
+          </button>
+          <button (click)="viewMovieDetails(movie)" class="btn-hero-secondary">
+            <span>ℹ️</span> Details & Trailer
+          </button>
+        </div>
+      </div>
     </div>
 
-    <h2>Currently showing </h2>
-    <div class="filter-bar">
+    <!-- Hero Controls -->
+    <div class="hero-controls">
+      <button class="hero-arrow prev" (click)="prevHero()" aria-label="Previous Slide">‹</button>
+      <div class="hero-dots">
+        <button 
+          *ngFor="let m of heroMovies; let i = index" 
+          class="dot-btn" 
+          [class.active]="i === currentHeroIndex"
+          (click)="setHeroIndex(i)"
+          [attr.aria-label]="'Slide ' + (i + 1)"
+        >
+          <span class="dot-fill"></span>
+        </button>
+      </div>
+      <button class="hero-arrow next" (click)="nextHero()" aria-label="Next Slide">›</button>
+    </div>
+  </section>
+
+  <!-- Cinema Perks / Feature Highlights Bar -->
+  <section class="perks-section">
+    <div class="perks-container">
+      <div class="perk-card">
+        <div class="perk-icon">⚡</div>
+        <div class="perk-info">
+          <h4>Instant Digital Booking</h4>
+          <p>Pick your favorite seats & get your digital ticket in seconds</p>
+        </div>
+      </div>
+
+      <div class="perk-card">
+        <div class="perk-icon">🍿</div>
+        <div class="perk-info">
+          <h4>Dolby Atmos & IMAX</h4>
+          <p>Next-level immersive audio & crystal-clear 4K laser projection</p>
+        </div>
+      </div>
+
+      <div class="perk-card">
+        <div class="perk-icon">📱</div>
+        <div class="perk-info">
+          <h4>Fast QR Gate Pass</h4>
+          <p>Scan and walk in directly without standing in ticket lines</p>
+        </div>
+      </div>
+
+      <div class="perk-card">
+        <div class="perk-icon">💳</div>
+        <div class="perk-info">
+          <h4>Telebirr & CBE Birr</h4>
+          <p>Direct integration with local Ethiopian payment providers</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Catalog Section -->
+  <section class="catalog-section" id="movies-catalog">
+    <div class="section-header">
+      <div class="header-left">
+        <span class="section-tag">CINEMA SCHEDULE</span>
+        <h2>🎬 Now Showing in Theaters</h2>
+        <p class="section-subtitle">Discover the latest blockbusters and local favorites in Addis Ababa & beyond</p>
+      </div>
+      <div class="header-right" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <a routerLink="/admin/create-movie" class="btn-secondary" style="background: rgba(225, 29, 72, 0.15); border-color: rgba(225, 29, 72, 0.4); color: #f43f5e;">
+          <span>➕</span> Add Movie
+        </a>
+        <a routerLink="/booking-history" class="btn-secondary link-history">
+          <span>📅</span> My Booking History
+        </a>
+      </div>
+    </div>
+
+    <!-- Interactive Filters & Search -->
+    <div class="filter-wrapper glass-panel">
+      <!-- Search Input -->
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
         <input
-            type="text"
-            [(ngModel)]="filters.searchTitle"
-            (input)="onSearch()"
-            placeholder="Search movie title..."
-            class="search-input"
+          type="text"
+          [(ngModel)]="filters.searchTitle"
+          (input)="onSearch()"
+          placeholder="Search by title, director, or actor..."
+          class="search-input"
         />
-        <select [(ngModel)]="filters.genre" (change)="onSearch()" class="filter-select">
-            <option value="">All Genres </option>
-            <option value="Action"> Action </option>
-            <option value="Drama"> Drama </option>
-            <option value="Comedy">Comedy</option>
-            <option value="Sci-Fi">Sci-Fi</option>
-        </select>
-        <select [(ngModel)]="filters.audioLanguage" (change)="onSearch()" class="filter-select">
-            <option value =" ">All Languages</option>
-            <option value="Amharic"> Amharic</option>
-            <option value="English">English </option>
-        </select>
-    </div>
-    
-    <div *ngIf="loading" class="loader">
-        <div class="spinner"></div>
-        <p>Loading catalog...</p>
-    </div>
+        <button *ngIf="filters.searchTitle" class="btn-clear" (click)="filters.searchTitle = ''; onSearch()">✕</button>
+      </div>
 
-    <div *ngIf="!loading && movies.length > 0" class="movie-grid">
-        <div *ngFor="let movie of movies" class="movie-card">
-            <div class="movie-image-container">
-                <img [src]="movie.featuredImageUrl||'assets/placeholder.jpg'" 
-                     (error)="$event.target.src='https://via.placeholder.com/300x450?text=No+Poster'"
-                     [alt]="movie.titleEnglish"
-                     class="movie-poster"/>
-                <div class="overlay">
-                    <a [routerLink]="['/movie', movie.id]" class="view-details">
-                        View Details & Showtimes →
-                    </a>
-                </div>
-            </div>
-            <div class="movie-info">
-                <h3> {{movie.titleEnglish }} </h3>
-                <p class="subtitle">{{movie.titleAmharic }} </p>
-                <div class="badges">
-                    <span class="badge">{{ movie.genre }} </span>
-                    <span class="badge lang"> {{movie.audioLanguage }} </span>
-                </div>
-                <p class="desc">{{ movie.descriptionEnglish | slice:0:100 }}...</p>
-                <a [routerLink]="['/movie', movie.id]" class="btn-book">Book Tickets</a>
-            </div>
+      <!-- Genre Pills -->
+      <div class="genre-chips-container">
+        <button
+          *ngFor="let chip of genreChips"
+          class="genre-chip"
+          [class.active]="selectedGenreChip === chip"
+          (click)="selectGenreChip(chip)"
+        >
+          {{ chip === 'Amharic' ? '🇪🇹 Amharic Cinema' : chip }}
+        </button>
+      </div>
+
+      <!-- Dropdown Filters -->
+      <div class="dropdown-filters">
+        <div class="filter-select-group">
+          <label>Language</label>
+          <select [(ngModel)]="filters.audioLanguage" (change)="onSearch()" class="filter-select">
+            <option value="">All Languages</option>
+            <option value="Amharic">Amharic (አማርኛ)</option>
+            <option value="English">English</option>
+          </select>
         </div>
+
+        <div class="filter-select-group">
+          <label>Cinema Hall / Location</label>
+          <select [(ngModel)]="filters.cinemaBranch" (change)="onSearch()" class="filter-select">
+            <option value="">All Cinema Halls</option>
+            <option value="Bole">Bole Medhanialem Screen</option>
+            <option value="Edna">Edna Mall VIP Screen</option>
+            <option value="Hawassa">Hawassa Lake Screen</option>
+            <option value="Dire Dawa">Dire Dawa Cinema</option>
+          </select>
+        </div>
+      </div>
     </div>
 
-    <div *ngIf="!loading && movies.length ===0" class="empty-msg">
-        <div class="empty-icon">🎬</div>
-        <p>No movies found matching your filters.</p>
-        <a href="/movies" class="btn-reset">Reset Filters</a>
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loader-container">
+      <div class="spinner"></div>
+      <p>Loading the latest showtimes & movies...</p>
     </div>
+
+    <!-- Movie Cards Grid -->
+    <div *ngIf="!loading && movies.length > 0" class="movie-grid animate-fade-in">
+      <div *ngFor="let movie of movies" class="movie-card">
+        <!-- Poster & Overlay -->
+        <div class="poster-container">
+          <img 
+            [src]="movie.featuredImageUrl || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&auto=format&fit=crop&q=80'" 
+            (error)="onImageError($event)"
+            [alt]="movie.titleEnglish"
+            class="poster-image"
+            loading="lazy"
+          />
+          
+          <div class="poster-badges">
+            <span class="badge genre-badge">{{ movie.genre }}</span>
+            <span class="badge lang-badge">{{ movie.audioLanguage }}</span>
+          </div>
+
+          <div class="poster-overlay">
+            <button (click)="viewMovieDetails(movie)" class="btn-overlay-details">
+              View Showtimes & Hall Layout →
+            </button>
+          </div>
+        </div>
+
+        <!-- Movie Details Body -->
+        <div class="card-body">
+          <div class="title-block" (click)="viewMovieDetails(movie)" style="cursor: pointer;">
+            <h3 class="movie-title">{{ movie.titleEnglish }}</h3>
+            <p class="movie-title-amharic" *ngIf="movie.titleAmharic">{{ movie.titleAmharic }}</p>
+          </div>
+
+          <div class="movie-specs">
+            <span class="spec-item">⏱️ {{ movie.durationMinutes }}m</span>
+            <span class="spec-item" *ngIf="movie.directorName">🎬 {{ movie.directorName }}</span>
+          </div>
+
+          <p class="movie-desc">
+            {{ movie.descriptionEnglish | slice:0:110 }}...
+          </p>
+
+          <!-- Quick Showtimes Preview -->
+          <div class="showtime-pills" *ngIf="movie.schedules && movie.schedules.length > 0">
+            <span class="showtimes-label">Available Shows:</span>
+            <div class="pills-row">
+              <span *ngFor="let sch of movie.schedules.slice(0, 2)" class="sch-pill">
+                🕒 {{ sch.startTime | date:'shortTime' }} • {{ sch.price }} ETB
+              </span>
+            </div>
+          </div>
+
+          <!-- Card Actions -->
+          <div class="card-actions">
+            <button class="btn-book" (click)="bookMovie(movie)">
+              <span>🎟️</span> Book Seats
+            </button>
+            <a [routerLink]="['/movie', movie.id]" class="btn-info" title="View details">
+              Details
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && movies.length === 0" class="empty-state glass-panel">
+      <div class="empty-icon">🎬</div>
+      <h3>No Movies Found</h3>
+      <p>We couldn't find any movies matching your current search criteria.</p>
+      <button class="btn-primary" (click)="resetFilters()">
+        🔄 Reset All Filters
+      </button>
+    </div>
+  </section>
+
+  <!-- Cinema Locations Section -->
+  <section class="locations-section">
+    <div class="section-header text-center">
+      <span class="section-tag">PREMIUM VENUES</span>
+      <h2>🏛️ Our Cinema Branches & Screens</h2>
+      <p class="section-subtitle">Equipped with luxury reclining seats, Dolby 7.1 surround sound & gourmet concessions</p>
+    </div>
+
+    <div class="branches-grid">
+      <div class="branch-card glass-panel">
+        <div class="branch-header">
+          <span class="branch-status">🟢 OPEN TODAY</span>
+          <h3>Bole Medhanialem IMAX</h3>
+        </div>
+        <p class="branch-address">📍 Camroon St, Next to Edna Mall, Addis Ababa</p>
+        <div class="branch-features">
+          <span>🍿 IMAX 4K Laser</span>
+          <span>🛋️ VIP Recliner Lounges</span>
+          <span>⚡ QR Gate Pass</span>
+        </div>
+        <a routerLink="/movies" class="btn-branch">Browse Shows →</a>
+      </div>
+
+      <div class="branch-card glass-panel">
+        <div class="branch-header">
+          <span class="branch-status">🟢 OPEN TODAY</span>
+          <h3>Edna Mall VIP Dolby Screen</h3>
+        </div>
+        <p class="branch-address">📍 Edna Mall 4th Floor, Bole, Addis Ababa</p>
+        <div class="branch-features">
+          <span>🔊 Dolby Atmos 3D</span>
+          <span>☕ Cinema Café</span>
+          <span>🅿️ Free Parking</span>
+        </div>
+        <a routerLink="/movies" class="btn-branch">Browse Shows →</a>
+      </div>
+
+      <div class="branch-card glass-panel">
+        <div class="branch-header">
+          <span class="branch-status">🟢 OPEN TODAY</span>
+          <h3>Hawassa Lake Screen</h3>
+        </div>
+        <p class="branch-address">📍 Lake View Boulevard, Hawassa</p>
+        <div class="branch-features">
+          <span>🌅 Panoramic View</span>
+          <span>🍿 Family Auditoriums</span>
+          <span>💳 Telebirr Express</span>
+        </div>
+        <a routerLink="/movies" class="btn-branch">Browse Shows →</a>
+      </div>
+    </div>
+  </section>
 </div>
-
