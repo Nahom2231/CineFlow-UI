@@ -1,41 +1,103 @@
-<div class="auth-container
-">
-    <div class="auth-card">
-    <h2>Welcome to Cinema Scheduling and Booking Tickets System</h2>
-    <p class = "subtitle"> Log in to manage bookings and purchase tickets </p>
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="brand-badge">
+      <span>🎬</span>
+      <span>CineFlow ID</span>
+    </div>
+
+    <h2>Welcome Back to CineFlow</h2>
+    <p class="subtitle">Log in to reserve your favorite seats and access digital tickets</p>
+
+    <!-- Dynamic Alert Banners -->
+    <!-- 1. Lockout Security Alert -->
+    <div *ngIf="isLockedOut" class="alert-box alert-lockout animate-shake">
+      <div class="alert-header">
+        <span class="alert-icon">🔒</span>
+        <strong class="alert-title">Account Temporarily Locked</strong>
+      </div>
+      <p class="alert-desc">
+        Maximum login attempts exceeded (5 failed attempts limit). Access is temporarily rate-limited for 60 seconds to protect your CineFlow account.
+      </p>
+      <div class="lockout-countdown-badge">
+        <span class="hourglass">⏳</span>
+        <span>Try again in <strong>{{ lockoutCountdown }}s</strong></span>
+      </div>
+    </div>
+
+    <!-- 2. Warning / Standard Error Alert -->
+    <div *ngIf="!isLockedOut && errorMessage" class="alert-box" [ngClass]="'alert-' + alertType">
+      <div class="alert-header">
+        <span class="alert-icon" *ngIf="alertType === 'warning'">⚠️</span>
+        <span class="alert-icon" *ngIf="alertType === 'error'">❌</span>
+        <span class="alert-icon" *ngIf="alertType === 'info'">ℹ️</span>
+        <span class="alert-text">{{ errorMessage }}</span>
+      </div>
+      <div class="attempt-counter-pill" *ngIf="alertType === 'warning' && failedAttempts > 0">
+        <span>Failed Attempts: <strong>{{ failedAttempts }} / {{ MAX_FAILED_ATTEMPTS }}</strong></span>
+      </div>
+    </div>
+
+    <!-- Quick Demo Accounts Banner (Disabled when locked out) -->
+    <div class="demo-accounts-pill" [class.disabled-opacity]="isLockedOut">
+      <span class="pill-label">⚡ 1-Click Quick Sign-In:</span>
+      <div class="demo-btn-group">
+        <button type="button" class="btn-demo-user" [disabled]="isLockedOut" (click)="useDemoCustomer()">
+          🍿 Moviegoer
+        </button>
+        <button type="button" class="btn-demo-admin" [disabled]="isLockedOut" (click)="useDemoAdmin()">
+          👑 Administrator
+        </button>
+      </div>
+    </div>
 
     <form (ngSubmit)="onLogin()">
-        <div class = "form-group">
-        <label for = "loginEmail">Email Address </label>
-        <input 
-        type="email"
-        id="loginEmail"
-        [(ngModel)]= "email"
-        name="email"
-        placeholder="user@cineflow.com"
-        required
-        />
+      <div class="form-group">
+        <label for="loginEmail">Email Address</label>
+        <div class="input-wrap">
+          <span class="input-icon">✉️</span>
+          <input
+            type="email"
+            id="loginEmail"
+            [(ngModel)]="email"
+            (ngModelChange)="onEmailChange()"
+            name="email"
+            placeholder="e.g. nahom0462@gmail.com"
+            [disabled]="isLockedOut || loading"
+            required
+          />
         </div>
-        <div class ="form-group">
+      </div>
+
+      <div class="form-group">
         <label for="loginPassword">Password</label>
-        <input
-        type="password"
-        id="loginPassword"
-        [(ngModel)]="password"
-        name="password"
-        placeholder=".........."
-        required
-        />
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input
+            type="password"
+            id="loginPassword"
+            [(ngModel)]="password"
+            name="password"
+            placeholder="••••••••••••"
+            [disabled]="isLockedOut || loading"
+            required
+          />
         </div>
-        <button type="submit" [disabled]="loading" class="btn-primary">
-            {{loading ? 'Signing in...': 'Sign in'}}
-        </button>
+      </div>
+
+      <button type="submit" [disabled]="loading || isLockedOut" class="btn-primary" [class.btn-locked]="isLockedOut">
+        <span *ngIf="!loading && !isLockedOut">Sign In →</span>
+        <span *ngIf="isLockedOut">🔒 Locked (Wait {{ lockoutCountdown }}s)</span>
+        <span *ngIf="loading && !isLockedOut" class="btn-loading-wrap">
+          <span class="spinner-sm"></span> Signing In...
+        </span>
+      </button>
     </form>
-   <div class="auth-footer">
-  <p>Don't have an account?</p>
-  <button type="button" class="btn-secondary" [routerLink]="'/auth/register'">
-    Register here
-  </button>
-</div>
+
+    <div class="auth-footer">
+      <p>Don't have an account?</p>
+      <a class="btn-secondary" routerLink="/auth/register">
+        Create an Account →
+      </a>
     </div>
+  </div>
 </div>
