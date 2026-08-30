@@ -10,13 +10,13 @@
       <div class="hero-content">
         <div class="hero-badge">
           <span class="pulse-dot"></span>
-          🔥 NOW SCREENING • IMAX & DOLBY ATMOS
+          {{ 'HERO_TAG' | translate }}
         </div>
 
         <h1 class="hero-title">
-          {{ movie.titleEnglish }}
+          {{ translationService.dynamic(movie.titleEnglish, movie.titleAmharic) }}
         </h1>
-        <p class="hero-title-amharic" *ngIf="movie.titleAmharic">
+        <p class="hero-title-amharic" *ngIf="movie.titleAmharic && translationService.getLanguage() === 'en'">
           {{ movie.titleAmharic }}
         </p>
 
@@ -24,20 +24,20 @@
           <span class="meta-pill rating">⭐ 4.9 / 5.0</span>
           <span class="meta-pill genre">{{ movie.genre }}</span>
           <span class="meta-pill language">🗣️ {{ movie.audioLanguage }}</span>
-          <span class="meta-pill duration">⏱️ {{ movie.durationMinutes }} min</span>
-          <span class="meta-pill director" *ngIf="movie.directorName">🎬 Dir. {{ movie.directorName }}</span>
+          <span class="meta-pill duration">⏱️ {{ movie.durationMinutes }} {{ 'MINUTES' | translate }}</span>
+          <span class="meta-pill director" *ngIf="movie.directorName">🎬 {{ 'DIRECTOR' | translate }}: {{ movie.directorName }}</span>
         </div>
 
         <p class="hero-synopsis">
-          {{ movie.descriptionEnglish | slice:0:190 }}...
+          {{ translationService.dynamic(movie.descriptionEnglish, movie.descriptionAmharic) | slice:0:190 }}...
         </p>
 
         <div class="hero-actions">
           <button class="btn-hero-primary" (click)="bookMovie(movie)">
-            <span class="btn-icon">🎟️</span> Book Tickets Now
+            <span class="btn-icon">🎟️</span> {{ 'BOOK_NOW' | translate }}
           </button>
           <button (click)="viewMovieDetails(movie)" class="btn-hero-secondary">
-            <span>ℹ️</span> Details & Trailer
+            <span>ℹ️</span> {{ 'VIEW_DETAILS' | translate }}
           </button>
         </div>
       </div>
@@ -67,8 +67,8 @@
       <div class="perk-card">
         <div class="perk-icon">⚡</div>
         <div class="perk-info">
-          <h4>Instant Digital Booking</h4>
-          <p>Pick your favorite seats & get your digital ticket in seconds</p>
+          <h4>Chapa Payment Gateway</h4>
+          <p>Instant API checkout for Telebirr, CBE Birr & Card payments</p>
         </div>
       </div>
 
@@ -89,10 +89,10 @@
       </div>
 
       <div class="perk-card">
-        <div class="perk-icon">💳</div>
+        <div class="perk-icon">🎟️</div>
         <div class="perk-info">
-          <h4>Telebirr & CBE Birr</h4>
-          <p>Direct integration with local Ethiopian payment providers</p>
+          <h4>Instant Digital Ticketing</h4>
+          <p>Pick your favorite seats & get your verified pass in seconds</p>
         </div>
       </div>
     </div>
@@ -102,16 +102,16 @@
   <section class="catalog-section" id="movies-catalog">
     <div class="section-header">
       <div class="header-left">
-        <span class="section-tag">CINEMA SCHEDULE</span>
-        <h2>🎬 Now Showing in Theaters</h2>
-        <p class="section-subtitle">Discover the latest blockbusters and local favorites in Addis Ababa & beyond</p>
+        <span class="section-tag">{{ 'HERO_SCHEDULE_BTN' | translate }}</span>
+        <h2>🎬 {{ 'CATALOG_TITLE' | translate }}</h2>
+        <p class="section-subtitle">{{ 'CATALOG_SUBTITLE' | translate }}</p>
       </div>
       <div class="header-right" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
         <a routerLink="/admin/create-movie" class="btn-secondary" style="background: rgba(225, 29, 72, 0.15); border-color: rgba(225, 29, 72, 0.4); color: #f43f5e;">
-          <span>➕</span> Add Movie
+          <span>➕</span> {{ 'NAV_ADD_MOVIE' | translate }}
         </a>
         <a routerLink="/booking-history" class="btn-secondary link-history">
-          <span>📅</span> My Booking History
+          <span>📅</span> {{ 'NAV_MY_TICKETS' | translate }}
         </a>
       </div>
     </div>
@@ -125,7 +125,7 @@
           type="text"
           [(ngModel)]="filters.searchTitle"
           (input)="onSearch()"
-          placeholder="Search by title, director, or actor..."
+          [placeholder]="'SEARCH_PLACEHOLDER' | translate"
           class="search-input"
         />
         <button *ngIf="filters.searchTitle" class="btn-clear" (click)="filters.searchTitle = ''; onSearch()">✕</button>
@@ -139,16 +139,16 @@
           [class.active]="selectedGenreChip === chip"
           (click)="selectGenreChip(chip)"
         >
-          {{ chip === 'Amharic' ? '🇪🇹 Amharic Cinema' : chip }}
+          {{ chip === 'All' ? ('GENRE_ALL' | translate) : chip === 'Amharic' ? '🇪🇹 አማርኛ ፊልም' : chip }}
         </button>
       </div>
 
       <!-- Dropdown Filters -->
       <div class="dropdown-filters">
         <div class="filter-select-group">
-          <label>Language</label>
-          <select [(ngModel)]="filters.audioLanguage" (change)="onSearch()" class="filter-select">
-            <option value="">All Languages</option>
+          <label>Language / ቋንቋ</label>
+          <select [(ngModel)]="filters.audioLanguage" (change)="onFilterChange()" class="filter-select">
+            <option value="">All Languages / ሁሉም ቋንቋዎች</option>
             <option value="Amharic">Amharic (አማርኛ)</option>
             <option value="English">English</option>
           </select>
@@ -156,8 +156,8 @@
 
         <div class="filter-select-group">
           <label>Cinema Hall / Location</label>
-          <select [(ngModel)]="filters.cinemaBranch" (change)="onSearch()" class="filter-select">
-            <option value="">All Cinema Halls</option>
+          <select [(ngModel)]="filters.cinemaBranch" (change)="onFilterChange()" class="filter-select">
+            <option value="">All Cinema Halls / ሁሉም አዳራሾች</option>
             <option value="Bole">Bole Medhanialem Screen</option>
             <option value="Edna">Edna Mall VIP Screen</option>
             <option value="Hawassa">Hawassa Lake Screen</option>
@@ -167,20 +167,20 @@
       </div>
     </div>
 
-    <!-- Loading State -->
-    <div *ngIf="loading" class="loader-container">
+    <!-- Loading State (Only if initial load has no movies) -->
+    <div *ngIf="loading && movies.length === 0" class="loader-container">
       <div class="spinner"></div>
       <p>Loading the latest showtimes & movies...</p>
     </div>
 
     <!-- Movie Cards Grid -->
-    <div *ngIf="!loading && movies.length > 0" class="movie-grid animate-fade-in">
+    <div *ngIf="isSelectionActive && movies.length > 0" class="movie-grid animate-fade-in">
       <div *ngFor="let movie of movies" class="movie-card">
         <!-- Poster & Overlay -->
         <div class="poster-container">
           <img 
             [src]="movie.featuredImageUrl || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&auto=format&fit=crop&q=80'" 
-            (error)="onImageError($event)"
+            (error)="onImageError($event)" 
             [alt]="movie.titleEnglish"
             class="poster-image"
             loading="lazy"
@@ -193,7 +193,7 @@
 
           <div class="poster-overlay">
             <button (click)="viewMovieDetails(movie)" class="btn-overlay-details">
-              View Showtimes & Hall Layout →
+              {{ 'SHOWTIMES' | translate }} →
             </button>
           </div>
         </div>
@@ -201,8 +201,8 @@
         <!-- Movie Details Body -->
         <div class="card-body">
           <div class="title-block" (click)="viewMovieDetails(movie)" style="cursor: pointer;">
-            <h3 class="movie-title">{{ movie.titleEnglish }}</h3>
-            <p class="movie-title-amharic" *ngIf="movie.titleAmharic">{{ movie.titleAmharic }}</p>
+            <h3 class="movie-title">{{ translationService.dynamic(movie.titleEnglish, movie.titleAmharic) }}</h3>
+            <p class="movie-title-amharic" *ngIf="movie.titleAmharic && translationService.getLanguage() === 'en'">{{ movie.titleAmharic }}</p>
           </div>
 
           <div class="movie-specs">
@@ -211,26 +211,34 @@
           </div>
 
           <p class="movie-desc">
-            {{ movie.descriptionEnglish | slice:0:110 }}...
+            {{ translationService.dynamic(movie.descriptionEnglish, movie.descriptionAmharic) | slice:0:110 }}...
           </p>
 
-          <!-- Quick Showtimes Preview -->
-          <div class="showtime-pills" *ngIf="movie.schedules && movie.schedules.length > 0">
-            <span class="showtimes-label">Available Shows:</span>
+          <!-- Quick Showtimes Preview (Relevant to selected cinema branch) -->
+          <div class="showtime-pills" *ngIf="getRelevantSchedules(movie).length > 0">
+            <span class="showtimes-label">
+              {{ filters.cinemaBranch ? ('📍 ' + filters.cinemaBranch + ':') : ('SHOWTIMES' | translate) + ':' }}
+            </span>
             <div class="pills-row">
-              <span *ngFor="let sch of movie.schedules.slice(0, 2)" class="sch-pill">
+              <button 
+                *ngFor="let sch of getRelevantSchedules(movie).slice(0, 3)" 
+                type="button"
+                class="sch-pill btn-pill-schedule" 
+                (click)="bookSchedule(movie, sch)"
+                title="Book this showtime directly"
+              >
                 🕒 {{ sch.startTime | date:'shortTime' }} • {{ sch.price }} ETB
-              </span>
+              </button>
             </div>
           </div>
 
           <!-- Card Actions -->
           <div class="card-actions">
             <button class="btn-book" (click)="bookMovie(movie)">
-              <span>🎟️</span> Book Seats
+              <span>🎟️</span> {{ 'BOOK_NOW' | translate }}
             </button>
             <a [routerLink]="['/movie', movie.id]" class="btn-info" title="View details">
-              Details
+              {{ 'VIEW_DETAILS' | translate }}
             </a>
           </div>
         </div>
@@ -238,12 +246,12 @@
     </div>
 
     <!-- Empty State -->
-    <div *ngIf="!loading && movies.length === 0" class="empty-state glass-panel">
+    <div *ngIf="isSelectionActive && !loading && movies.length === 0" class="empty-state glass-panel animate-fade-in">
       <div class="empty-icon">🎬</div>
-      <h3>No Movies Found</h3>
-      <p>We couldn't find any movies matching your current search criteria.</p>
+      <h3>{{ 'NO_MOVIES_FOUND' | translate }}</h3>
+      <p>We couldn't find any movie showtimes matching your selected filter.</p>
       <button class="btn-primary" (click)="resetFilters()">
-        🔄 Reset All Filters
+        🔄 Reset Filters & Search Again
       </button>
     </div>
   </section>
@@ -251,9 +259,9 @@
   <!-- Cinema Locations Section -->
   <section class="locations-section">
     <div class="section-header text-center">
-      <span class="section-tag">PREMIUM VENUES</span>
-      <h2>🏛️ Our Cinema Branches & Screens</h2>
-      <p class="section-subtitle">Equipped with luxury reclining seats, Dolby 7.1 surround sound & gourmet concessions</p>
+      <span class="section-tag">{{ 'NAV_CINEMA_HALLS' | translate }}</span>
+      <h2>🏛️ {{ 'FOOTER_BRANCHES' | translate }}</h2>
+      <p class="section-subtitle">Equipped with luxury reclining seats, Dolby 7.1 surround sound & Chapa instant ticketing</p>
     </div>
 
     <div class="branches-grid">
@@ -266,9 +274,9 @@
         <div class="branch-features">
           <span>🍿 IMAX 4K Laser</span>
           <span>🛋️ VIP Recliner Lounges</span>
-          <span>⚡ QR Gate Pass</span>
+          <span>⚡ Chapa API Gate Pass</span>
         </div>
-        <a routerLink="/movies" class="btn-branch">Browse Shows →</a>
+        <a routerLink="/movies" class="btn-branch">{{ 'HERO_BROWSE_BTN' | translate }} →</a>
       </div>
 
       <div class="branch-card glass-panel">
@@ -282,7 +290,7 @@
           <span>☕ Cinema Café</span>
           <span>🅿️ Free Parking</span>
         </div>
-        <a routerLink="/movies" class="btn-branch">Browse Shows →</a>
+        <a routerLink="/movies" class="btn-branch">{{ 'HERO_BROWSE_BTN' | translate }} →</a>
       </div>
 
       <div class="branch-card glass-panel">
@@ -294,9 +302,9 @@
         <div class="branch-features">
           <span>🌅 Panoramic View</span>
           <span>🍿 Family Auditoriums</span>
-          <span>💳 Telebirr Express</span>
+          <span>⚡ Chapa Checkout</span>
         </div>
-        <a routerLink="/movies" class="btn-branch">Browse Shows →</a>
+        <a routerLink="/movies" class="btn-branch">{{ 'HERO_BROWSE_BTN' | translate }} →</a>
       </div>
     </div>
   </section>
