@@ -37,19 +37,6 @@
       </div>
     </div>
 
-    <!-- Quick Demo Accounts Banner (Disabled when locked out) -->
-    <div class="demo-accounts-pill" [class.disabled-opacity]="isLockedOut">
-      <span class="pill-label">⚡ 1-Click Quick Sign-In:</span>
-      <div class="demo-btn-group">
-        <button type="button" class="btn-demo-user" [disabled]="isLockedOut" (click)="useDemoCustomer()">
-          🍿 Moviegoer
-        </button>
-        <button type="button" class="btn-demo-admin" [disabled]="isLockedOut" (click)="useDemoAdmin()">
-          👑 Administrator
-        </button>
-      </div>
-    </div>
-
     <form (ngSubmit)="onLogin()">
       <div class="form-group">
         <label for="loginEmail">Email Address</label>
