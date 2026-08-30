@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -12,17 +12,16 @@ import { AuthService } from '../../../core/services/auth';
   styleUrl: './register.scss'
 })
 export class Register {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
+
   email: string = '';
   password: string = '';
   confirmPassword: string = '';
   isSuccess: boolean = false;
   message: string = '';
   loading: boolean = false;
-
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
 
   // Password Requirement Helpers
   get hasMinLength(): boolean {
@@ -94,6 +93,7 @@ export class Register {
         this.loading = false;
         this.isSuccess = true;
         this.message = res?.message || 'Registration successful! Redirecting to login...';
+        this.cdr.detectChanges();
         setTimeout(() => this.router.navigate(['/auth/login']), 1500);
       },
       error: (err) => {
@@ -125,9 +125,10 @@ export class Register {
         } else if (typeof err.error === 'string') {
           errMsg = err.error;
         } else {
-          errMsg = 'Registration failed (HTTP 400). Please check that your email is unique and password meets ASP.NET security rules.';
+          errMsg = 'Registration failed (HTTP 400). Please check that your email is unique or try signing in if you already have an account.';
         }
         this.message = errMsg;
+        this.cdr.detectChanges();
       }
     });
   }
