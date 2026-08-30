@@ -1,4 +1,4 @@
-﻿export interface RegisterRequest {
+export interface RegisterRequest {
     email: string;
     password?: string;
 }
@@ -71,6 +71,7 @@ export interface BookTicketCommand {
     seatNumber: string;
     paymentPhoneNumber: string;
     paymentProvider: string;
+    transactionReference?: string;
     userId?: string;
     movieTitle?: string;
     movieTitleAmharic?: string;
@@ -87,7 +88,8 @@ export interface HoldSeatCommand {
 }
 
 export interface ValidateTicketCommand {
-    transactionReference: string;
+    transactionReference?: string;
+    codeOrReference?: string;
 }
 
 export interface CinemaHall {
@@ -107,6 +109,43 @@ export interface CreateMovieDto {
     genre: string;
     audioLanguage: string;
     directorId?: string | null;
+    directorName?: string;
     starIds?: string[] | null;
     featuredImageUrl?: string;
 }
+
+export interface InitializePaymentRequest {
+    amount: number;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    phoneNumber?: string;
+    currency?: string;
+    reference?: string;
+    scheduleId?: string | null;
+    seatNumber?: string | null;
+}
+
+export interface InitializePaymentResponse {
+    success: boolean;
+    message: string;
+    reference: string;
+    encryptedReference?: string;
+    checkoutUrl?: string;
+    publicKey?: string;
+    callbackUrl?: string;
+}
+
+export interface VerifyPaymentResponse {
+    success: boolean;
+    reference: string;
+    status: string;
+    message: string;
+}
+
+export interface PaymentConfigResponse {
+    publicKey: string;
+    baseUrl: string;
+    callbackUrl: string;
+}
+
