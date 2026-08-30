@@ -4,20 +4,25 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
 import { CineFlowApiService } from '../../../core/services/cineflow-api.service';
 import { MovieResponseDto, MovieFilterParams, ScheduleDto } from '../../../core/models/CineFlow.model';
+import { TranslationService } from '../../../core/services/translation.service';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-movie-catalog',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe],
   templateUrl: './movie-catalog.html',
   styleUrl: './movie-catalog.scss'
 })
 export class MovieCatalog implements OnInit, OnDestroy {
   private apiService = inject(CineFlowApiService);
+  public translationService = inject(TranslationService);
   private router = inject(Router);
 
+  allMovies: MovieResponseDto[] = [];
   movies: MovieResponseDto[] = [];
-  loading: boolean = true;
+  loading: boolean = false;
+  hasRequestedShowtimes: boolean = false;
 
   // Hero carousel
   heroMovies: MovieResponseDto[] = [];
@@ -35,40 +40,95 @@ export class MovieCatalog implements OnInit, OnDestroy {
     cinemaBranch: ''
   };
 
+  get isSelectionActive(): boolean {
+    return (
+      this.hasRequestedShowtimes ||
+      !!this.filters.audioLanguage ||
+      !!this.filters.cinemaBranch ||
+      !!this.filters.searchTitle ||
+      (!!this.filters.genre && this.filters.genre !== 'All')
+    );
+  }
+
   ngOnInit(): void {
-    this.loadMovies();
+    // 1. Preload local/cached movies and display immediately
+    this.allMovies = this.apiService.getAllLocalMovies();
+    if (this.allMovies.length > 0) {
+      this.heroMovies = this.allMovies.slice(0, 3);
+      this.startAutoSlide();
+      this.hasRequestedShowtimes = true;
+      this.applyFiltersInstant();
+    }
+
+    // 2. Fetch fresh updates in background seamlessly
+    this.loadMovies(true);
   }
 
   ngOnDestroy(): void {
     this.stopAutoSlide();
   }
 
-  loadMovies(): void {
-    this.loading = true;
-    this.apiService.getFilteredMovies(this.filters).subscribe({
+  loadMovies(silent: boolean = false): void {
+    if (!silent && this.allMovies.length === 0) {
+      this.loading = true;
+    }
+    this.apiService.getFilteredMovies({}).subscribe({
       next: (data) => {
-        this.movies = data || [];
-        this.loading = false;
-
-        // Set hero banner movies
-        if (this.movies.length > 0) {
-          this.heroMovies = this.movies.slice(0, 3);
-          this.startAutoSlide();
+        if (data && data.length > 0) {
+          this.allMovies = data;
+          if (this.heroMovies.length === 0) {
+            this.heroMovies = this.allMovies.slice(0, 3);
+            this.startAutoSlide();
+          }
+          if (this.isSelectionActive) {
+            this.applyFiltersInstant();
+          }
         }
+        this.loading = false;
       },
       error: (err) => {
-        console.error('Failed to load Movies', err);
+        console.warn('Catalog background sync: using local catalog', err?.status);
         this.loading = false;
       }
     });
   }
 
+  applyFiltersInstant(): void {
+    this.movies = this.apiService.applyLocalFilters(this.allMovies, this.filters);
+  }
+
+  onFilterChange(): void {
+    this.hasRequestedShowtimes = true;
+    this.applyFiltersInstant();
+  }
+
   onSearch(): void {
-    this.loadMovies();
+    if (this.filters.searchTitle && this.filters.searchTitle.trim() !== '') {
+      this.hasRequestedShowtimes = true;
+    }
+    this.applyFiltersInstant();
+  }
+
+  requestAllShowtimes(): void {
+    this.hasRequestedShowtimes = true;
+    this.applyFiltersInstant();
+  }
+
+  selectLanguage(lang: string): void {
+    this.filters.audioLanguage = lang;
+    this.hasRequestedShowtimes = true;
+    this.applyFiltersInstant();
+  }
+
+  selectBranch(branch: string): void {
+    this.filters.cinemaBranch = branch;
+    this.hasRequestedShowtimes = true;
+    this.applyFiltersInstant();
   }
 
   selectGenreChip(chip: string): void {
     this.selectedGenreChip = chip;
+    this.hasRequestedShowtimes = true;
     if (chip === 'All') {
       this.filters.genre = '';
       this.filters.audioLanguage = '';
@@ -79,10 +139,11 @@ export class MovieCatalog implements OnInit, OnDestroy {
       this.filters.genre = chip;
       this.filters.audioLanguage = '';
     }
-    this.loadMovies();
+    this.applyFiltersInstant();
   }
 
   resetFilters(): void {
+    this.hasRequestedShowtimes = false;
     this.selectedGenreChip = 'All';
     this.filters = {
       searchTitle: '',
@@ -90,7 +151,21 @@ export class MovieCatalog implements OnInit, OnDestroy {
       audioLanguage: '',
       cinemaBranch: ''
     };
-    this.loadMovies();
+    this.movies = [];
+  }
+
+  getRelevantSchedules(movie: MovieResponseDto): ScheduleDto[] {
+    if (!movie.schedules || movie.schedules.length === 0) return [];
+    if (!this.filters.cinemaBranch || this.filters.cinemaBranch.trim() === '') {
+      return movie.schedules;
+    }
+    const branch = this.filters.cinemaBranch.toLowerCase().trim();
+    const matched = movie.schedules.filter((s) => {
+      const hall = (s.cinemaHallName || '').toLowerCase();
+      const id = (s.cinemaHallId || '').toLowerCase();
+      return hall.includes(branch) || id.includes(branch);
+    });
+    return matched.length > 0 ? matched : movie.schedules;
   }
 
   setHeroIndex(index: number): void {
@@ -132,20 +207,7 @@ export class MovieCatalog implements OnInit, OnDestroy {
     this.startAutoSlide();
   }
 
-  bookMovie(movie: MovieResponseDto): void {
-    let schedule: ScheduleDto;
-    if (movie.schedules && movie.schedules.length > 0) {
-      schedule = movie.schedules[0];
-    } else {
-      schedule = {
-        id: 'sch-' + movie.id + '-1',
-        startTime: new Date(Date.now() + 2 * 3600000).toISOString(),
-        cinemaHallId: 'hall-1',
-        cinemaHallName: 'Grand Bole Screen (Dolby Atmos)',
-        price: 300
-      };
-    }
-
+  bookSchedule(movie: MovieResponseDto, schedule: ScheduleDto): void {
     this.router.navigate(['/book', schedule.id], {
       state: {
         movie: movie,
@@ -155,9 +217,26 @@ export class MovieCatalog implements OnInit, OnDestroy {
         posterUrl: movie.featuredImageUrl,
         ticketPrice: schedule.price || 300,
         cinemaHall: schedule.cinemaHallName || 'Grand Bole Screen (Dolby Atmos)',
-        cinemaLocation: 'Addis Ababa (Bole)'
+        cinemaLocation: this.filters.cinemaBranch ? `${this.filters.cinemaBranch} Screen` : 'Addis Ababa (Bole)'
       }
     });
+  }
+
+  bookMovie(movie: MovieResponseDto): void {
+    const schedules = this.getRelevantSchedules(movie);
+    let schedule: ScheduleDto;
+    if (schedules && schedules.length > 0) {
+      schedule = schedules[0];
+    } else {
+      schedule = {
+        id: 'sch-' + movie.id + '-1',
+        startTime: new Date(Date.now() + 2 * 3600000).toISOString(),
+        cinemaHallId: 'hall-1',
+        cinemaHallName: 'Grand Bole Screen (Dolby Atmos)',
+        price: 300
+      };
+    }
+    this.bookSchedule(movie, schedule);
   }
 
   viewMovieDetails(movie: MovieResponseDto): void {
