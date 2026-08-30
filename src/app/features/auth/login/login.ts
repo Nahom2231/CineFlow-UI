@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../core/services/auth';
 
 @Component({
@@ -14,6 +14,7 @@ import { AuthService } from '../../../core/services/auth';
 export class Login implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
 
   email: string = '';
@@ -68,7 +69,8 @@ export class Login implements OnInit, OnDestroy {
       next: () => {
         this.loading = false;
         this.resetFailedAttempts(attemptEmail);
-        this.router.navigate(['/movies']);
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/movies';
+        this.router.navigateByUrl(returnUrl);
       },
       error: (err) => {
         this.loading = false;
