@@ -2,14 +2,14 @@
   <!-- Top Navigation & Breadcrumbs -->
   <div class="top-nav-bar">
     <button class="btn-back" (click)="goBack()">
-      <span>‹</span> Back to Catalog
+      <span>‹</span> {{ 'HERO_BROWSE_BTN' | translate }}
     </button>
     <div class="quick-admin-actions">
       <a [routerLink]="['/admin/create-schedule']" class="btn-schedule-shortcut">
-        <span>📅</span> Add Schedule
+        <span>📅</span> {{ 'ADMIN_CREATE_SCHEDULE_BTN' | translate }}
       </a>
       <a routerLink="/admin/create-movie" class="btn-movie-shortcut">
-        <span>🎬</span> Add Movie
+        <span>🎬</span> {{ 'NAV_ADD_MOVIE' | translate }}
       </a>
     </div>
   </div>
@@ -44,34 +44,31 @@
         <!-- Movie Header Info -->
         <div class="movie-header-info">
           <div class="title-wrap">
-            <h1 class="title-en">{{ movie.titleEnglish }}</h1>
-            <h2 class="title-am" *ngIf="movie.titleAmharic">{{ movie.titleAmharic }}</h2>
+            <h1 class="title-en">{{ translationService.dynamic(movie.titleEnglish, movie.titleAmharic) }}</h1>
+            <h2 class="title-am" *ngIf="movie.titleAmharic && translationService.getLanguage() === 'en'">{{ movie.titleAmharic }}</h2>
           </div>
 
           <div class="meta-chips">
-            <span class="chip">⏱️ {{ movie.durationMinutes || 120 }} min</span>
+            <span class="chip">⏱️ {{ movie.durationMinutes || 120 }} {{ 'MINUTES' | translate }}</span>
             <span class="chip">⭐ 4.9 (Audience Choice)</span>
             <span class="chip">🔊 Dolby Atmos / IMAX</span>
-            <span class="chip">🍿 Concessions Available</span>
+            <span class="chip">⚡ Chapa Real-Time API</span>
           </div>
 
           <div class="crew-info-box">
             <div class="crew-item" *ngIf="movie.directorName">
-              <span class="label">Director:</span>
+              <span class="label">{{ 'DIRECTOR' | translate }}:</span>
               <span class="val">{{ movie.directorName }}</span>
             </div>
             <div class="crew-item" *ngIf="movie.starName && movie.starName.length">
-              <span class="label">Cast:</span>
+              <span class="label">{{ 'MOVIE_CAST' | translate }}:</span>
               <span class="val">{{ movie.starName.join(', ') }}</span>
             </div>
           </div>
 
           <div class="synopsis-box">
-            <h3>Synopsis</h3>
-            <p class="synopsis-text">{{ movie.descriptionEnglish }}</p>
-            <p class="synopsis-amharic" *ngIf="movie.descriptionAmharic && movie.descriptionAmharic !== 'N/A'">
-              {{ movie.descriptionAmharic }}
-            </p>
+            <h3>{{ 'MOVIE_SYNOPSIS' | translate }}</h3>
+            <p class="synopsis-text">{{ translationService.dynamic(movie.descriptionEnglish, movie.descriptionAmharic) }}</p>
           </div>
         </div>
       </div>
@@ -80,8 +77,8 @@
     <!-- Showtimes & Booking Section -->
     <div class="showtimes-booking-container">
       <div class="section-title-wrap">
-        <h2>🎟️ Select Showtime & Cinema Hall</h2>
-        <p class="section-sub">Choose your preferred screening time to select seats and reserve online</p>
+        <h2>🎟️ {{ 'SELECT_CINEMA_HALL' | translate }}</h2>
+        <p class="section-sub">{{ 'SELECT_TIME_PROMPT' | translate }}</p>
       </div>
 
       <!-- Showtimes Grid -->
@@ -103,7 +100,7 @@
           </div>
 
           <div class="price-row">
-            <span class="price-label">Ticket Price:</span>
+            <span class="price-label">Price / ዋጋ:</span>
             <span class="price-amount">{{ schedule.price || 300 }} ETB</span>
           </div>
 
@@ -132,13 +129,13 @@
             <strong class="summary-val">{{ selectedSchedule.startTime | date:'EEE, MMM d, hh:mm a' }}</strong>
           </div>
           <div class="summary-col">
-            <span class="summary-label">Standard Admission</span>
+            <span class="summary-label">Admission</span>
             <strong class="summary-val price-highlight">{{ selectedSchedule.price || 300 }} ETB</strong>
           </div>
         </div>
 
         <button class="btn-proceed-seats" (click)="bookNow()">
-          <span>Proceed to Seat Selection</span> →
+          <span>🎟️</span> {{ 'PROCEED_SEAT_SELECTION' | translate }} →
         </button>
       </div>
     </div>
