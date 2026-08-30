@@ -3,7 +3,7 @@
   <header class="booking-header">
     <div class="header-inner">
       <a routerLink="/movies" class="btn-back">
-        <span class="arrow">‹</span> Back to Catalog
+        <span class="arrow">‹</span> {{ 'HERO_BROWSE_BTN' | translate }}
       </a>
       <div class="movie-pill">
         <span class="pulse-live"></span>
@@ -18,15 +18,15 @@
     <section class="seat-picker-section">
       <div class="auditorium-header">
         <div class="title-wrap">
-          <h1 class="main-title">Select Your Seat</h1>
-          <p class="subtitle">Tap any available seat to reserve it for 10 minutes</p>
+          <h1 class="main-title">{{ 'SEAT_PICKER_TITLE' | translate }}</h1>
+          <p class="subtitle">{{ 'SELECT_TIME_PROMPT' | translate }}</p>
         </div>
 
         <!-- 10-Minute Hold Status Banner -->
         <div *ngIf="holdActive" class="timer-banner animate-pop">
           <div class="timer-icon">⏳</div>
           <div class="timer-info">
-            <span class="timer-label">Seat <strong>{{ selectedSeat }}</strong> is held exclusively for you</span>
+            <span class="timer-label">{{ 'SEAT_HOLD_TIMER' | translate }}: <strong>{{ selectedSeat }}</strong> ({{ selectedSeatType === 'vip' ? 'VIP' : 'Standard' }})</span>
             <span class="timer-countdown">{{ formattedTimer }} remaining</span>
           </div>
         </div>
@@ -37,14 +37,17 @@
         <div class="projector-glow"></div>
         <div class="curved-screen"></div>
         <div class="screen-label">
-          <span>FRONT CINEMA SCREEN • ፊት ለፊት መመልከቻ</span>
+          <span>{{ 'SCREEN_THIS_WAY' | translate }}</span>
         </div>
       </div>
 
       <!-- Interactive Seat Layout -->
       <div class="seat-matrix">
-        <div *ngFor="let row of seatRows" class="matrix-row">
-          <span class="row-indicator">{{ row.rowLabel }}</span>
+        <div *ngFor="let row of seatRows" class="matrix-row" [class.vip-row-wrap]="row.rowLabel === 'D' || row.rowLabel === 'E'">
+          <div class="row-label-badge" [class.vip]="row.rowLabel === 'D' || row.rowLabel === 'E'">
+            <span class="row-text">{{ row.rowLabel }}</span>
+            <span class="vip-subtag" *ngIf="row.rowLabel === 'D' || row.rowLabel === 'E'">VIP</span>
+          </div>
           
           <div class="seats-lane">
             <button
@@ -54,17 +57,23 @@
               [class.selected]="seat.id === selectedSeat"
               [class.occupied]="seat.isOccupied"
               [class.vip]="seat.type === 'vip'"
-              [disabled]="seat.isOccupied || (holdActive && selectedSeat !== null && seat.id !== selectedSeat)"
-              (click)="selectSeat(seat.id)"
-              [attr.aria-label]="'Seat ' + seat.id + (seat.isOccupied ? ' Occupied' : ' Available')"
+              [class.available]="!seat.isOccupied && seat.id !== selectedSeat"
+              [disabled]="seat.isOccupied"
+              (click)="selectSeat(seat.id, seat.type)"
+              [attr.aria-label]="'Seat ' + seat.id"
               [title]="seat.id + ' • ' + (seat.isOccupied ? 'Occupied' : seat.type === 'vip' ? 'VIP Seat' : 'Standard Seat')"
             >
-              <span class="seat-icon">💺</span>
+              <span class="seat-icon">
+                {{ seat.isOccupied ? '🔒' : (seat.id === selectedSeat ? '✓' : (seat.type === 'vip' ? '👑' : '💺')) }}
+              </span>
               <span class="seat-num">{{ seat.label }}</span>
+              <span class="seat-type-tag" *ngIf="seat.type === 'vip' && !seat.isOccupied && seat.id !== selectedSeat">VIP</span>
             </button>
           </div>
 
-          <span class="row-indicator">{{ row.rowLabel }}</span>
+          <div class="row-label-badge" [class.vip]="row.rowLabel === 'D' || row.rowLabel === 'E'">
+            <span class="row-text">{{ row.rowLabel }}</span>
+          </div>
         </div>
       </div>
 
@@ -72,24 +81,39 @@
       <div class="seat-legend">
         <div class="legend-item">
           <span class="legend-box available"></span>
-          <span class="legend-text">Available</span>
+          <div class="legend-info">
+            <span class="legend-text">{{ 'SEAT_STANDARD' | translate }}</span>
+            <span class="legend-count">({{ availableStandardCount }} seats)</span>
+          </div>
         </div>
-        <div class="legend-item">
-          <span class="legend-box selected"></span>
-          <span class="legend-text">Selected</span>
-        </div>
+
         <div class="legend-item">
           <span class="legend-box vip"></span>
-          <span class="legend-text">VIP Rows</span>
+          <div class="legend-info">
+            <span class="legend-text">{{ 'SEAT_VIP' | translate }}</span>
+            <span class="legend-count">({{ availableVipCount }} seats)</span>
+          </div>
         </div>
+
+        <div class="legend-item">
+          <span class="legend-box selected"></span>
+          <div class="legend-info">
+            <span class="legend-text">{{ 'SEAT_SELECTED' | translate }}</span>
+            <span class="legend-count">{{ selectedSeat ? ('(' + selectedSeat + ')') : '' }}</span>
+          </div>
+        </div>
+
         <div class="legend-item">
           <span class="legend-box occupied"></span>
-          <span class="legend-text">Occupied / Booked</span>
+          <div class="legend-info">
+            <span class="legend-text">{{ 'SEAT_OCCUPIED' | translate }}</span>
+            <span class="legend-count">({{ occupiedCount }} seats)</span>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Right Column: Movie Summary & Instant Ethiopian Mobile Payment -->
+    <!-- Right Column: Movie Summary & Real Chapa Payment Gateway -->
     <aside class="checkout-panel">
       <!-- Movie Ticket Preview Card -->
       <div class="ticket-preview-card">
@@ -101,8 +125,8 @@
           />
         </div>
         <div class="preview-meta">
-          <h2 class="preview-title-en">{{ movieTitle }}</h2>
-          <h3 class="preview-title-am" *ngIf="movieTitleAmharic">{{ movieTitleAmharic }}</h3>
+          <h2 class="preview-title-en">{{ translationService.dynamic(movieTitle, movieTitleAmharic) }}</h2>
+          <h3 class="preview-title-am" *ngIf="movieTitleAmharic && translationService.getLanguage() === 'en'">{{ movieTitleAmharic }}</h3>
           
           <div class="preview-specs">
             <span class="spec-tag">📍 {{ cinemaLocation }}</span>
@@ -114,86 +138,134 @@
       <!-- Selected Seat Summary -->
       <div class="selection-summary">
         <div class="summary-row">
-          <span class="summary-label">Chosen Seat</span>
-          <span class="seat-highlight" [class.unselected]="!selectedSeat">
-            {{ selectedSeat ? selectedSeat : 'None Selected' }}
-          </span>
+          <span class="summary-label">{{ 'CHOSEN_SEAT' | translate }}</span>
+          <div class="seat-badge-wrap">
+            <span class="seat-highlight" [class.unselected]="!selectedSeat" [class.vip-highlight]="selectedSeatType === 'vip'">
+              {{ selectedSeat ? selectedSeat : 'None Selected' }}
+            </span>
+            <span class="tier-badge" *ngIf="selectedSeatType === 'vip'">VIP Recliner</span>
+          </div>
         </div>
 
         <div class="summary-row">
-          <span class="summary-label">Base Ticket Price</span>
-          <span class="summary-val">{{ ticketPrice }} ETB</span>
+          <span class="summary-label">{{ 'BASE_PRICE' | translate }}</span>
+          <span class="summary-val">{{ baseTicketPrice }} ETB</span>
+        </div>
+
+        <div class="summary-row" *ngIf="selectedSeatType === 'vip'">
+          <span class="summary-label">{{ 'VIP_UPGRADE' | translate }}</span>
+          <span class="summary-val vip-extra">+{{ vipExtraPrice }} ETB</span>
         </div>
 
         <div class="summary-row">
-          <span class="summary-label">VAT & Service Fee (15%)</span>
+          <span class="summary-label">{{ 'VAT_SERVICE' | translate }}</span>
           <span class="summary-val">{{ vatAmount }} ETB</span>
         </div>
 
         <div class="summary-divider"></div>
 
         <div class="summary-row total-row">
-          <span class="total-label">Total Payment</span>
+          <span class="total-label">{{ 'TOTAL_PAYMENT' | translate }}</span>
           <span class="total-price">{{ totalAmount }} ETB</span>
         </div>
       </div>
 
-      <!-- Mobile Payment Options -->
-      <div class="payment-box">
-        <h3 class="payment-title">
-          <span>💳</span> Instant Mobile Payment
-        </h3>
-
-        <!-- Provider Select Tabs -->
-        <div class="provider-selector">
-          <button 
-            type="button" 
-            class="provider-tab" 
-            [class.active]="paymentProvider === 'Telebirr'"
-            (click)="paymentProvider = 'Telebirr'"
-          >
-            <span class="provider-icon">📱</span>
-            <span class="provider-name">Telebirr</span>
-            <span class="provider-badge">Popular</span>
-          </button>
-
-          <button 
-            type="button" 
-            class="provider-tab" 
-            [class.active]="paymentProvider === 'CBEBirr'"
-            (click)="paymentProvider = 'CBEBirr'"
-          >
-            <span class="provider-icon">🏦</span>
-            <span class="provider-name">CBE Birr</span>
-          </button>
-
-          <button 
-            type="button" 
-            class="provider-tab" 
-            [class.active]="paymentProvider === 'chapa'"
-            (click)="paymentProvider = 'chapa'"
-          >
-            <span class="provider-icon">⚡</span>
-            <span class="provider-name">Chapa</span>
-          </button>
+      <!-- Real Chapa Payment Gateway Container -->
+      <div class="payment-box chapa-dedicated-box">
+        <div class="chapa-brand-header">
+          <div class="chapa-brand-title">
+            <span class="chapa-logo-icon">⚡</span>
+            <div>
+              <h3 class="chapa-main-title">Chapa Payment Gateway</h3>
+              <span class="chapa-sub-badge">Real-Time API Clearance</span>
+            </div>
+          </div>
+          <span class="chapa-et-flag">🇪🇹 ETB</span>
         </div>
 
-        <!-- Phone Number Input -->
-        <div class="phone-input-group">
-          <label for="bookingPhone">
-            {{ paymentProvider }} Account / Mobile Number
-          </label>
-          <div class="input-wrapper">
-            <span class="country-prefix">🇪🇹 +251</span>
-            <input 
-              id="bookingPhone"
-              type="tel" 
-              [(ngModel)]="phoneNumber" 
-              placeholder="0911223344"
-              maxlength="13"
-            />
+        <p class="chapa-desc">
+          {{ 'CHAPA_GATEWAY_SUBTITLE' | translate }}
+        </p>
+
+        <!-- Supported Sub-methods under Chapa -->
+        <div class="chapa-rails-list">
+          <span class="rail-pill">📱 Telebirr</span>
+          <span class="rail-pill">🏦 CBE Birr</span>
+          <span class="rail-pill">🏛️ Awash Birr</span>
+          <span class="rail-pill">💳 Visa / Master</span>
+          <span class="rail-pill">💎 BOA</span>
+        </div>
+
+        <!-- Chapa Customer Information Form -->
+        <div class="chapa-customer-fields">
+          <!-- Email Field -->
+          <div class="phone-input-group">
+            <label for="chapaEmail">
+              {{ 'CHAPA_EMAIL_LABEL' | translate }} <span class="req">*</span>
+            </label>
+            <div class="input-wrapper">
+              <span class="field-symbol">📧</span>
+              <input 
+                id="chapaEmail"
+                type="email" 
+                [(ngModel)]="customerEmail" 
+                placeholder="customer@example.com"
+                autocomplete="email"
+                required
+              />
+            </div>
           </div>
-          <p class="input-hint">Enter your 10-digit mobile wallet number</p>
+
+          <!-- First & Last Name -->
+          <div class="name-fields-grid">
+            <div class="phone-input-group" style="margin-bottom: 0;">
+              <label for="chapaFirstName">{{ 'CHAPA_FIRST_NAME' | translate }}</label>
+              <div class="input-wrapper">
+                <input 
+                  id="chapaFirstName"
+                  type="text" 
+                  [(ngModel)]="customerFirstName" 
+                  placeholder="Abebe"
+                />
+              </div>
+            </div>
+            <div class="phone-input-group" style="margin-bottom: 0;">
+              <label for="chapaLastName">{{ 'CHAPA_LAST_NAME' | translate }}</label>
+              <div class="input-wrapper">
+                <input 
+                  id="chapaLastName"
+                  type="text" 
+                  [(ngModel)]="customerLastName" 
+                  placeholder="Kebede"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Phone Number Field -->
+          <div class="phone-input-group">
+            <label for="bookingPhone">
+              {{ 'CHAPA_PHONE_LABEL' | translate }} <span class="req">*</span>
+            </label>
+            <div class="input-wrapper">
+              <span class="country-prefix">🇪🇹 +251</span>
+              <input 
+                id="bookingPhone"
+                type="text" 
+                [(ngModel)]="phoneNumber" 
+                placeholder="0911223344"
+                maxlength="25"
+                autocomplete="tel"
+              />
+            </div>
+            <!-- Quick Fill Wallet Chips -->
+            <div class="quick-wallet-chips">
+              <span class="chip-label">Quick:</span>
+              <button type="button" class="wallet-chip" (click)="fillQuickPhone('0911223344')">0911223344</button>
+              <button type="button" class="wallet-chip" (click)="fillQuickPhone('0922334455')">0922334455</button>
+              <button type="button" class="wallet-chip" (click)="fillQuickPhone('0933445566')">0933445566</button>
+            </div>
+          </div>
         </div>
 
         <!-- Error Message Alert -->
@@ -204,24 +276,78 @@
         <!-- Submit & Pay Button -->
         <button 
           type="button"
-          class="btn-checkout" 
-          [disabled]="!selectedSeat || isBooking"
+          class="btn-checkout btn-chapa-glow" 
+          [disabled]="isBooking || !selectedSeat"
           (click)="confirmBooking()"
         >
           <span *ngIf="!isBooking">
-            🔒 Pay {{ totalAmount }} ETB & Confirm
+            ⚡ {{ 'CHAPA_PAY_BUTTON' | translate }} ({{ totalAmount }} ETB)
           </span>
           <span *ngIf="isBooking" class="btn-spinner-wrap">
-            <span class="spinner-sm"></span> Processing Secure Payment...
+            <span class="spinner-sm"></span> {{ 'CHAPA_PROCESSING' | translate }}
           </span>
         </button>
 
-        <!-- Digital Ticket Guarantee -->
-        <div class="guarantee-badge">
-          <span class="badge-icon">🎟️</span>
-          <span>Instant Digital QR Pass issued directly to your device after payment</span>
+        <!-- Chapa Security Badge -->
+        <div class="guarantee-badge chapa-security-badge">
+          <span class="badge-icon">🔒</span>
+          <span>{{ 'CHAPA_SECURE_BADGE' | translate }}</span>
         </div>
       </div>
     </aside>
   </main>
+
+  <!-- Instant Payment Processing Modal -->
+  <div *ngIf="isPaymentModalOpen" class="payment-modal-backdrop animate-fade-in">
+    <div class="payment-modal-card glass-panel">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="modal-provider-badge chapa">
+          <span class="icon">⚡</span>
+          <span>Chapa Payment Gateway</span>
+        </div>
+        <span class="amount-tag">{{ totalAmount }} ETB</span>
+      </div>
+
+      <!-- Live Payment Animation & Status -->
+      <div class="modal-body">
+        <div class="pulse-indicator" [class.success]="paymentStep === 'success'">
+          <span class="ring"></span>
+          <span class="center-icon">{{ paymentStep === 'success' ? '✓' : '⚡' }}</span>
+        </div>
+
+        <h3 class="modal-status-title">
+          <span *ngIf="paymentStep === 'initiating'">Connecting to Chapa Payment Gateway...</span>
+          <span *ngIf="paymentStep === 'awaiting_pin'">Securing Chapa Transaction Handshake...</span>
+          <span *ngIf="paymentStep === 'verifying'">Verifying Multi-Bank Clearance...</span>
+          <span *ngIf="paymentStep === 'success'" style="color: #34d399;">Chapa Payment Approved & Verified!</span>
+        </h3>
+
+        <p class="modal-prompt-text">{{ paymentPromptMessage }}</p>
+
+        <div class="modal-txn-box">
+          <span class="label">Chapa Transaction Reference:</span>
+          <code class="txn-ref">{{ generatedTxnRef }}</code>
+        </div>
+
+        <div class="modal-meta-grid">
+          <div class="meta-cell">
+            <span class="c-label">Movie</span>
+            <span class="c-val">{{ movieTitle }}</span>
+          </div>
+          <div class="meta-cell">
+            <span class="c-label">Seat</span>
+            <span class="c-val" style="color: #34d399; font-weight: 800;">{{ selectedSeat }} ({{ selectedSeatType === 'vip' ? 'VIP' : 'Standard' }})</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer" *ngIf="paymentStep !== 'success'">
+        <button type="button" class="btn-cancel-modal" (click)="cancelPaymentModal()">
+          Cancel Transaction
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
