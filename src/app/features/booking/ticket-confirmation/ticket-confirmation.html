@@ -1,102 +1,131 @@
 <div class="ticket-confirmation-container">
+  <!-- Perforated Notches on Ticket Edges -->
+  <div class="notch notch-left"></div>
+  <div class="notch notch-right"></div>
+
+  <!-- Cinema Pass Header -->
   <div class="confirmation-header">
-    <div class="success-badge">✓ Booking Confirmed</div>
-    <h1>Your Digital Pass</h1>
+    <div class="pass-top-bar">
+      <span class="cinema-brand">🎬 CINEFLOW ADMISSION PASS</span>
+      <div class="hologram-badge">{{ 'PASS_VERIFIED' | translate }}</div>
+    </div>
+    <div class="success-badge">✓ Booking Confirmed & Verified</div>
+    <h1>{{ 'PASS_TITLE' | translate }}</h1>
   </div>
 
   <!-- QR Code Section -->
   <div class="qr-section">
-    <h2>Show this QR code at the cinema</h2>
-    <div class="qr-display">
-      <img [src]="qrCodeUrl" alt="Ticket QR Code" class="qr-code" />
+    <div class="qr-wrapper">
+      <div class="qr-display">
+        <img [src]="qrCodeUrl" alt="Ticket QR Code" class="qr-code" />
+      </div>
+      <div class="qr-watermark">CINEFLOW VIP PASS</div>
     </div>
-    <p class="qr-info">Present your phone with this code to the cinema staff for quick entry</p>
+    
+    <div class="qr-scan-guide">
+      <span class="guide-badge">📱 Instant Scannable Gate Pass</span>
+      <p class="qr-info">{{ 'PASS_GATE_INSTRUCTION' | translate }}</p>
+      <a [routerLink]="['/booking-details', ticketId]" class="btn-direct-verify" target="_blank">
+        <span>🔗</span> Open Live Verification Screen →
+      </a>
+    </div>
   </div>
 
-  <!-- Ticket Details -->
+  <!-- Perforated Tear Line -->
+  <div class="perforated-divider">
+    <span class="divider-dot"></span>
+    <span class="divider-line"></span>
+    <span class="divider-dot"></span>
+  </div>
+
+  <!-- Ticket Details Grid -->
   <div class="ticket-details">
-    <div class="detail-section">
-      <h3>Movie</h3>
+    <div class="detail-section movie-hero-detail">
       <div class="movie-info">
-        <p class="movie-title">{{ movieTitle }}</p>
-        <p class="movie-subtitle">{{ movieTitleAmharic }}</p>
+        <span class="section-tag">NOW SCREENING</span>
+        <p class="movie-title">{{ translationService.dynamic(movieTitle, movieTitleAmharic) }}</p>
+        <p class="movie-subtitle" *ngIf="movieTitleAmharic && translationService.getLanguage() === 'en'">{{ movieTitleAmharic }}</p>
       </div>
+      <span class="hall-pill">🎭 {{ cinemaHall }}</span>
     </div>
 
     <div class="detail-section">
-      <h3>Seat Information</h3>
+      <h3>Seat & Pricing</h3>
       <div class="grid-2">
         <div>
-          <p class="label">Seat:</p>
-          <p class="value">{{ seatNumber }}</p>
+          <p class="label">{{ 'PASS_SEAT_NUMBER' | translate }}:</p>
+          <p class="value seat-val">💺 {{ seatNumber }}</p>
         </div>
         <div>
-          <p class="label">Price:</p>
-          <p class="value">{{ ticketPrice }} ETB</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="detail-section">
-      <h3>Cinema Information</h3>
-      <div class="grid-2">
-        <div>
-          <p class="label">Hall:</p>
-          <p class="value">{{ cinemaHall }}</p>
-        </div>
-        <div>
-          <p class="label">Location:</p>
-          <p class="value">{{ cinemaLocation }}</p>
+          <p class="label">{{ 'PASS_PRICE' | translate }}:</p>
+          <p class="value price-val">{{ ticketPrice }} ETB</p>
         </div>
       </div>
     </div>
 
     <div class="detail-section">
-      <h3>Show Time</h3>
-      <p class="value">{{ scheduleTime | date:'medium' }}</p>
+      <h3>{{ 'PASS_LOCATION' | translate }} & {{ 'PASS_SHOWTIME' | translate }}</h3>
+      <div class="grid-2">
+        <div>
+          <p class="label">{{ 'PASS_LOCATION' | translate }}:</p>
+          <p class="value">📍 {{ cinemaLocation }}</p>
+        </div>
+        <div>
+          <p class="label">{{ 'PASS_SHOWTIME' | translate }}:</p>
+          <p class="value">🕒 {{ scheduleTime | date:'EEE, MMM d • h:mm a' }}</p>
+        </div>
+      </div>
     </div>
 
     <div class="detail-section">
-      <h3>Payment Details</h3>
+      <h3>Payment & Verification Reference</h3>
       <div class="grid-2">
         <div>
-          <p class="label">Provider:</p>
-          <p class="value">{{ paymentProvider }}</p>
+          <p class="label">Payment Provider:</p>
+          <p class="value provider-val">⚡ Chapa Payment Gateway</p>
         </div>
         <div>
-          <p class="label">Transaction Ref:</p>
+          <p class="label">{{ 'PASS_TXN_REF' | translate }}:</p>
           <p class="value ticket-ref">{{ transactionReference }}</p>
         </div>
       </div>
     </div>
 
-    <div class="detail-section">
-      <h3>Booking Time</h3>
-      <p class="value">{{ bookingDateTime | date:'medium' }}</p>
+    <div class="detail-section" style="border-bottom: none;">
+      <div class="grid-2">
+        <div>
+          <p class="label">Issued Date & Time:</p>
+          <p class="value small">{{ bookingDateTime | date:'MMM d, y, h:mm a' }}</p>
+        </div>
+        <div>
+          <p class="label">Pass ID:</p>
+          <p class="value small" style="color: #38bdf8; font-family: monospace;">{{ ticketId }}</p>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- Actions -->
   <div class="actions">
     <button class="btn btn-primary" (click)="downloadQRCode()">
-      📥 Download QR Code
+      <span>📥</span> {{ 'PASS_DOWNLOAD_QR' | translate }}
     </button>
     <button class="btn btn-secondary" (click)="printTicket()">
-      🖨️ Print Ticket
+      <span>🖨️</span> {{ 'PASS_PRINT' | translate }}
     </button>
     <button class="btn btn-outline" (click)="goToMovies()">
-      Back to Movies
+      <span>🍿</span> {{ 'HERO_BROWSE_BTN' | translate }}
     </button>
   </div>
 
   <!-- Important Info -->
   <div class="info-box">
-    <h4>Important Information</h4>
+    <h4><span>ℹ️</span> Cinema Admission Guidelines</h4>
     <ul>
-      <li>Keep this QR code safe - it's your ticket to the cinema</li>
-      <li>Arrive 15 minutes before show time</li>
-      <li>The QR code is valid only for the selected date and time</li>
-      <li>One QR code per seat - cannot be used for multiple entries</li>
+      <li>Keep this digital pass accessible on your phone when arriving at the cinema.</li>
+      <li>Arrive 15 minutes prior to screening time to enjoy refreshments and find your seat.</li>
+      <li>This QR pass is valid strictly for the designated date, showtime, and auditorium.</li>
+      <li>One unique QR code per seat — single-entry admission guaranteed.</li>
     </ul>
   </div>
 </div>
