@@ -4,17 +4,20 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { CineFlowApiService } from '../../../core/services/cineflow-api.service';
 import { MovieResponseDto, ScheduleDto } from '../../../core/models/CineFlow.model';
+import { TranslationService } from '../../../core/services/translation.service';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-movie-details',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   templateUrl: './movie-details.html',
   styleUrl: './movie-details.scss'
 })
 export class MovieDetails implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private apiService = inject(CineFlowApiService);
+  public translationService = inject(TranslationService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private routeSub?: Subscription;
