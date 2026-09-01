@@ -31,8 +31,21 @@
       </a>
     </nav>
 
-    <!-- Header Actions & Top Right Language Switcher -->
+    <!-- Header Actions & Top Right Language & Theme Switcher -->
     <div class="header-actions">
+      <!-- Dark / Light Theme Toggle Button -->
+      <button 
+        type="button" 
+        class="btn-theme-toggle" 
+        (click)="toggleTheme()"
+        [attr.aria-label]="'THEME_TOGGLE_TITLE' | translate"
+        [title]="currentTheme === 'dark' ? ('THEME_LIGHT' | translate) : ('THEME_DARK' | translate)"
+      >
+        <span class="theme-icon" *ngIf="currentTheme === 'dark'">☀️</span>
+        <span class="theme-icon" *ngIf="currentTheme === 'light'">🌙</span>
+        <span class="theme-text">{{ currentTheme === 'dark' ? ('THEME_LIGHT' | translate) : ('THEME_DARK' | translate) }}</span>
+      </button>
+
       <!-- Standardized ISO Language Switcher Button (Top Right) -->
       <div class="lang-switcher-container">
         <button 
@@ -194,3 +207,6 @@
   <div class="cinema-particles"></div>
   <div class="ambient-grid-overlay"></div>
 </div>
+
+<!-- Global Floating Toast Notifications -->
+<app-toast></app-toast>

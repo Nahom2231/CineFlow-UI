@@ -26,7 +26,7 @@ export const routes: Routes = [
   { path: 'book/:scheduleId', component: SeatPicker, canActivate: [authGuard] },
   { path: 'ticket-confirmation', component: TicketConfirmation, canActivate: [authGuard] },
   { path: 'booking-history', component: BookingHistory, canActivate: [authGuard] },
-  { path: 'booking-details/:ticketId', component: TicketConfirmation, canActivate: [authGuard] },
+  { path: 'booking-details/:ticketId', component: TicketConfirmation },
   { path: 'admin/dashboard', component: AdminDashboard, canActivate: [adminGuard] },
   { path: 'admin/validate-ticket', component: TicketValidator, canActivate: [adminGuard] },
   { path: 'admin/manage-halls', component: ManageHalls, canActivate: [adminGuard] },

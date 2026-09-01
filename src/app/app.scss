@@ -2,7 +2,7 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: rgba(7, 9, 14, 0.85);
+  background: var(--bg-card);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-subtle);
@@ -47,7 +47,7 @@
       font-family: var(--font-heading);
       font-size: 1.45rem;
       font-weight: 800;
-      color: #ffffff;
+      color: var(--text-main);
       line-height: 1.1;
       letter-spacing: -0.03em;
 
@@ -59,11 +59,10 @@
     }
 
     .tagline {
-      font-size: 0.68rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-muted);
-      font-weight: 600;
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      letter-spacing: 0.04em;
     }
   }
 }
@@ -94,23 +93,23 @@
     }
 
     &:hover {
-      color: #ffffff;
-      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      background: var(--bg-glass);
     }
 
     &.active {
-      color: #ffffff;
-      background: rgba(99, 102, 241, 0.15);
-      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: var(--text-main);
+      background: rgba(99, 102, 241, 0.18);
+      border: 1px solid rgba(99, 102, 241, 0.35);
     }
 
     &.admin-pill {
       border: 1px dashed rgba(245, 158, 11, 0.4);
-      color: #fcd34d;
+      color: #f59e0b;
 
       &:hover, &.active {
         background: rgba(245, 158, 11, 0.15);
-        color: #fef08a;
+        color: #d97706;
       }
     }
   }
@@ -121,6 +120,36 @@
   align-items: center;
   gap: 0.75rem;
 
+  .btn-theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.85rem;
+    background: var(--bg-glass);
+    border: 1px solid var(--border-subtle);
+    border-radius: 50px;
+    color: var(--text-main);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.25s ease;
+
+    .theme-icon {
+      font-size: 1rem;
+    }
+
+    .theme-text {
+      font-size: 0.8rem;
+    }
+
+    &:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-focus);
+      transform: scale(1.03);
+    }
+  }
+
   .lang-switcher-container {
     display: flex;
     align-items: center;
@@ -130,10 +159,10 @@
       align-items: center;
       gap: 0.35rem;
       padding: 0.45rem 0.85rem;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: var(--bg-glass);
+      border: 1px solid var(--border-subtle);
       border-radius: 50px;
-      color: #ffffff;
+      color: var(--text-main);
       font-size: 0.85rem;
       font-weight: 700;
       cursor: pointer;

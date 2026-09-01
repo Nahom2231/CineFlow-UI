@@ -3,18 +3,23 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/router';
 import { AuthService } from './core/services/auth';
 import { TranslationService, LanguageCode } from './core/services/translation.service';
+import { ThemeService, ThemeMode } from './core/services/theme.service';
+import { NotificationService } from './core/services/notification.service';
 import { TranslatePipe } from './core/pipes/translate.pipe';
+import { ToastComponent } from './core/components/toast/toast.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, ToastComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class AppComponent {
   authService = inject(AuthService);
   translationService = inject(TranslationService);
+  themeService = inject(ThemeService);
+  notificationService = inject(NotificationService);
   router = inject(Router);
 
   isLoggedIn$ = this.authService.isLoggedIn$;
@@ -29,8 +34,22 @@ export class AppComponent {
     return this.translationService.languages;
   }
 
+  get currentTheme(): ThemeMode {
+    return this.themeService.currentTheme();
+  }
+
+  toggleTheme(): void {
+    const newTheme = this.themeService.toggleTheme();
+    const modeName = newTheme === 'dark' 
+      ? this.translationService.t('THEME_DARK', 'Dark Mode') 
+      : this.translationService.t('THEME_LIGHT', 'Light Mode');
+    this.notificationService.info(`Switched to ${modeName}`, 'Theme Changed');
+  }
+
   toggleLanguage(): void {
-    this.translationService.toggleLanguage();
+    const nextLang = this.translationService.toggleLanguage();
+    const langLabel = nextLang === 'am' ? 'አማርኛ' : 'English';
+    this.notificationService.info(`Language set to ${langLabel}`, 'Language');
   }
 
   setLanguage(lang: LanguageCode): void {
@@ -62,6 +81,7 @@ export class AppComponent {
   logout(): void {
     this.authService.logout();
     this.closeMobileMenu();
+    this.notificationService.success('Signed out successfully', 'Logged Out');
     this.router.navigate(['/movies']);
   }
 }
