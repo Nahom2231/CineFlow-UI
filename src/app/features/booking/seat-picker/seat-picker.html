@@ -3,12 +3,19 @@
   <header class="booking-header">
     <div class="header-inner">
       <a routerLink="/movies" class="btn-back">
-        <span class="arrow">‹</span> {{ 'HERO_BROWSE_BTN' | translate }}
+        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        {{ 'HERO_BROWSE_BTN' | translate }}
       </a>
       <div class="movie-pill">
         <span class="pulse-live"></span>
-        <span class="hall-badge">🏛️ {{ cinemaHall }}</span>
-        <span class="time-badge">🕒 {{ showTime | date:'EEEE, MMM d • h:mm a' }}</span>
+        <span class="hall-badge">
+          <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v14M21 7v14M6 7V3h12v4M10 11h4M10 16h4"/></svg>
+          {{ cinemaHall }}
+        </span>
+        <span class="time-badge">
+          <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          {{ showTime | date:'EEEE, MMM d • h:mm a' }}
+        </span>
       </div>
     </div>
   </header>
@@ -22,9 +29,11 @@
           <p class="subtitle">{{ 'SELECT_TIME_PROMPT' | translate }}</p>
         </div>
 
-        <!-- 10-Minute Hold Status Banner -->
+        <!-- 3-Minute Hold Status Banner -->
         <div *ngIf="holdActive" class="timer-banner animate-pop">
-          <div class="timer-icon">⏳</div>
+          <div class="timer-icon">
+            <svg class="ui-icon icon-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
           <div class="timer-info">
             <span class="timer-label">{{ 'SEAT_HOLD_TIMER' | translate }}: <strong>{{ selectedSeat }}</strong> ({{ selectedSeatType === 'vip' ? 'VIP' : 'Standard' }})</span>
             <span class="timer-countdown">{{ formattedTimer }} remaining</span>
@@ -64,7 +73,18 @@
               [title]="seat.id + ' • ' + (seat.isOccupied ? 'Occupied' : seat.type === 'vip' ? 'VIP Seat' : 'Standard Seat')"
             >
               <span class="seat-icon">
-                {{ seat.isOccupied ? '🔒' : (seat.id === selectedSeat ? '✓' : (seat.type === 'vip' ? '👑' : '💺')) }}
+                <ng-container *ngIf="seat.isOccupied">
+                  <svg class="ui-icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </ng-container>
+                <ng-container *ngIf="!seat.isOccupied && seat.id === selectedSeat">
+                  <svg class="ui-icon icon-sm icon-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                </ng-container>
+                <ng-container *ngIf="!seat.isOccupied && seat.id !== selectedSeat && seat.type === 'vip'">
+                  <svg class="ui-icon icon-sm icon-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 4 3 12h14l3-12-6 7-4-5-4 5-6-7z"/><path d="M5 20h14"/></svg>
+                </ng-container>
+                <ng-container *ngIf="!seat.isOccupied && seat.id !== selectedSeat && seat.type !== 'vip'">
+                  <svg class="ui-icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 11V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v6"/><path d="M4 11h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2z"/></svg>
+                </ng-container>
               </span>
               <span class="seat-num">{{ seat.label }}</span>
               <span class="seat-type-tag" *ngIf="seat.type === 'vip' && !seat.isOccupied && seat.id !== selectedSeat">VIP</span>
@@ -129,8 +149,14 @@
           <h3 class="preview-title-am" *ngIf="movieTitleAmharic && translationService.getLanguage() === 'en'">{{ movieTitleAmharic }}</h3>
           
           <div class="preview-specs">
-            <span class="spec-tag">📍 {{ cinemaLocation }}</span>
-            <span class="spec-tag">🎭 {{ cinemaHall }}</span>
+            <span class="spec-tag">
+              <svg class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              {{ cinemaLocation }}
+            </span>
+            <span class="spec-tag">
+              <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v14M21 7v14M6 7V3h12v4M10 11h4M10 16h4"/></svg>
+              {{ cinemaHall }}
+            </span>
           </div>
         </div>
       </div>
@@ -174,7 +200,9 @@
       <div class="payment-box chapa-dedicated-box">
         <div class="chapa-brand-header">
           <div class="chapa-brand-title">
-            <span class="chapa-logo-icon">⚡</span>
+            <span class="chapa-logo-icon">
+              <svg class="ui-icon icon-zap icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </span>
             <div>
               <h3 class="chapa-main-title">Chapa Payment Gateway</h3>
               <span class="chapa-sub-badge">Real-Time API Clearance</span>
@@ -189,11 +217,26 @@
 
         <!-- Supported Sub-methods under Chapa -->
         <div class="chapa-rails-list">
-          <span class="rail-pill">📱 Telebirr</span>
-          <span class="rail-pill">🏦 CBE Birr</span>
-          <span class="rail-pill">🏛️ Awash Birr</span>
-          <span class="rail-pill">💳 Visa / Master</span>
-          <span class="rail-pill">💎 BOA</span>
+          <span class="rail-pill">
+            <svg class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+            Telebirr
+          </span>
+          <span class="rail-pill">
+            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 10v11M9 10v11M13 10v11M17 10v11M12 3l9 7H3l9-7z"/></svg>
+            CBE Birr
+          </span>
+          <span class="rail-pill">
+            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v14M21 7v14M6 7V3h12v4M10 11h4M10 16h4"/></svg>
+            Awash Birr
+          </span>
+          <span class="rail-pill">
+            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            Visa / Master
+          </span>
+          <span class="rail-pill">
+            <svg class="ui-icon icon-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 2 18 2 22 8 12 22 2 8 6 2"/></svg>
+            BOA
+          </span>
         </div>
 
         <!-- Chapa Customer Information Form -->
@@ -204,7 +247,9 @@
               {{ 'CHAPA_EMAIL_LABEL' | translate }} <span class="req">*</span>
             </label>
             <div class="input-wrapper">
-              <span class="field-symbol">📧</span>
+              <span class="field-symbol">
+                <svg class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </span>
               <input 
                 id="chapaEmail"
                 type="email" 
@@ -270,7 +315,10 @@
 
         <!-- Error Message Alert -->
         <div *ngIf="errorMessage" class="error-banner animate-fade-in">
-          <span>⚠️</span> {{ errorMessage }}
+          <span>
+            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </span>
+          {{ errorMessage }}
         </div>
 
         <!-- Submit & Pay Button -->
@@ -281,7 +329,8 @@
           (click)="confirmBooking()"
         >
           <span *ngIf="!isBooking">
-            ⚡ {{ 'CHAPA_PAY_BUTTON' | translate }} ({{ totalAmount }} ETB)
+            <svg class="ui-icon icon-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            {{ 'CHAPA_PAY_BUTTON' | translate }} ({{ totalAmount }} ETB)
           </span>
           <span *ngIf="isBooking" class="btn-spinner-wrap">
             <span class="spinner-sm"></span> {{ 'CHAPA_PROCESSING' | translate }}
@@ -290,7 +339,9 @@
 
         <!-- Chapa Security Badge -->
         <div class="guarantee-badge chapa-security-badge">
-          <span class="badge-icon">🔒</span>
+          <span class="badge-icon">
+            <svg class="ui-icon icon-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </span>
           <span>{{ 'CHAPA_SECURE_BADGE' | translate }}</span>
         </div>
       </div>
@@ -303,7 +354,9 @@
       <!-- Modal Header -->
       <div class="modal-header">
         <div class="modal-provider-badge chapa">
-          <span class="icon">⚡</span>
+          <span class="icon">
+            <svg class="ui-icon icon-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </span>
           <span>Chapa Payment Gateway</span>
         </div>
         <span class="amount-tag">{{ totalAmount }} ETB</span>
@@ -313,7 +366,14 @@
       <div class="modal-body">
         <div class="pulse-indicator" [class.success]="paymentStep === 'success'">
           <span class="ring"></span>
-          <span class="center-icon">{{ paymentStep === 'success' ? '✓' : '⚡' }}</span>
+          <span class="center-icon">
+            <ng-container *ngIf="paymentStep === 'success'; else zapIcon">
+              <svg class="ui-icon icon-success icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </ng-container>
+            <ng-template #zapIcon>
+              <svg class="ui-icon icon-zap icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </ng-template>
+          </span>
         </div>
 
         <h3 class="modal-status-title">

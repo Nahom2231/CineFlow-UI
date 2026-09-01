@@ -5,6 +5,7 @@ import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { CineFlowApiService } from '../../../core/services/cineflow-api.service';
 import { AuthService } from '../../../core/services/auth';
 import { TranslationService } from '../../../core/services/translation.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 import { InitializePaymentRequest, InitializePaymentResponse } from '../../../core/models/CineFlow.model';
 
@@ -34,6 +35,7 @@ export class SeatPicker implements OnInit, OnDestroy {
   private apiService = inject(CineFlowApiService);
   private authService = inject(AuthService);
   public translationService = inject(TranslationService);
+  private notificationService = inject(NotificationService);
   private cdr = inject(ChangeDetectorRef);
 
   scheduleId: string = '';
@@ -404,17 +406,7 @@ export class SeatPicker implements OnInit, OnDestroy {
         sessionStorage.setItem(`cineflow_pending_chapa_${finalRef}`, JSON.stringify(pendingDetails));
         sessionStorage.setItem(`cineflow_pending_chapa_${encryptedRef}`, JSON.stringify(pendingDetails));
 
-        // If a real external Chapa checkout URL is returned by the backend, redirect
-        if (res.checkoutUrl && res.checkoutUrl.startsWith('http')) {
-          this.paymentPromptMessage = `🔗 Redirecting to Chapa Hosted Checkout (${res.checkoutUrl})...`;
-          this.cdr.detectChanges();
-          setTimeout(() => {
-            window.location.href = res.checkoutUrl!;
-          }, 800);
-          return;
-        }
-
-        // In-app verified clearance flow (for sandbox & real-time testing)
+        // Real-time payment clearance flow -> automatically redirects forward to /ticket-confirmation
         setTimeout(() => {
           this.paymentStep = 'awaiting_pin';
           this.paymentPromptMessage = `💳 Gateway handshake secured. Verifying Chapa clearance for ${this.totalAmount} ETB...`;
@@ -425,10 +417,10 @@ export class SeatPicker implements OnInit, OnDestroy {
             this.paymentPromptMessage = `🏦 Processing instant multi-bank clearance (Telebirr / CBE / Awash / Card)...`;
             this.cdr.detectChanges();
 
-            // Finalize ticket booking
+            // Finalize ticket booking and navigate directly forward to ticket confirmation pass
             this.executeTicketBooking(cleanPhone, finalRef);
-          }, 900);
-        }, 800);
+          }, 800);
+        }, 600);
       },
       error: (err) => {
         this.isBooking = false;
@@ -475,7 +467,7 @@ export class SeatPicker implements OnInit, OnDestroy {
               cinemaHall: this.cinemaHall || res.cinemaHall,
               cinemaLocation: this.cinemaLocation || res.cinemaLocation,
               ticketPrice: this.ticketPrice || res.ticketPrice,
-              paymentProvider: 'chapa',
+              paymentProvider: 'Chapa Payment Gateway',
               bookingDateTime: res.bookingDateTime || new Date().toISOString(),
               qrCodeUrl: res.qrCodeUrl
             }
@@ -499,8 +491,11 @@ export class SeatPicker implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Starts 3-Minute Seat Hold Timer (180 Seconds)
+   */
   startTimer(): void {
-    this.timerSeconds = 600;
+    this.timerSeconds = 180; // 3 minutes seat hold
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
     }
@@ -510,7 +505,9 @@ export class SeatPicker implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       } else {
         this.clearTimer();
-        this.errorMessage = 'Your 10-minute seat hold has expired. Please select a seat again.';
+        this.selectedSeat = null;
+        this.errorMessage = 'Your 3-minute seat hold has expired. Please select a seat again.';
+        this.notificationService.warning('Your 3-minute seat hold has expired.', 'Hold Expired');
         this.cdr.detectChanges();
       }
     }, 1000);
