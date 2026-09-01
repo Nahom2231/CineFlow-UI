@@ -68,8 +68,8 @@
             <span class="field-icon">🏛️</span>
             <select id="hallSelect" [(ngModel)]="schedule.cinemaHallId" name="cinemaHallId" required>
               <option value="" disabled>-- Choose Cinema Hall --</option>
-              <option *ngFor="let hall of cinemaHalls" [value]="hall.id">
-                {{ hall.name }} {{ hall.branch ? '– ' + hall.branch : '' }}
+              <option *ngFor="let hall of cinemaHalls" [value]="hall.id || hall.cinemaHallId">
+                {{ getHallDisplayName(hall) }}
               </option>
             </select>
           </div>
@@ -128,7 +128,7 @@
 
         <div class="schedule-preview-card">
           <div class="preview-header">
-            <span class="hall-tag">{{ getSelectedHall()?.name || 'Grand Bole Screen (Dolby Atmos)' }}</span>
+            <span class="hall-tag">{{ getSelectedHallDisplayName() }}</span>
             <span class="price-tag">{{ schedule.ticketPrice || 300 }} ETB</span>
           </div>
 
@@ -149,7 +149,7 @@
           </div>
 
           <div class="preview-footer">
-            <span>🎟️ 60 Seats Available</span>
+            <span>🎟️ {{ getSelectedHall()?.totalCapacity || getSelectedHall()?.capacity || 36 }} Seats Available</span>
             <span class="status-live">● Live Booking Ready</span>
           </div>
         </div>

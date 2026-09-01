@@ -1,120 +1,162 @@
-<div class="admin-dashboard">
-  <div class="dashboard-header">
-    <h1>🏢 Admin Dashboard</h1>
-    <p class="subtitle">Cinema Management & Revenue Tracking</p>
+<div class="admin-dashboard-page">
+  <!-- Header Bar -->
+  <div class="dashboard-header-bar">
+    <div class="header-left">
+      <div class="admin-live-badge">
+        <span class="live-pulse"></span> SYSTEM LIVE • REAL-TIME METRICS
+      </div>
+      <h1>🏢 Cinema Executive Dashboard</h1>
+      <p class="subtitle">Real-time box office analytics, schedule tracking & revenue management</p>
+    </div>
+    <div class="header-right">
+      <button class="btn-refresh" (click)="loadDashboardStats()" [disabled]="loading">
+        <span [class.spin]="loading">🔄</span> Refresh Live Stats
+      </button>
+    </div>
   </div>
 
-  <div *ngIf="loading" class="loading">
-    <div class="spinner"></div>
-    <p>Loading dashboard...</p>
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-panel">
+    <div class="spinner-lg"></div>
+    <p>Synchronizing real-time cinema box office metrics...</p>
   </div>
 
-  <div *ngIf="!loading" class="dashboard-content">
+  <div *ngIf="!loading" class="dashboard-body animate-fade-in">
     <!-- Key Metrics Row -->
     <div class="metrics-grid">
-      <div class="metric-card primary">
-        <div class="icon">💰</div>
-        <div class="content">
-          <h3>Total Revenue</h3>
-          <p class="value">{{ formatCurrency(stats.totalRevenue) }}</p>
-          <p class="label">All time earnings</p>
+      <div class="metric-card metric-rev">
+        <div class="metric-icon-wrap">💰</div>
+        <div class="metric-details">
+          <span class="metric-label">Total Box Office</span>
+          <h2 class="metric-value">{{ formatCurrency(stats.totalRevenue) }}</h2>
+          <span class="metric-sub">Lifetime confirmed sales</span>
         </div>
       </div>
 
-      <div class="metric-card accent">
-        <div class="icon">📅</div>
-        <div class="content">
-          <h3>Today's Revenue</h3>
-          <p class="value">{{ formatCurrency(stats.todayRevenue) }}</p>
-          <p class="label">{{ stats.todayTickets }} tickets sold</p>
+      <div class="metric-card metric-today">
+        <div class="metric-icon-wrap">⚡</div>
+        <div class="metric-details">
+          <span class="metric-label">Today's Revenue</span>
+          <h2 class="metric-value">{{ formatCurrency(stats.todayRevenue) }}</h2>
+          <span class="metric-sub">{{ stats.todayTickets }} tickets sold today</span>
         </div>
       </div>
 
-      <div class="metric-card success">
-        <div class="icon">🎫</div>
-        <div class="content">
-          <h3>Total Tickets</h3>
-          <p class="value">{{ stats.totalTicketsSold }}</p>
-          <p class="label">Avg: {{ formatCurrency(stats.averageTicketPrice) }}/ticket</p>
+      <div class="metric-card metric-tickets">
+        <div class="metric-icon-wrap">🎫</div>
+        <div class="metric-details">
+          <span class="metric-label">Total Tickets Sold</span>
+          <h2 class="metric-value">{{ stats.totalTicketsSold }}</h2>
+          <span class="metric-sub">Avg: {{ formatCurrency(stats.averageTicketPrice) }}/seat</span>
         </div>
       </div>
 
-      <div class="metric-card warning">
-        <div class="icon">🎬</div>
-        <div class="content">
-          <h3>Upcoming Shows</h3>
-          <p class="value">{{ stats.upcomingShowsCount }}</p>
-          <p class="label">Scheduled screenings</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Most Popular Movie -->
-    <div class="featured-section">
-      <div class="feature-card">
-        <div class="feature-icon">⭐</div>
-        <h2>Most Popular Movie</h2>
-        <p class="feature-title">{{ stats.mostPopularMovie || 'No data yet' }}</p>
-      </div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="admin-actions">
-      <a routerLink="/admin/create-movie" class="action-btn movie">
-        <span class="icon">🎬</span>
-        <span class="text">Add New Movie</span>
-      </a>
-      <a routerLink="/admin/create-schedule" class="action-btn schedule">
-        <span class="icon">📅</span>
-        <span class="text">Create Schedules</span>
-      </a>
-      <a routerLink="/admin/manage-halls" class="action-btn halls">
-        <span class="icon">🏛️</span>
-        <span class="text">Manage Cinema Halls</span>
-      </a>
-      <a routerLink="/admin/validate-ticket" class="action-btn scan">
-        <span class="icon">📱</span>
-        <span class="text">Scan QR Code</span>
-      </a>
-      <a routerLink="/admin/revenue-report" class="action-btn report">
-        <span class="icon">📊</span>
-        <span class="text">View Reports</span>
-      </a>
-    </div>
-
-    <!-- Weekly Revenue Chart (Simple Table View) -->
-    <div class="chart-section" *ngIf="weeklyRevenue.length > 0">
-      <h2>📈 Weekly Revenue Trend</h2>
-      <div class="revenue-table">
-        <div class="table-header">
-          <div class="col-date">Date</div>
-          <div class="col-tickets">Tickets</div>
-          <div class="col-revenue">Revenue</div>
-        </div>
-        <div *ngFor="let day of weeklyRevenue" class="table-row">
-          <div class="col-date">{{ day.date | date:'MMM dd' }}</div>
-          <div class="col-tickets">{{ day.ticketsSold }} tickets</div>
-          <div class="col-revenue">{{ formatCurrency(day.revenue) }}</div>
+      <div class="metric-card metric-shows">
+        <div class="metric-icon-wrap">🎬</div>
+        <div class="metric-details">
+          <span class="metric-label">Upcoming Shows</span>
+          <h2 class="metric-value">{{ stats.upcomingShowsCount }}</h2>
+          <span class="metric-sub">Active scheduled showtimes</span>
         </div>
       </div>
     </div>
 
-    <!-- Top Movies This Week -->
-    <div class="top-movies-section" *ngIf="topMovies.length > 0">
-      <h2>🎬 Top Performing Movies</h2>
-      <div class="movies-grid">
-        <div *ngFor="let movie of topMovies; let i = index" class="movie-rank">
-          <div class="rank-badge">{{ i + 1 }}</div>
-          <div class="movie-info">
-            <h3>{{ movie.name }}</h3>
-            <div class="stats">
-              <span class="stat">
-                <strong>{{ movie.ticketsSold }}</strong> tickets
-              </span>
-              <span class="stat">
-                <strong>{{ formatCurrency(movie.revenue) }}</strong> earned
-              </span>
+    <!-- Quick Management Action Grid -->
+    <div class="admin-actions-grid">
+      <a routerLink="/admin/create-movie" class="action-card action-movie">
+        <span class="action-icon">➕🎬</span>
+        <div class="action-info">
+          <h4>Publish Movie</h4>
+          <p>Add new film to catalog</p>
+        </div>
+      </a>
+      <a routerLink="/admin/create-schedule" class="action-card action-schedule">
+        <span class="action-icon">📅</span>
+        <div class="action-info">
+          <h4>Create Schedule</h4>
+          <p>Set dates, halls & times</p>
+        </div>
+      </a>
+      <a routerLink="/admin/manage-halls" class="action-card action-halls">
+        <span class="action-icon">🏛️</span>
+        <div class="action-info">
+          <h4>Cinema Auditoriums</h4>
+          <p>Configure halls & seatmaps</p>
+        </div>
+      </a>
+      <a routerLink="/admin/validate-ticket" class="action-card action-scan">
+        <span class="action-icon">📱</span>
+        <div class="action-info">
+          <h4>QR Gate Scanner</h4>
+          <p>Verify digital guest passes</p>
+        </div>
+      </a>
+      <a routerLink="/admin/revenue-report" class="action-card action-report">
+        <span class="action-icon">📊</span>
+        <div class="action-info">
+          <h4>Revenue Reports</h4>
+          <p>Export analytics & CSVs</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Analytics Double Column Layout -->
+    <div class="analytics-layout">
+      <!-- 7-Day Visual Revenue Chart -->
+      <div class="analytics-panel weekly-revenue-panel">
+        <div class="panel-header">
+          <h3>📈 7-Day Revenue Trend</h3>
+          <span class="badge-tag">Daily Breakdown</span>
+        </div>
+
+        <div class="revenue-bars-container" *ngIf="weeklyRevenue.length > 0">
+          <div *ngFor="let day of weeklyRevenue" class="bar-col">
+            <span class="bar-val">{{ formatCurrency(day.revenue) }}</span>
+            <div class="bar-track">
+              <div 
+                class="bar-fill"
+                [style.height.%]="(day.revenue > 0 ? (day.revenue / (stats.totalRevenue || 1) * 300) : 10) | number:'1.0-0'"
+                [style.min-height.px]="12"
+              ></div>
             </div>
+            <span class="bar-day">{{ day.date | date:'EEE d' }}</span>
+            <span class="bar-tix">{{ day.ticketsSold }} tix</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Movies Ranking -->
+      <div class="analytics-panel top-movies-panel">
+        <div class="panel-header">
+          <h3>🌟 Top Performing Movies</h3>
+          <span class="badge-tag">By Box Office</span>
+        </div>
+
+        <div class="top-movies-list" *ngIf="topMovies.length > 0">
+          <div *ngFor="let movie of topMovies; let i = index" class="movie-rank-item">
+            <div class="rank-num" [class.top-one]="i === 0" [class.top-two]="i === 1" [class.top-three]="i === 2">
+              {{ i + 1 }}
+            </div>
+            <div class="movie-rank-info">
+              <div class="movie-name-row">
+                <h4>{{ movie.name }}</h4>
+                <span class="movie-rev-badge">{{ formatCurrency(movie.revenue) }}</span>
+              </div>
+              <div class="movie-progress-wrap">
+                <div class="progress-bar">
+                  <div class="progress-fill" [style.width.%]="stats.totalRevenue > 0 ? (movie.revenue / stats.totalRevenue * 100) : 50"></div>
+                </div>
+                <span class="tix-count">{{ movie.ticketsSold }} seats sold</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="featured-popular-banner">
+          <span class="pop-icon">🏆</span>
+          <div>
+            <span class="pop-label">Overall Most In-Demand Film:</span>
+            <strong class="pop-title">{{ stats.mostPopularMovie }}</strong>
           </div>
         </div>
       </div>

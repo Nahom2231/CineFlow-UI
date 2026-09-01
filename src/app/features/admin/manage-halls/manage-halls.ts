@@ -1,18 +1,20 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { CineFlowApiService } from '../../../core/services/cineflow-api.service';
 import { CinemaHall } from '../../../core/models/CineFlow.model';
 
 @Component({
   selector: 'app-manage-halls',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './manage-halls.html',
   styleUrl: './manage-halls.scss'
 })
 export class ManageHalls implements OnInit {
   private apiService = inject(CineFlowApiService);
+  private cdr = inject(ChangeDetectorRef);
 
   halls: CinemaHall[] = [];
   loading: boolean = true;
@@ -41,12 +43,14 @@ export class ManageHalls implements OnInit {
     this.loading = true;
     this.apiService.getCinemaHalls().subscribe({
       next: (data) => {
-        this.halls = data;
+        this.halls = data || [];
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Failed to load halls', err);
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -96,7 +100,7 @@ export class ManageHalls implements OnInit {
 
   submitHall(): void {
     if (!this.newHall.branchName || !this.newHall.hallName || !this.newHall.totalCapacity) {
-      this.message = 'Please fill all fields';
+      this.message = 'Please fill out all required fields.';
       this.isSuccess = false;
       return;
     }
@@ -112,27 +116,45 @@ export class ManageHalls implements OnInit {
         this.resetForm();
         this.showAddForm = false;
         this.loadHalls();
-        setTimeout(() => this.message = '', 3000);
+        setTimeout(() => {
+          this.message = '';
+          this.cdr.detectChanges();
+        }, 3500);
       },
       error: (err) => {
         this.message = err.error?.message || 'Failed to create hall';
         this.isSuccess = false;
+        this.cdr.detectChanges();
       }
     });
   }
 
   deleteHall(id: string): void {
-    if (confirm('Are you sure you want to delete this hall?')) {
+    const targetHall = this.halls.find(h => h.id === id);
+    const hallName = targetHall ? targetHall.hallName : 'this hall';
+
+    if (confirm(`Are you sure you want to delete "${hallName}"?`)) {
+      // 1. Optimistically remove from UI immediately for 0ms lag
+      this.halls = this.halls.filter(h => String(h.id).toLowerCase() !== String(id).toLowerCase());
+      this.message = `✓ "${hallName}" deleted successfully!`;
+      this.isSuccess = true;
+      this.cdr.detectChanges();
+
+      // 2. Execute deletion via service
       this.apiService.deleteCinemaHall(id).subscribe({
         next: () => {
-          this.message = '✓ Hall deleted successfully!';
-          this.isSuccess = true;
           this.loadHalls();
-          setTimeout(() => this.message = '', 3000);
+          setTimeout(() => {
+            this.message = '';
+            this.cdr.detectChanges();
+          }, 3500);
         },
-        error: (err) => {
-          this.message = err.error?.message || 'Failed to delete hall';
-          this.isSuccess = false;
+        error: () => {
+          this.loadHalls();
+          setTimeout(() => {
+            this.message = '';
+            this.cdr.detectChanges();
+          }, 3500);
         }
       });
     }
@@ -155,23 +177,27 @@ export class ManageHalls implements OnInit {
     }
 
     this.calculateSeats();
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   updateHall(): void {
     if (this.editingId) {
       this.apiService.updateCinemaHall(this.editingId, this.newHall as CinemaHall).subscribe({
         next: () => {
-          this.message = '✓ Hall updated successfully!';
+          this.message = '✓ Cinema hall updated successfully!';
           this.isSuccess = true;
           this.resetForm();
           this.showAddForm = false;
           this.loadHalls();
-          setTimeout(() => this.message = '', 3000);
+          setTimeout(() => {
+            this.message = '';
+            this.cdr.detectChanges();
+          }, 3500);
         },
         error: (err) => {
           this.message = err.error?.message || 'Failed to update hall';
           this.isSuccess = false;
+          this.cdr.detectChanges();
         }
       });
     }

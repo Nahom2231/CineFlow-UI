@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -14,6 +14,11 @@ import { MovieResponseDto } from '../../../core/models/CineFlow.model';
   styleUrls: ['./create-schedule.scss']
 })
 export class CreateSchedule implements OnInit {
+  private apiService = inject(CineFlowApiService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
+
   movies: MovieResponseDto[] = [];
   cinemaHalls: any[] = [];
   showtimeInput: string = '';
@@ -27,12 +32,6 @@ export class CreateSchedule implements OnInit {
     cinemaHallId: '',
     ticketPrice: 300
   };
-
-  constructor(
-    private apiService: CineFlowApiService,
-    private authService: AuthService,
-    private router: Router
-  ) {}
 
   get isLoggedIn(): boolean {
     return this.authService.isLoggedIn();
@@ -63,6 +62,7 @@ export class CreateSchedule implements OnInit {
         if (this.movies.length > 0 && !this.schedule.movieId) {
           this.schedule.movieId = this.movies[0].id;
         }
+        this.cdr.detectChanges();
       },
       error: (err) => console.error('Failed to load movies:', err)
     });
@@ -70,23 +70,53 @@ export class CreateSchedule implements OnInit {
     this.apiService.getCinemaHalls().subscribe({
       next: (data) => {
         this.cinemaHalls = data && data.length > 0 ? data : [
-          { id: '11111111-aaaa-1111-aaaa-111111111111', name: 'Grand Bole Screen (Dolby Atmos)', branch: 'Bole Medhanialem' },
-          { id: '22222222-bbbb-2222-bbbb-222222222222', name: 'IMAX Laser Bole', branch: 'Bole' },
-          { id: '33333333-cccc-3333-cccc-333333333333', name: 'Edna Mall VIP Lounge', branch: 'Edna Mall' }
+          { id: '11111111-aaaa-1111-aaaa-111111111111', hallName: 'Grand Bole Screen (Dolby Atmos)', branchName: 'Bole Medhanialem', totalCapacity: 36 },
+          { id: '22222222-bbbb-2222-bbbb-222222222222', hallName: 'IMAX Laser Bole', branchName: 'Bole', totalCapacity: 40 },
+          { id: '33333333-cccc-3333-cccc-333333333333', hallName: 'Edna Mall VIP Lounge', branchName: 'Edna Mall', totalCapacity: 24 }
         ];
         if (this.cinemaHalls.length > 0 && !this.schedule.cinemaHallId) {
-          this.schedule.cinemaHallId = this.cinemaHalls[0].id;
+          const first = this.cinemaHalls[0];
+          this.schedule.cinemaHallId = first.id || first.cinemaHallId;
         }
+        this.cdr.detectChanges();
       },
       error: () => {
         this.cinemaHalls = [
-          { id: '11111111-aaaa-1111-aaaa-111111111111', name: 'Grand Bole Screen (Dolby Atmos)', branch: 'Bole Medhanialem' },
-          { id: '22222222-bbbb-2222-bbbb-222222222222', name: 'IMAX Laser Bole', branch: 'Bole' },
-          { id: '33333333-cccc-3333-cccc-333333333333', name: 'Edna Mall VIP Lounge', branch: 'Edna Mall' }
+          { id: '11111111-aaaa-1111-aaaa-111111111111', hallName: 'Grand Bole Screen (Dolby Atmos)', branchName: 'Bole Medhanialem', totalCapacity: 36 },
+          { id: '22222222-bbbb-2222-bbbb-222222222222', hallName: 'IMAX Laser Bole', branchName: 'Bole', totalCapacity: 40 },
+          { id: '33333333-cccc-3333-cccc-333333333333', hallName: 'Edna Mall VIP Lounge', branchName: 'Edna Mall', totalCapacity: 24 }
         ];
         this.schedule.cinemaHallId = this.cinemaHalls[0].id;
+        this.cdr.detectChanges();
       }
     });
+  }
+
+  getHallDisplayName(hall: any): string {
+    if (!hall) return 'Cinema Hall';
+    const name = hall.hallName || hall.name || hall.cinemaHallName || hall.title || 'Screen Hall';
+    const branch = hall.branchName || hall.branch || hall.location || hall.cinemaBranch || '';
+    const capacity = hall.totalCapacity || hall.capacity;
+    const capStr = capacity ? ` (${capacity} Seats)` : '';
+    return `${name}${branch ? ' – ' + branch : ''}${capStr}`;
+  }
+
+  getSelectedHall(): any {
+    if (!this.schedule.cinemaHallId) return null;
+    const targetId = String(this.schedule.cinemaHallId).toLowerCase().trim();
+    return this.cinemaHalls.find(h => {
+      const hId = String(h.id || h.cinemaHallId || '').toLowerCase().trim();
+      return hId === targetId;
+    });
+  }
+
+  getSelectedHallDisplayName(): string {
+    const hall = this.getSelectedHall();
+    return hall ? this.getHallDisplayName(hall) : 'Grand Bole Screen (Dolby Atmos)';
+  }
+
+  getSelectedMovie(): MovieResponseDto | undefined {
+    return this.movies.find(m => m.id === this.schedule.movieId);
   }
 
   quickAdminLogin(): void {
@@ -100,7 +130,6 @@ export class CreateSchedule implements OnInit {
       },
       error: () => {
         this.adminLoginLoading = false;
-        // Trigger seed-admin then retry
         this.authService.seedAdmin().subscribe(() => {
           this.authService.loginAsAdmin().subscribe({
             next: () => {
@@ -159,13 +188,5 @@ export class CreateSchedule implements OnInit {
         this.message = err.error?.message || 'Schedule creation failed. Please ensure you are logged in as Admin.';
       }
     });
-  }
-
-  getSelectedMovie(): MovieResponseDto | undefined {
-    return this.movies.find(m => m.id === this.schedule.movieId);
-  }
-
-  getSelectedHall(): any {
-    return this.cinemaHalls.find(h => h.id === this.schedule.cinemaHallId);
   }
 }

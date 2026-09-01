@@ -121,11 +121,30 @@
           <h3 class="section-title"><span>🎬</span> Director & Credits</h3>
 
           <div class="form-group">
-            <label>Select Director</label>
-            <select [(ngModel)]="movie.directorId" name="directorId">
-              <option [ngValue]="null">-- Select Registered Director --</option>
-              <option *ngFor="let d of directors" [value]="d.id">{{ d.name }}</option>
-            </select>
+            <label for="directorName">Director Name</label>
+            <input
+              id="directorName"
+              type="text"
+              [(ngModel)]="movie.directorName"
+              name="directorName"
+              placeholder="e.g. Christopher Nolan, Yidnekachew Shumete, Denis Villeneuve"
+              autocomplete="off"
+            />
+            <span class="field-hint">Type any director name freely or click one of the quick suggestions below</span>
+
+            <!-- Quick Suggestion Chips -->
+            <div class="director-suggestions" style="display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.65rem;">
+              <span style="font-size: 0.76rem; color: var(--text-muted); align-self: center; font-weight: 600;">Quick Fill:</span>
+              <button
+                type="button"
+                *ngFor="let name of suggestedDirectors"
+                class="suggestion-pill"
+                (click)="selectSuggestedDirector(name)"
+                style="background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 20px; color: #a5b4fc; padding: 0.22rem 0.65rem; font-size: 0.78rem; cursor: pointer; transition: all 0.2s;"
+              >
+                + {{ name }}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -190,7 +209,8 @@
 
             <div class="preview-meta-row">
               <span>⏱️ {{ movie.durationMinutes || 120 }} min</span>
-              <span>⭐ 5.0 (New)</span>
+              <span *ngIf="movie.directorName" style="color: #38bdf8; font-weight: 600;">🎬 {{ movie.directorName }}</span>
+              <span *ngIf="!movie.directorName">⭐ 5.0 (New)</span>
             </div>
 
             <p class="preview-desc">

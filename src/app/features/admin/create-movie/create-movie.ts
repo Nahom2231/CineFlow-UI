@@ -14,6 +14,15 @@ import { CreateMovieDto } from '../../../core/models/CineFlow.model';
 })
 export class CreateMovie implements OnInit {
   directors: Array<{ id: string; name: string }> = [];
+  suggestedDirectors: string[] = [
+    'Christopher Nolan',
+    'Denis Villeneuve',
+    'Yidnekachew Shumete',
+    'Hermon Hailay',
+    'James Cameron',
+    'Greta Gerwig',
+    'Ryan Coogler'
+  ];
 
   movie: CreateMovieDto = {
     titleEnglish: '',
@@ -24,6 +33,7 @@ export class CreateMovie implements OnInit {
     genre: 'Action',
     audioLanguage: 'English',
     directorId: null,
+    directorName: '',
     featuredImageUrl: ''
   };
 
@@ -44,9 +54,23 @@ export class CreateMovie implements OnInit {
 
   ngOnInit(): void {
     this.apiService.getDirectors().subscribe({
-      next: (data: any) => (this.directors = data || []),
+      next: (data: any) => {
+        this.directors = data || [];
+        if (data && data.length > 0) {
+          const names = data.map((d: any) => d.name).filter(Boolean);
+          this.suggestedDirectors = Array.from(new Set([...this.suggestedDirectors, ...names]));
+        }
+      },
       error: () => (this.directors = [])
     });
+  }
+
+  selectSuggestedDirector(name: string): void {
+    this.movie.directorName = name;
+    const match = this.directors.find(d => d.name.toLowerCase() === name.toLowerCase());
+    if (match) {
+      this.movie.directorId = match.id;
+    }
   }
 
   onFileSelected(event: any): void {
@@ -110,8 +134,15 @@ export class CreateMovie implements OnInit {
     formData.append('Genre', this.movie.genre || 'Action');
     formData.append('AudioLanguage', this.movie.audioLanguage || 'English');
 
-    // Only append DirectorId if explicitly selected by the user
-    if (this.movie.directorId) {
+    const enteredDirectorName = (this.movie.directorName || '').trim() || 'Special Feature';
+    formData.append('DirectorName', enteredDirectorName);
+    formData.append('Director', enteredDirectorName);
+
+    // If matching director exists in registered directors list, append GUID as well
+    const matchedDirector = this.directors.find(d => d.name.toLowerCase() === enteredDirectorName.toLowerCase());
+    if (matchedDirector) {
+      formData.append('DirectorId', matchedDirector.id);
+    } else if (this.movie.directorId) {
       formData.append('DirectorId', this.movie.directorId);
     }
 
