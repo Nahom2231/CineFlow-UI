@@ -719,7 +719,11 @@ export class CineFlowApiService {
           cinemaHall: b.cinemaHall || 'Grand Bole Screen',
           cinemaLocation: b.cinemaLocation || 'Addis Ababa (Bole)',
           scheduleTime: b.scheduleTime || new Date().toISOString(),
-          ticketPrice: b.price || b.ticketPrice || 300
+          ticketPrice: b.price || b.ticketPrice || 300,
+          customerEmail: b.customerEmail || b.userEmail || 'customer@cineflow.et',
+          phoneNumber: b.paymentPhoneNumber || b.phoneNumber || '0911223344',
+          paymentProvider: b.paymentProvider || 'Chapa Payment Gateway',
+          bookingDateTime: b.bookingDateTime || b.bookingDate || new Date().toISOString()
         };
       }
     }
@@ -916,25 +920,32 @@ export class CineFlowApiService {
   }
 
   getBookingDetails(ticketId: string): Observable<any> {
+    const localMatch = this.findLocalBookingForValidation(ticketId);
+    if (localMatch) {
+      return of(localMatch);
+    }
+
     return this.http.get<any>(`${this.baseUrl}/Tickets/${ticketId}`).pipe(
       catchError(() => {
         const stored = this.getStoredBookings();
-        const found = stored.find((b: any) => b.ticketId === ticketId);
+        const found = stored.find((b: any) => b.ticketId === ticketId || b.transactionReference === ticketId);
         if (found) return of(found);
 
         const allLocal = this.getAllLocalMovies();
         const topMovie = allLocal[0];
         return of({
           ticketId: ticketId || 'TKT-774912',
-          transactionReference: 'TXN-CF-' + Math.random().toString(36).substring(2, 9).toUpperCase(),
-          movieTitle: topMovie ? topMovie.titleEnglish : 'CineFlow Ticket',
-          movieTitleAmharic: topMovie ? topMovie.titleAmharic : '',
-          seatNumber: 'C3',
+          transactionReference: 'CF-TXN-' + (ticketId || 'CONFIRMED'),
+          movieTitle: topMovie ? topMovie.titleEnglish : 'fugitive',
+          movieTitleAmharic: topMovie ? topMovie.titleAmharic : 'ፊዩጂቲቭ',
+          seatNumber: 'D4',
           scheduleTime: new Date(Date.now() + 3 * 3600000).toISOString(),
-          cinemaHall: 'Grand Bole Screen',
-          cinemaLocation: 'Bole, Addis Ababa',
+          cinemaHall: 'Grand Bole Screen (Dolby Atmos)',
+          cinemaLocation: 'Addis Ababa (Bole)',
           ticketPrice: 300,
-          paymentProvider: 'Telebirr',
+          paymentProvider: 'Chapa Payment Gateway',
+          customerEmail: 'customer@cineflow.et',
+          phoneNumber: '0911223344',
           bookingDateTime: new Date().toISOString(),
           qrCodeUrl: this.createSvgQrDataUri(ticketId || 'TKT-774912')
         });
@@ -993,14 +1004,13 @@ export class CineFlowApiService {
         callbackUrl: res?.callbackUrl
       })),
       catchError((err) => {
-        console.warn('Backend Payment/initialize unreachable or returned error, using local fallback:', err?.status);
+        console.warn('Backend Payment/initialize unreachable or returned error, using local simulation mode:', err?.status);
         const ref = request.reference || `CF-TXN-${Date.now()}`;
         return of({
           success: true,
-          message: 'Payment initialized successfully (Offline/Simulation Mode)',
+          message: 'Payment initialized successfully (Simulation Mode)',
           reference: ref,
-          encryptedReference: `ENC-${ref}`,
-          checkoutUrl: `https://checkout.chapa.co/checkout/payment/${ref}`
+          encryptedReference: `ENC-${ref}`
         });
       })
     );
@@ -1303,10 +1313,10 @@ export class CineFlowApiService {
   }
 
   public getOccupiedSeatsForSchedule(scheduleId: string): string[] {
-    const baseOccupied = ['A3', 'A4', 'B5', 'B6', 'C2', 'C7', 'D3', 'E4'];
+    const baseOccupied = ['A3', 'A4', 'B5', 'B6', 'C2', 'C7', 'D3'];
     const bookings = this.getAllStoredBookings();
     const bookedForSch = bookings
-      .filter((b: any) => (b.scheduleId === scheduleId || !b.scheduleId) && b.status !== 'cancelled')
+      .filter((b: any) => b.scheduleId === scheduleId && b.status !== 'cancelled')
       .map((b: any) => b.seatNumber)
       .filter((seat: any): seat is string => typeof seat === 'string' && seat.length > 0);
     return Array.from(new Set([...baseOccupied, ...bookedForSch]));
@@ -1315,8 +1325,7 @@ export class CineFlowApiService {
   public createSvgQrDataUri(ticketId: string): string {
     const origin = typeof window !== 'undefined' && window.location?.origin ? window.location.origin : 'http://localhost:4200';
     const verifyUrl = `${origin}/booking-details/${ticketId}`;
-    // Generate phone-scannable QR Code via standard dynamic QR generator
-    return `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=8&color=0a0d16&bgcolor=ffffff&data=${encodeURIComponent(verifyUrl)}`;
+    return `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=8&color=0f172a&bgcolor=ffffff&data=${encodeURIComponent(verifyUrl)}`;
   }
 
   // ADMIN METHODS
@@ -1721,5 +1730,42 @@ export class CineFlowApiService {
 
   deleteSchedule(scheduleId: string): Observable<{ message: string }> {
     return this.http.delete<{ message: string }>(`${this.baseUrl}/Schedules/${scheduleId}`);
+  }
+
+  // --- Watchlist Methods ---
+  getWatchlistIds(): string[] {
+    try {
+      if (typeof localStorage === 'undefined') return [];
+      const data = localStorage.getItem('cineflow_watchlist');
+      return data ? JSON.parse(data) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  isInWatchlist(movieId: string): boolean {
+    const list = this.getWatchlistIds();
+    return list.includes(movieId);
+  }
+
+  toggleWatchlist(movieId: string): boolean {
+    const list = this.getWatchlistIds();
+    const idx = list.indexOf(movieId);
+    let isAdded = false;
+
+    if (idx >= 0) {
+      list.splice(idx, 1);
+      isAdded = false;
+    } else {
+      list.push(movieId);
+      isAdded = true;
+    }
+
+    try {
+      localStorage.setItem('cineflow_watchlist', JSON.stringify(list));
+    } catch (e) {
+      console.warn('Could not save watchlist:', e);
+    }
+    return isAdded;
   }
 }

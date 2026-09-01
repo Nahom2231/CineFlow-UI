@@ -142,6 +142,18 @@ export class TranslationService {
       'ADMIN_VALIDATE_BTN': 'Gate Ticket Scanner',
       'ADMIN_REVENUE_REPORT_BTN': 'Audited Revenue Reports',
 
+      // Theme & Watchlist & Extra
+      'THEME_DARK': 'Dark Mode',
+      'THEME_LIGHT': 'Light Mode',
+      'THEME_TOGGLE_TITLE': 'Toggle Light/Dark Theme',
+      'NAV_WATCHLIST': 'My Watchlist',
+      'WATCHLIST_FILTER': 'Watchlist Only',
+      'ADD_TO_WATCHLIST': 'Add to Watchlist',
+      'REMOVE_FROM_WATCHLIST': 'In Watchlist',
+      'PASS_SHARE': 'Share Pass',
+      'PASS_COPY_REF': 'Copy Ref Code',
+      'PASS_COPIED': 'Ticket Reference Copied!',
+
       // Footer
       'FOOTER_DESC': "Ethiopia's premier next-generation cinema ticketing platform. Experience IMAX, Dolby Atmos sound, and instant QR gate passes seamlessly.",
       'FOOTER_QUICK_NAV': 'Quick Navigation',
@@ -265,6 +277,18 @@ export class TranslationService {
       'ADMIN_MANAGE_HALLS_BTN': 'አዳራሾችን አስተካክል',
       'ADMIN_VALIDATE_BTN': 'የመግቢያ QR ስካነር',
       'ADMIN_REVENUE_REPORT_BTN': 'የተሟላ የገቢ ሪፖርት',
+
+      // Theme & Watchlist & Extra
+      'THEME_DARK': 'የማታ እይታ',
+      'THEME_LIGHT': 'የቀን እይታ',
+      'THEME_TOGGLE_TITLE': 'የቀን/የማታ እይታን ቀይር',
+      'NAV_WATCHLIST': 'የተወደዱ ፊልሞች',
+      'WATCHLIST_FILTER': 'የተወደዱ ብቻ',
+      'ADD_TO_WATCHLIST': 'ወደ ተወደዱ መዝግብ',
+      'REMOVE_FROM_WATCHLIST': 'የተወደደ ፊልም',
+      'PASS_SHARE': 'ትኬቱን አጋራ',
+      'PASS_COPY_REF': 'መለያ ቁጥር ቅዳ',
+      'PASS_COPIED': 'የመለያ ቁጥሩ ተቀድቷል!',
 
       // Footer
       'FOOTER_DESC': 'የኢትዮጵያ ቀዳሚ የዲጂታል ሲኒማ ትኬት መቁረጫ መድረክ። ምርጥ የአይማክስ እና ዶልቢ አትሞስ ድምፅ ጥራት ከፈጣን QR ትኬት ጋር።',
