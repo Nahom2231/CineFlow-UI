@@ -5,6 +5,7 @@ import { RouterLink, Router } from '@angular/router';
 import { CineFlowApiService } from '../../../core/services/cineflow-api.service';
 import { MovieResponseDto, MovieFilterParams, ScheduleDto } from '../../../core/models/CineFlow.model';
 import { TranslationService } from '../../../core/services/translation.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
@@ -17,6 +18,7 @@ import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 export class MovieCatalog implements OnInit, OnDestroy {
   private apiService = inject(CineFlowApiService);
   public translationService = inject(TranslationService);
+  private notificationService = inject(NotificationService);
   private router = inject(Router);
 
   allMovies: MovieResponseDto[] = [];
@@ -31,7 +33,10 @@ export class MovieCatalog implements OnInit, OnDestroy {
 
   // Filter state
   selectedGenreChip: string = 'All';
-  genreChips: string[] = ['All', 'Action', 'Sci-Fi', 'Drama', 'Comedy', 'Amharic'];
+  genreChips: string[] = ['All', 'Action', 'Sci-Fi', 'Drama', 'Comedy', 'Amharic', 'Watchlist'];
+
+  // Sorting option
+  sortBy: 'title' | 'duration' | 'default' = 'default';
 
   filters: MovieFilterParams = {
     searchTitle: '',
@@ -46,7 +51,8 @@ export class MovieCatalog implements OnInit, OnDestroy {
       !!this.filters.audioLanguage ||
       !!this.filters.cinemaBranch ||
       !!this.filters.searchTitle ||
-      (!!this.filters.genre && this.filters.genre !== 'All')
+      (!!this.filters.genre && this.filters.genre !== 'All') ||
+      this.selectedGenreChip === 'Watchlist'
     );
   }
 
@@ -94,7 +100,20 @@ export class MovieCatalog implements OnInit, OnDestroy {
   }
 
   applyFiltersInstant(): void {
-    this.movies = this.apiService.applyLocalFilters(this.allMovies, this.filters);
+    let result = this.apiService.applyLocalFilters(this.allMovies, this.filters);
+
+    if (this.selectedGenreChip === 'Watchlist') {
+      const watchlistIds = this.apiService.getWatchlistIds();
+      result = result.filter(m => watchlistIds.includes(m.id));
+    }
+
+    if (this.sortBy === 'title') {
+      result = [...result].sort((a, b) => a.titleEnglish.localeCompare(b.titleEnglish));
+    } else if (this.sortBy === 'duration') {
+      result = [...result].sort((a, b) => b.durationMinutes - a.durationMinutes);
+    }
+
+    this.movies = result;
   }
 
   onFilterChange(): void {
@@ -129,7 +148,7 @@ export class MovieCatalog implements OnInit, OnDestroy {
   selectGenreChip(chip: string): void {
     this.selectedGenreChip = chip;
     this.hasRequestedShowtimes = true;
-    if (chip === 'All') {
+    if (chip === 'All' || chip === 'Watchlist') {
       this.filters.genre = '';
       this.filters.audioLanguage = '';
     } else if (chip === 'Amharic') {
@@ -142,9 +161,15 @@ export class MovieCatalog implements OnInit, OnDestroy {
     this.applyFiltersInstant();
   }
 
+  onSortChange(mode: 'title' | 'duration' | 'default'): void {
+    this.sortBy = mode;
+    this.applyFiltersInstant();
+  }
+
   resetFilters(): void {
     this.hasRequestedShowtimes = false;
     this.selectedGenreChip = 'All';
+    this.sortBy = 'default';
     this.filters = {
       searchTitle: '',
       genre: '',
@@ -152,6 +177,24 @@ export class MovieCatalog implements OnInit, OnDestroy {
       cinemaBranch: ''
     };
     this.movies = [];
+  }
+
+  isInWatchlist(movieId: string): boolean {
+    return this.apiService.isInWatchlist(movieId);
+  }
+
+  toggleWatchlist(event: Event, movie: MovieResponseDto): void {
+    event.stopPropagation();
+    const added = this.apiService.toggleWatchlist(movie.id);
+    const title = this.translationService.dynamic(movie.titleEnglish, movie.titleAmharic);
+    if (added) {
+      this.notificationService.success(`"${title}" added to Watchlist`, 'Watchlist');
+    } else {
+      this.notificationService.info(`"${title}" removed from Watchlist`, 'Watchlist');
+    }
+    if (this.selectedGenreChip === 'Watchlist') {
+      this.applyFiltersInstant();
+    }
   }
 
   getRelevantSchedules(movie: MovieResponseDto): ScheduleDto[] {

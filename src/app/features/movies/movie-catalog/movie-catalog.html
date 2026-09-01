@@ -131,7 +131,7 @@
         <button *ngIf="filters.searchTitle" class="btn-clear" (click)="filters.searchTitle = ''; onSearch()">✕</button>
       </div>
 
-      <!-- Genre Pills -->
+      <!-- Genre & Watchlist Pills -->
       <div class="genre-chips-container">
         <button
           *ngFor="let chip of genreChips"
@@ -139,12 +139,21 @@
           [class.active]="selectedGenreChip === chip"
           (click)="selectGenreChip(chip)"
         >
-          {{ chip === 'All' ? ('GENRE_ALL' | translate) : chip === 'Amharic' ? '🇪🇹 አማርኛ ፊልም' : chip }}
+          {{ chip === 'All' ? ('GENRE_ALL' | translate) : chip === 'Amharic' ? '🇪🇹 አማርኛ ፊልም' : chip === 'Watchlist' ? '⭐ ' + ('NAV_WATCHLIST' | translate) : chip }}
         </button>
       </div>
 
-      <!-- Dropdown Filters -->
+      <!-- Dropdown Filters & Sorting -->
       <div class="dropdown-filters">
+        <div class="filter-select-group">
+          <label>Sort By / ቅደም ተከተል</label>
+          <select [(ngModel)]="sortBy" (change)="onFilterChange()" class="filter-select">
+            <option value="default">Default Order / መደበኛ</option>
+            <option value="title">Title (A-Z) / በፊልም ርዕስ</option>
+            <option value="duration">Longest Duration / በርዝማኔ</option>
+          </select>
+        </div>
+
         <div class="filter-select-group">
           <label>Language / ቋንቋ</label>
           <select [(ngModel)]="filters.audioLanguage" (change)="onFilterChange()" class="filter-select">
@@ -189,6 +198,15 @@
           <div class="poster-badges">
             <span class="badge genre-badge">{{ movie.genre }}</span>
             <span class="badge lang-badge">{{ movie.audioLanguage }}</span>
+            <button 
+              type="button"
+              class="btn-watchlist-star" 
+              [class.in-watchlist]="isInWatchlist(movie.id)" 
+              (click)="toggleWatchlist($event, movie)"
+              [title]="isInWatchlist(movie.id) ? ('REMOVE_FROM_WATCHLIST' | translate) : ('ADD_TO_WATCHLIST' | translate)"
+            >
+              {{ isInWatchlist(movie.id) ? '⭐' : '☆' }}
+            </button>
           </div>
 
           <div class="poster-overlay">

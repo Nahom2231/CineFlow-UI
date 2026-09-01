@@ -491,3 +491,104 @@
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Light Mode Specific Clear Visibility Overrides */
+[data-theme="light"], body.light-theme {
+  .movie-details-page {
+    color: #0f172a !important;
+  }
+
+  .btn-back {
+    background: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+
+    &:hover {
+      background: #f1f5f9 !important;
+      color: #4f46e5 !important;
+    }
+  }
+
+  .movie-hero {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 10px 40px rgba(15, 23, 42, 0.08) !important;
+
+    .title-en {
+      color: #0f172a !important;
+    }
+
+    .meta-chips .chip {
+      background: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
+      color: #334155 !important;
+    }
+
+    .crew-info-box {
+      background: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+
+      .crew-item {
+        color: #0f172a !important;
+
+        .label {
+          color: #64748b !important;
+        }
+
+        .val {
+          color: #0f172a !important;
+        }
+      }
+    }
+
+    .synopsis-box {
+      h3 {
+        color: #0f172a !important;
+      }
+
+      .synopsis-text {
+        color: #334155 !important;
+      }
+
+      .synopsis-amharic {
+        color: #475569 !important;
+      }
+    }
+  }
+
+  .showtimes-booking-container {
+    .section-title-wrap h2 {
+      color: #0f172a !important;
+    }
+
+    .section-sub {
+      color: #475569 !important;
+    }
+
+    .showtime-card {
+      background: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
+
+      .time-val {
+        color: #0f172a !important;
+      }
+
+      &.active {
+        background: #f0f9ff !important;
+        border-color: #0284c7 !important;
+        box-shadow: 0 0 0 2px #0284c7 !important;
+      }
+    }
+
+    .booking-action-bar {
+      background: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12) !important;
+
+      .summary-val {
+        color: #0f172a !important;
+      }
+    }
+  }
+}
