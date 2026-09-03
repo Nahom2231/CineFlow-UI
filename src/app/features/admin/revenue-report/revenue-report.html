@@ -1,0 +1,160 @@
+<div class="revenue-report-page">
+  <div class="page-header">
+    <div class="header-inner">
+      <div class="title-group">
+        <a routerLink="/admin/dashboard" class="btn-back">
+          <span>‹</span> Back to Admin Hub
+        </a>
+        <h1>📊 Box Office Revenue & Analytics</h1>
+        <p class="subtitle">Comprehensive performance breakdown, sales trends & CSV report exporter</p>
+      </div>
+      <div class="quick-nav-actions">
+        <a routerLink="/admin/create-schedule" class="btn-quick-action">
+          <span>📅</span> Add Schedule
+        </a>
+        <a routerLink="/admin/create-movie" class="btn-quick-action">
+          <span>🎬</span> Add Movie
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Controls -->
+  <div class="filters-panel glass-panel">
+    <div class="filter-group">
+      <label>Report Interval</label>
+      <select [(ngModel)]="filterType" (change)="onFilterChange()" class="filter-select">
+        <option value="daily">Daily Breakdown</option>
+        <option value="weekly">Weekly Summary</option>
+        <option value="monthly">Monthly Overview</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Billing Month</label>
+      <input 
+        type="month" 
+        [(ngModel)]="filterMonthYear"
+        (change)="onFilterChange()"
+        class="filter-select"
+      />
+    </div>
+
+    <div class="filter-actions">
+      <button class="btn btn-export" (click)="exportReport()">
+        <span>📥</span> Export CSV
+      </button>
+      <button class="btn btn-print" (click)="printReport()">
+        <span>🖨️</span> Print Statement
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div *ngIf="!loading" class="summary-grid">
+    <div class="summary-card card-revenue">
+      <div class="icon">💰</div>
+      <div class="card-details">
+        <span class="label">Total Period Revenue</span>
+        <h3 class="value">{{ formatCurrency(summary.totalRevenue) }}</h3>
+      </div>
+    </div>
+
+    <div class="summary-card card-tickets">
+      <div class="icon">🎫</div>
+      <div class="card-details">
+        <span class="label">Seats Reserved</span>
+        <h3 class="value">{{ summary.totalTickets }}</h3>
+      </div>
+    </div>
+
+    <div class="summary-card card-price">
+      <div class="icon">💵</div>
+      <div class="card-details">
+        <span class="label">Average Seat Price</span>
+        <h3 class="value">{{ formatCurrency(summary.averageTicketPrice) }}</h3>
+      </div>
+    </div>
+
+    <div class="summary-card card-top">
+      <div class="icon">⭐</div>
+      <div class="card-details">
+        <span class="label">Leading Film Title</span>
+        <h3 class="value small-text">{{ summary.topMovie || 'Dune: Part Two' }}</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-panel">
+    <div class="spinner"></div>
+    <p>Generating financial reports...</p>
+  </div>
+
+  <!-- Revenue Details Table -->
+  <div *ngIf="!loading" class="report-section glass-panel">
+    <div class="section-title-row">
+      <h2>📅 {{ filterType === 'monthly' ? 'Monthly' : filterType === 'weekly' ? 'Weekly' : 'Daily' }} Box Office Breakdown</h2>
+      <span class="badge-tag">Audited Transactions</span>
+    </div>
+
+    <div class="table-container">
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th class="text-right">Revenue</th>
+            <th class="text-right">Tickets Sold</th>
+            <th class="text-right">Avg Ticket Price</th>
+            <th>Top Performing Film</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of revenueReport; let even = even" [class.even]="even">
+            <td class="date-cell">{{ formatDate(row.date) }}</td>
+            <td class="text-right value">{{ formatCurrency(row.totalRevenue) }}</td>
+            <td class="text-right tickets-cell">{{ row.totalTickets }} seats</td>
+            <td class="text-right">{{ formatCurrency(row.averageTicketPrice) }}</td>
+            <td class="top-movie-cell">🎬 {{ row.topMovie }}</td>
+          </tr>
+          <tr *ngIf="revenueReport.length === 0" class="empty-row">
+            <td colspan="5" class="text-center">No recorded transactions for this timeframe</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Movie Stats -->
+  <div *ngIf="!loading && movieStats.length > 0" class="report-section glass-panel">
+    <div class="section-title-row">
+      <h2>🎬 Box Office Gross by Movie Title</h2>
+      <span class="badge-tag">Catalog Rankings</span>
+    </div>
+
+    <div class="movies-stats-grid">
+      <div *ngFor="let movie of movieStats; let i = index" class="movie-stat-card">
+        <div class="rank-badge" [class.gold]="i === 0" [class.silver]="i === 1">
+          {{ i + 1 }}
+        </div>
+        <div class="movie-details">
+          <h3>{{ movie.movieName }}</h3>
+          <div class="stats-row">
+            <div class="stat-pill">
+              <span class="label">Tickets:</span>
+              <span class="val">{{ movie.ticketsSold }}</span>
+            </div>
+            <div class="stat-pill revenue-pill">
+              <span class="label">Gross:</span>
+              <span class="val">{{ formatCurrency(movie.totalRevenue) }}</span>
+            </div>
+            <div class="stat-pill">
+              <span class="label">Screenings:</span>
+              <span class="val">{{ movie.screenings }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

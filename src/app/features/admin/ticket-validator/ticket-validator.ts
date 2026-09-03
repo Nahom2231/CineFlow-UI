@@ -5,6 +5,20 @@ import { FormsModule } from '@angular/forms';
 import { CineFlowApiService } from '../../../core/services/cineflow-api.service';
 import { Html5Qrcode } from 'html5-qrcode';
 
+export interface ValidatedTicket {
+  ticketId: string;
+  movieTitle: string;
+  movieTitleAmharic: string;
+  customerName: string;
+  seatNumber: string;
+  cinemaHall: string;
+  cinemaLocation: string;
+  scheduleTime: string;
+  ticketPrice: number;
+  validatedAt?: string;
+  validatedBy?: string;
+}
+
 @Component({
   selector: 'app-ticket-validator',
   standalone: true,
@@ -18,6 +32,8 @@ export class TicketValidator implements OnDestroy {
   message: string = '';
   isSuccess: boolean = false;
   isProcessingFile: boolean = false;
+  validatedTicket: ValidatedTicket | null = null;
+  validationHistory: ValidatedTicket[] = [];
 
   constructor(
     private apiService: CineFlowApiService,
@@ -62,7 +78,7 @@ export class TicketValidator implements OnDestroy {
     // Clean URL prefixes or whitespace
     const cleanRef = this.txnRef.replace('https://', '').trim();
 
-    this.apiService.validateTicket({ transactionReference: cleanRef }).subscribe({
+    this.apiService.validateTicket({ transactionReference: cleanRef, codeOrReference: cleanRef }).subscribe({
       next: (res: any) => {
         console.log('API Response Payload:', res);
 
@@ -73,14 +89,44 @@ export class TicketValidator implements OnDestroy {
         if (isOk) {
           this.isSuccess = true;
           this.message = responseMsg || 'Ticket verified! Customer allowed entry!';
+          
+          let formattedTime = res?.scheduleTime || 'N/A';
+          if (res?.scheduleTime && !isNaN(new Date(res.scheduleTime).getTime())) {
+            formattedTime = new Date(res.scheduleTime).toLocaleString();
+          }
+
+          // Capture ticket details
+          this.validatedTicket = {
+            ticketId: res?.ticketId || cleanRef,
+            movieTitle: res?.movieTitle || 'fugitive',
+            movieTitleAmharic: res?.movieTitleAmharic || '',
+            customerName: res?.customerName || 'Verified Customer',
+            seatNumber: res?.seatNumber || 'A1',
+            cinemaHall: res?.cinemaHall || 'Grand Bole Screen (Dolby Atmos)',
+            cinemaLocation: res?.cinemaLocation || 'Addis Ababa (Bole)',
+            scheduleTime: formattedTime,
+            ticketPrice: res?.ticketPrice || 300,
+            validatedAt: new Date().toLocaleTimeString(),
+            validatedBy: localStorage.getItem('staffName') || 'Staff Member'
+          };
+
+          // Add to history
+          this.validationHistory.unshift(this.validatedTicket);
+
+          // Limit history to last 10 validations
+          if (this.validationHistory.length > 10) {
+            this.validationHistory.pop();
+          }
+
           this.cdr.detectChanges(); // Force UI update immediately
 
           setTimeout(() => {
-            this.router.navigate(['/catalog']);
-          }, 1500);
+            this.resetForm();
+          }, 4000);
         } else {
           this.isSuccess = false;
           this.message = responseMsg || 'Invalid ticket reference or already used.';
+          this.validatedTicket = null;
           this.cdr.detectChanges();
         }
       },
@@ -88,8 +134,16 @@ export class TicketValidator implements OnDestroy {
         console.error('Validation API Error:', err);
         this.isSuccess = false;
         this.message = err.error?.message || err.error?.Message || 'Invalid ticket reference or already used.';
+        this.validatedTicket = null;
         this.cdr.detectChanges();
       }
     });
+  }
+
+  resetForm(): void {
+    this.txnRef = '';
+    this.message = '';
+    this.isSuccess = false;
+    this.validatedTicket = null;
   }
 }

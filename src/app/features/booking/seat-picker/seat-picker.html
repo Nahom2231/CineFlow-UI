@@ -1,39 +1,413 @@
-<div class ="seat-picker-container">
-    <h2>Select Your Seat </h2>
-
-    <div *ngIf="holdActive" class ="timer-banner">
-        Seat <strong>{{ selectedSeat }} </strong> held for: <strong> {{ formattedTimer }} </strong>
+<div class="booking-experience">
+  <!-- Top Navigation & Movie Header -->
+  <header class="booking-header">
+    <div class="header-inner">
+      <a routerLink="/movies" class="btn-back">
+        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        {{ 'HERO_BROWSE_BTN' | translate }}
+      </a>
+      <div class="movie-pill">
+        <span class="pulse-live"></span>
+        <span class="hall-badge">
+          <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v14M21 7v14M6 7V3h12v4M10 11h4M10 16h4"/></svg>
+          {{ cinemaHall }}
+        </span>
+        <span class="time-badge">
+          <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          {{ showTime | date:'EEEE, MMM d • h:mm a' }}
+        </span>
+      </div>
     </div>
-    <div class ="screen-indicator">SCREEN</div>
-    <div class="seat-layout">
-        <div *ngFor="let row of seatRows" class="seat-row">
-            <span class="row-label"> {{row.rowLabel }} </span>
-            <div class="seats-group">
-            <button
-            *ngFor="let seat of row.seats"
-            [class.selected]="seat===selectedSeat"
-            [disabled] ="holdActive && seat!== selectedSeat"
-            (click)="selectSeat(seat)">
-                  {{seat}}
-              </button>
-            </div>
+  </header>
+
+  <main class="booking-main-grid">
+    <!-- Left Column: Theater Auditorium Seat Map -->
+    <section class="seat-picker-section">
+      <div class="auditorium-header">
+        <div class="title-wrap">
+          <h1 class="main-title">{{ 'SEAT_PICKER_TITLE' | translate }}</h1>
+          <p class="subtitle">{{ 'SELECT_TIME_PROMPT' | translate }}</p>
         </div>
 
-    <div class="payment-panel">
-    <h3>Complete Mobile Payment </h3>
-    <div class ="form-group">
-        <label> Provider :</label>
-        <select [(ngModel)]="paymentProvider">
-        <option value="Telebirr">Telebirr</option>
-        <option value="CBEBirr"> CBE Birr</option>
-        <option value="chapa">Chapa</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label>Phone Number:</label>
-        <input type="text" [(ngModel)]="phoneNumber" placeholder="0941211607" />
-    </div>
-    <button (click)="confirmBooking()" class="btn-confirm">Pay & Confirm </button>
-    </div>
+        <!-- 3-Minute Hold Status Banner -->
+        <div *ngIf="holdActive" class="timer-banner animate-pop">
+          <div class="timer-icon">
+            <svg class="ui-icon icon-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="timer-info">
+            <span class="timer-label">{{ 'SEAT_HOLD_TIMER' | translate }}: <strong>{{ selectedSeat }}</strong> ({{ selectedSeatType === 'vip' ? 'VIP' : 'Standard' }})</span>
+            <span class="timer-countdown">{{ formattedTimer }} remaining</span>
+          </div>
+        </div>
+      </div>
 
+      <!-- Projection Screen Display -->
+      <div class="screen-stage">
+        <div class="projector-glow"></div>
+        <div class="curved-screen"></div>
+        <div class="screen-label">
+          <span>{{ 'SCREEN_THIS_WAY' | translate }}</span>
+        </div>
+      </div>
 
+      <!-- Interactive Seat Layout -->
+      <div class="seat-matrix">
+        <div *ngFor="let row of seatRows" class="matrix-row" [class.vip-row-wrap]="row.rowLabel === 'D' || row.rowLabel === 'E'">
+          <div class="row-label-badge" [class.vip]="row.rowLabel === 'D' || row.rowLabel === 'E'">
+            <span class="row-text">{{ row.rowLabel }}</span>
+            <span class="vip-subtag" *ngIf="row.rowLabel === 'D' || row.rowLabel === 'E'">VIP</span>
+          </div>
+          
+          <div class="seats-lane">
+            <button
+              *ngFor="let seat of row.seats"
+              type="button"
+              class="seat-btn"
+              [class.selected]="seat.id === selectedSeat"
+              [class.occupied]="seat.isOccupied"
+              [class.vip]="seat.type === 'vip'"
+              [class.available]="!seat.isOccupied && seat.id !== selectedSeat"
+              [disabled]="seat.isOccupied"
+              (click)="selectSeat(seat.id, seat.type)"
+              [attr.aria-label]="'Seat ' + seat.id"
+              [title]="seat.id + ' • ' + (seat.isOccupied ? 'Occupied' : seat.type === 'vip' ? 'VIP Seat' : 'Standard Seat')"
+            >
+              <span class="seat-icon">
+                <ng-container *ngIf="seat.isOccupied">
+                  <svg class="ui-icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </ng-container>
+                <ng-container *ngIf="!seat.isOccupied && seat.id === selectedSeat">
+                  <svg class="ui-icon icon-sm icon-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                </ng-container>
+                <ng-container *ngIf="!seat.isOccupied && seat.id !== selectedSeat && seat.type === 'vip'">
+                  <svg class="ui-icon icon-sm icon-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 4 3 12h14l3-12-6 7-4-5-4 5-6-7z"/><path d="M5 20h14"/></svg>
+                </ng-container>
+                <ng-container *ngIf="!seat.isOccupied && seat.id !== selectedSeat && seat.type !== 'vip'">
+                  <svg class="ui-icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 11V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v6"/><path d="M4 11h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2z"/></svg>
+                </ng-container>
+              </span>
+              <span class="seat-num">{{ seat.label }}</span>
+              <span class="seat-type-tag" *ngIf="seat.type === 'vip' && !seat.isOccupied && seat.id !== selectedSeat">VIP</span>
+            </button>
+          </div>
+
+          <div class="row-label-badge" [class.vip]="row.rowLabel === 'D' || row.rowLabel === 'E'">
+            <span class="row-text">{{ row.rowLabel }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seat Map Legend -->
+      <div class="seat-legend">
+        <div class="legend-item">
+          <span class="legend-box available"></span>
+          <div class="legend-info">
+            <span class="legend-text">{{ 'SEAT_STANDARD' | translate }}</span>
+            <span class="legend-count">({{ availableStandardCount }} seats)</span>
+          </div>
+        </div>
+
+        <div class="legend-item">
+          <span class="legend-box vip"></span>
+          <div class="legend-info">
+            <span class="legend-text">{{ 'SEAT_VIP' | translate }}</span>
+            <span class="legend-count">({{ availableVipCount }} seats)</span>
+          </div>
+        </div>
+
+        <div class="legend-item">
+          <span class="legend-box selected"></span>
+          <div class="legend-info">
+            <span class="legend-text">{{ 'SEAT_SELECTED' | translate }}</span>
+            <span class="legend-count">{{ selectedSeat ? ('(' + selectedSeat + ')') : '' }}</span>
+          </div>
+        </div>
+
+        <div class="legend-item">
+          <span class="legend-box occupied"></span>
+          <div class="legend-info">
+            <span class="legend-text">{{ 'SEAT_OCCUPIED' | translate }}</span>
+            <span class="legend-count">({{ occupiedCount }} seats)</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Movie Summary & Real Chapa Payment Gateway -->
+    <aside class="checkout-panel">
+      <!-- Movie Ticket Preview Card -->
+      <div class="ticket-preview-card">
+        <div class="preview-poster">
+          <img 
+            [src]="posterUrl" 
+            (error)="onImageError($event)" 
+            [alt]="movieTitle"
+          />
+        </div>
+        <div class="preview-meta">
+          <h2 class="preview-title-en">{{ translationService.dynamic(movieTitle, movieTitleAmharic) }}</h2>
+          <h3 class="preview-title-am" *ngIf="movieTitleAmharic && translationService.getLanguage() === 'en'">{{ movieTitleAmharic }}</h3>
+          
+          <div class="preview-specs">
+            <span class="spec-tag">
+              <svg class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              {{ cinemaLocation }}
+            </span>
+            <span class="spec-tag">
+              <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v14M21 7v14M6 7V3h12v4M10 11h4M10 16h4"/></svg>
+              {{ cinemaHall }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selected Seat Summary -->
+      <div class="selection-summary">
+        <div class="summary-row">
+          <span class="summary-label">{{ 'CHOSEN_SEAT' | translate }}</span>
+          <div class="seat-badge-wrap">
+            <span class="seat-highlight" [class.unselected]="!selectedSeat" [class.vip-highlight]="selectedSeatType === 'vip'">
+              {{ selectedSeat ? selectedSeat : 'None Selected' }}
+            </span>
+            <span class="tier-badge" *ngIf="selectedSeatType === 'vip'">VIP Recliner</span>
+          </div>
+        </div>
+
+        <div class="summary-row">
+          <span class="summary-label">{{ 'BASE_PRICE' | translate }}</span>
+          <span class="summary-val">{{ baseTicketPrice }} ETB</span>
+        </div>
+
+        <div class="summary-row" *ngIf="selectedSeatType === 'vip'">
+          <span class="summary-label">{{ 'VIP_UPGRADE' | translate }}</span>
+          <span class="summary-val vip-extra">+{{ vipExtraPrice }} ETB</span>
+        </div>
+
+        <div class="summary-row">
+          <span class="summary-label">{{ 'VAT_SERVICE' | translate }}</span>
+          <span class="summary-val">{{ vatAmount }} ETB</span>
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <div class="summary-row total-row">
+          <span class="total-label">{{ 'TOTAL_PAYMENT' | translate }}</span>
+          <span class="total-price">{{ totalAmount }} ETB</span>
+        </div>
+      </div>
+
+      <!-- Real Chapa Payment Gateway Container -->
+      <div class="payment-box chapa-dedicated-box">
+        <div class="chapa-brand-header">
+          <div class="chapa-brand-title">
+            <span class="chapa-logo-icon">
+              <svg class="ui-icon icon-zap icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </span>
+            <div>
+              <h3 class="chapa-main-title">Chapa Payment Gateway</h3>
+              <span class="chapa-sub-badge">Real-Time API Clearance</span>
+            </div>
+          </div>
+          <span class="chapa-et-flag">🇪🇹 ETB</span>
+        </div>
+
+        <p class="chapa-desc">
+          {{ 'CHAPA_GATEWAY_SUBTITLE' | translate }}
+        </p>
+
+        <!-- Supported Sub-methods under Chapa -->
+        <div class="chapa-rails-list">
+          <span class="rail-pill">
+            <svg class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+            Telebirr
+          </span>
+          <span class="rail-pill">
+            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 10v11M9 10v11M13 10v11M17 10v11M12 3l9 7H3l9-7z"/></svg>
+            CBE Birr
+          </span>
+          <span class="rail-pill">
+            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v14M21 7v14M6 7V3h12v4M10 11h4M10 16h4"/></svg>
+            Awash Birr
+          </span>
+          <span class="rail-pill">
+            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            Visa / Master
+          </span>
+          <span class="rail-pill">
+            <svg class="ui-icon icon-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 2 18 2 22 8 12 22 2 8 6 2"/></svg>
+            BOA
+          </span>
+        </div>
+
+        <!-- Chapa Customer Information Form -->
+        <div class="chapa-customer-fields">
+          <!-- Email Field -->
+          <div class="phone-input-group">
+            <label for="chapaEmail">
+              {{ 'CHAPA_EMAIL_LABEL' | translate }} <span class="req">*</span>
+            </label>
+            <div class="input-wrapper">
+              <span class="field-symbol">
+                <svg class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </span>
+              <input 
+                id="chapaEmail"
+                type="email" 
+                [(ngModel)]="customerEmail" 
+                placeholder="customer@example.com"
+                autocomplete="email"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- First & Last Name -->
+          <div class="name-fields-grid">
+            <div class="phone-input-group" style="margin-bottom: 0;">
+              <label for="chapaFirstName">{{ 'CHAPA_FIRST_NAME' | translate }}</label>
+              <div class="input-wrapper">
+                <input 
+                  id="chapaFirstName"
+                  type="text" 
+                  [(ngModel)]="customerFirstName" 
+                  placeholder="Abebe"
+                />
+              </div>
+            </div>
+            <div class="phone-input-group" style="margin-bottom: 0;">
+              <label for="chapaLastName">{{ 'CHAPA_LAST_NAME' | translate }}</label>
+              <div class="input-wrapper">
+                <input 
+                  id="chapaLastName"
+                  type="text" 
+                  [(ngModel)]="customerLastName" 
+                  placeholder="Kebede"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Phone Number Field -->
+          <div class="phone-input-group">
+            <label for="bookingPhone">
+              {{ 'CHAPA_PHONE_LABEL' | translate }} <span class="req">*</span>
+            </label>
+            <div class="input-wrapper">
+              <span class="country-prefix">🇪🇹 +251</span>
+              <input 
+                id="bookingPhone"
+                type="text" 
+                [(ngModel)]="phoneNumber" 
+                placeholder="0911223344"
+                maxlength="25"
+                autocomplete="tel"
+              />
+            </div>
+            <!-- Quick Fill Wallet Chips -->
+            <div class="quick-wallet-chips">
+              <span class="chip-label">Quick:</span>
+              <button type="button" class="wallet-chip" (click)="fillQuickPhone('0911223344')">0911223344</button>
+              <button type="button" class="wallet-chip" (click)="fillQuickPhone('0922334455')">0922334455</button>
+              <button type="button" class="wallet-chip" (click)="fillQuickPhone('0933445566')">0933445566</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Error Message Alert -->
+        <div *ngIf="errorMessage" class="error-banner animate-fade-in">
+          <span>
+            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </span>
+          {{ errorMessage }}
+        </div>
+
+        <!-- Submit & Pay Button -->
+        <button 
+          type="button"
+          class="btn-checkout btn-chapa-glow" 
+          [disabled]="isBooking || !selectedSeat"
+          (click)="confirmBooking()"
+        >
+          <span *ngIf="!isBooking">
+            <svg class="ui-icon icon-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            {{ 'CHAPA_PAY_BUTTON' | translate }} ({{ totalAmount }} ETB)
+          </span>
+          <span *ngIf="isBooking" class="btn-spinner-wrap">
+            <span class="spinner-sm"></span> {{ 'CHAPA_PROCESSING' | translate }}
+          </span>
+        </button>
+
+        <!-- Chapa Security Badge -->
+        <div class="guarantee-badge chapa-security-badge">
+          <span class="badge-icon">
+            <svg class="ui-icon icon-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </span>
+          <span>{{ 'CHAPA_SECURE_BADGE' | translate }}</span>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Instant Payment Processing Modal -->
+  <div *ngIf="isPaymentModalOpen" class="payment-modal-backdrop animate-fade-in">
+    <div class="payment-modal-card glass-panel">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="modal-provider-badge chapa">
+          <span class="icon">
+            <svg class="ui-icon icon-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </span>
+          <span>Chapa Payment Gateway</span>
+        </div>
+        <span class="amount-tag">{{ totalAmount }} ETB</span>
+      </div>
+
+      <!-- Live Payment Animation & Status -->
+      <div class="modal-body">
+        <div class="pulse-indicator" [class.success]="paymentStep === 'success'">
+          <span class="ring"></span>
+          <span class="center-icon">
+            <ng-container *ngIf="paymentStep === 'success'; else zapIcon">
+              <svg class="ui-icon icon-success icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </ng-container>
+            <ng-template #zapIcon>
+              <svg class="ui-icon icon-zap icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </ng-template>
+          </span>
+        </div>
+
+        <h3 class="modal-status-title">
+          <span *ngIf="paymentStep === 'initiating'">Connecting to Chapa Payment Gateway...</span>
+          <span *ngIf="paymentStep === 'awaiting_pin'">Securing Chapa Transaction Handshake...</span>
+          <span *ngIf="paymentStep === 'verifying'">Verifying Multi-Bank Clearance...</span>
+          <span *ngIf="paymentStep === 'success'" style="color: #34d399;">Chapa Payment Approved & Verified!</span>
+        </h3>
+
+        <p class="modal-prompt-text">{{ paymentPromptMessage }}</p>
+
+        <div class="modal-txn-box">
+          <span class="label">Chapa Transaction Reference:</span>
+          <code class="txn-ref">{{ generatedTxnRef }}</code>
+        </div>
+
+        <div class="modal-meta-grid">
+          <div class="meta-cell">
+            <span class="c-label">Movie</span>
+            <span class="c-val">{{ movieTitle }}</span>
+          </div>
+          <div class="meta-cell">
+            <span class="c-label">Seat</span>
+            <span class="c-val" style="color: #34d399; font-weight: 800;">{{ selectedSeat }} ({{ selectedSeatType === 'vip' ? 'VIP' : 'Standard' }})</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer" *ngIf="paymentStep !== 'success'">
+        <button type="button" class="btn-cancel-modal" (click)="cancelPaymentModal()">
+          Cancel Transaction
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

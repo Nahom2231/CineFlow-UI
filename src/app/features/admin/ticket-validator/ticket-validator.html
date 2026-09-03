@@ -1,15 +1,145 @@
-<div class=" validator-card">
-    <h2>Ticket Entry Verification </h2>
-    <div id="qr-reader" style="width:100%; margin-bottom: 20px; "></div>
-    <p>Enter the customer's transaction reference manually: </p>
+<div class="ticket-validator-page">
+  <!-- Hidden element for html5-qrcode file processing -->
+  <div id="qr-reader-temp" style="display: none;"></div>
 
-    <input 
-    type="text"
-    [(ngModel)]="txnRef"
-    placeholder="Enter Mock Transaction Reference..."
-    />
-    <button (click)="validate()">Verify Ticket </button>
-    <div *ngIf="message" [class.success]="isSuccess" [class.error]="!isSuccess" class="result-box">
-    {{message }}
-</div>
+  <div class="page-header">
+    <div class="header-inner">
+      <div class="title-group">
+        <a routerLink="/admin/dashboard" class="btn-back">
+          <span>‹</span> Back to Admin Hub
+        </a>
+        <div class="scanner-live-badge">
+          <span class="pulse-dot"></span> SCANNER GATE READY
+        </div>
+        <h1>📱 Cinema Admission Gate Validator</h1>
+        <p class="subtitle">Scan QR codes or enter digital pass references to admit moviegoers</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="validator-grid">
+    <!-- Scanner Card -->
+    <div class="scanner-card glass-panel">
+      <div class="scanner-box">
+        <div class="laser-scanner-frame">
+          <span class="laser-line"></span>
+          <div class="scanner-icon">📷</div>
+          <span class="scanner-tip">Ready to scan guest ticket pass</span>
+        </div>
+      </div>
+
+      <div class="input-section">
+        <label for="txnInput">Ticket ID or Transaction Reference</label>
+        <div class="input-group">
+          <input 
+            id="txnInput"
+            type="text"
+            [(ngModel)]="txnRef"
+            (keyup.enter)="validate()"
+            placeholder="Scan QR pass or enter CF-TXN-###### / TKT-######..."
+            class="qr-input"
+            [disabled]="isProcessingFile"
+            autocomplete="off"
+          />
+          <button (click)="validate()" class="btn btn-validate" [disabled]="!txnRef.trim()">
+            <span>⚡</span> Verify Pass
+          </button>
+        </div>
+      </div>
+
+      <div class="divider">
+        <span>OR UPLOAD PASS IMAGE</span>
+      </div>
+
+      <div class="file-upload">
+        <label class="upload-label">
+          <span>🖼️</span> Select QR Image File
+          <input 
+            type="file" 
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            [disabled]="isProcessingFile"
+            hidden
+          />
+        </label>
+        <p *ngIf="isProcessingFile" class="processing">⏳ Decoding pass with QR matrix...</p>
+      </div>
+
+      <!-- Message Alert -->
+      <div *ngIf="message" class="message-alert" [class.success]="isSuccess" [class.error]="!isSuccess">
+        <span>{{ isSuccess ? '✓' : '⚠️' }}</span> {{ message }}
+      </div>
+    </div>
+
+    <!-- Validated Ticket Details -->
+    <div *ngIf="validatedTicket && isSuccess" class="ticket-result-card glass-panel animate-pop">
+      <div class="result-header">
+        <div class="approved-badge">✓ ADMISSION GRANTED</div>
+        <span class="timestamp">{{ validatedTicket.validatedAt }}</span>
+      </div>
+
+      <div class="movie-banner">
+        <h3>{{ validatedTicket.movieTitle }}</h3>
+        <h4 *ngIf="validatedTicket.movieTitleAmharic">{{ validatedTicket.movieTitleAmharic }}</h4>
+      </div>
+
+      <div class="ticket-info-grid">
+        <div class="info-item highlight">
+          <span class="label">Assigned Seat</span>
+          <span class="value seat">💺 {{ validatedTicket.seatNumber }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Auditorium Hall</span>
+          <span class="value">🎭 {{ validatedTicket.cinemaHall }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Customer / Passholder</span>
+          <span class="value">👤 {{ validatedTicket.customerName }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Screening Location</span>
+          <span class="value">📍 {{ validatedTicket.cinemaLocation }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Scheduled Time</span>
+          <span class="value">🕒 {{ validatedTicket.scheduleTime }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Admission Price</span>
+          <span class="value price">{{ validatedTicket.ticketPrice }} ETB</span>
+        </div>
+      </div>
+
+      <div class="staff-footer">
+        <span>👮 Validated by: {{ validatedTicket.validatedBy }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Validation History Table -->
+  <div *ngIf="validationHistory.length > 0" class="history-section glass-panel">
+    <div class="section-title-row">
+      <h3>📋 Today's Verified Admissions</h3>
+      <span class="history-count">{{ validationHistory.length }} Verified Today</span>
+    </div>
+
+    <div class="history-table">
+      <div class="table-header">
+        <div class="col-time">Time</div>
+        <div class="col-movie">Movie Title</div>
+        <div class="col-seat">Seat</div>
+        <div class="col-customer">Customer</div>
+        <div class="col-status">Status</div>
+      </div>
+      <div *ngFor="let ticket of validationHistory" class="table-row">
+        <div class="col-time">{{ ticket.validatedAt }}</div>
+        <div class="col-movie">🎬 {{ ticket.movieTitle }}</div>
+        <div class="col-seat"><strong>{{ ticket.seatNumber }}</strong></div>
+        <div class="col-customer">{{ ticket.customerName }}</div>
+        <div class="col-status">
+          <span class="status-badge allowed">✓ Allowed Entry</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

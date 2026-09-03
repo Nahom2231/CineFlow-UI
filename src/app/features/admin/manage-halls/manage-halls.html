@@ -1,0 +1,154 @@
+<div class="manage-halls-page animate-fade-in">
+  <div class="page-header">
+    <div class="header-inner">
+      <div class="header-left">
+        <a routerLink="/admin/dashboard" class="btn-back">
+          <span>‹</span> Back to Admin Hub
+        </a>
+        <h1>🏛️ Cinema Hall Management</h1>
+        <p class="subtitle">Create, configure auditorium layouts, seat matrix capacity, and screen locations</p>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn-add" (click)="toggleAddForm()">
+          <span>{{ showAddForm ? '✕ Cancel' : '➕ Add Cinema Hall' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message Alert Banner -->
+  <div *ngIf="message" class="message-banner animate-fade-in" [class.success]="isSuccess" [class.error]="!isSuccess">
+    <span class="icon">{{ isSuccess ? '✓' : '⚠️' }}</span>
+    <span>{{ message }}</span>
+  </div>
+
+  <!-- Add/Edit Cinema Hall Form -->
+  <div *ngIf="showAddForm" class="form-panel glass-panel animate-fade-in">
+    <div class="form-header">
+      <h2>{{ editingId ? '✏️ Edit Cinema Hall' : '➕ Create New Cinema Hall' }}</h2>
+      <p>Configure auditorium location, name, and interactive seat matrix</p>
+    </div>
+    
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Cinema Branch / Location</label>
+        <input 
+          type="text" 
+          [(ngModel)]="newHall.branchName" 
+          placeholder="e.g. Addis Ababa (Bole), Edna Mall, Hawassa"
+          class="form-input"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Cinema Hall Name</label>
+        <input 
+          type="text" 
+          [(ngModel)]="newHall.hallName" 
+          placeholder="e.g. IMAX Laser Screen, VIP Dolby Atmos"
+          class="form-input"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Number of Seat Rows</label>
+        <select 
+          class="form-select"
+          [(ngModel)]="selectedRows"
+          (ngModelChange)="onLayoutChange()"
+        >
+          <option [ngValue]="5">5 Rows (A–E)</option>
+          <option [ngValue]="6">6 Rows (A–F)</option>
+          <option [ngValue]="7">7 Rows (A–G)</option>
+          <option [ngValue]="8">8 Rows (A–H)</option>
+          <option [ngValue]="10">10 Rows (A–J)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Seats per Row</label>
+        <select
+          class="form-select"
+          [(ngModel)]="selectedSeatsPerRow"
+          (ngModelChange)="onLayoutChange()"
+        >
+          <option [ngValue]="6">6 Seats per row</option>
+          <option [ngValue]="8">8 Seats per row</option>
+          <option [ngValue]="10">10 Seats per row</option>
+          <option [ngValue]="12">12 Seats per row</option>
+        </select>
+      </div>
+
+      <div class="form-group span-2">
+        <label>Total Auditorium Capacity</label>
+        <div class="capacity-preview-box">
+          <span class="cap-val">{{ newHall.totalCapacity }} Total Seats</span>
+          <span class="cap-calc">({{ selectedRows }} rows × {{ selectedSeatsPerRow }} seats per row)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button 
+        type="button"
+        class="btn-submit"
+        (click)="editingId ? updateHall() : submitHall()"
+      >
+        {{ editingId ? '💾 Update Cinema Hall' : '✓ Save Cinema Hall' }}
+      </button>
+      <button type="button" class="btn-cancel" (click)="toggleAddForm()">
+        Cancel
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading cinema screens & halls...</p>
+  </div>
+
+  <!-- Halls Grid -->
+  <div *ngIf="!loading && halls.length > 0" class="halls-grid">
+    <div *ngFor="let hall of halls" class="hall-card glass-panel animate-fade-in">
+      <div class="hall-card-header">
+        <div class="hall-title-wrap">
+          <span class="hall-badge">🏛️ SCREEN</span>
+          <h3>{{ hall.hallName }}</h3>
+          <span class="location-tag">📍 {{ hall.branchName }}</span>
+        </div>
+      </div>
+
+      <div class="hall-details-grid">
+        <div class="detail-cell">
+          <span class="label">Auditorium Capacity</span>
+          <span class="val highlight">{{ hall.totalCapacity }} Seats</span>
+        </div>
+        <div class="detail-cell">
+          <span class="label">Seat Matrix</span>
+          <span class="val">{{ getSeatsInfo(hall.seatMapMatrixJson) }}</span>
+        </div>
+      </div>
+
+      <div class="hall-card-actions">
+        <button type="button" class="btn-action-edit" (click)="editHall(hall)" title="Edit auditorium details">
+          ✏️ Edit
+        </button>
+        <button type="button" class="btn-action-delete" (click)="deleteHall(hall.id)" title="Delete cinema hall">
+          🗑️ Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && halls.length === 0" class="empty-state glass-panel animate-fade-in">
+    <div class="empty-icon">🏛️</div>
+    <h3>No Cinema Halls Found</h3>
+    <p>Get started by creating your first cinema screen and seating arrangement.</p>
+    <button class="btn-add primary" (click)="toggleAddForm()">
+      ➕ Create First Cinema Hall
+    </button>
+  </div>
+</div>

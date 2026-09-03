@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MovieDetails } from './movie-details';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -7,17 +8,25 @@ import { of, throwError } from 'rxjs';
 describe('MovieDetails', () => {
   let component: MovieDetails;
   let fixture: ComponentFixture<MovieDetails>;
-  let mockApiService: jasmine.SpyObj<CineFlowApiService>;
-  let mockRouter: jasmine.SpyObj<Router>;
+  let mockApiService: any;
+  let mockRouter: any;
   let mockActivatedRoute: any;
 
   beforeEach(async () => {
-    mockApiService = jasmine.createSpyObj('CineFlowApiService', ['getMovieById']);
-    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+    mockApiService = {
+      getMovieById: vi.fn().mockReturnValue(of(null)),
+      getAllLocalMovies: vi.fn().mockReturnValue([])
+    };
+    mockRouter = {
+      navigate: vi.fn()
+    };
     mockActivatedRoute = {
+      paramMap: of({
+        get: (key: string) => 'movie-123'
+      }),
       snapshot: {
         paramMap: {
-          get: jasmine.createSpy('get').and.returnValue('movie-123')
+          get: (key: string) => 'movie-123'
         }
       }
     };
@@ -36,7 +45,7 @@ describe('MovieDetails', () => {
   });
 
   it('should create', () => {
-    mockApiService.getMovieById.and.returnValue(of({
+    mockApiService.getMovieById.mockReturnValue(of({
       id: 'movie-123',
       titleEnglish: 'Test Movie',
       titleAmharic: 'ሙከራ ሚዲያ',
@@ -73,7 +82,7 @@ describe('MovieDetails', () => {
       schedules: []
     };
 
-    mockApiService.getMovieById.and.returnValue(of(mockMovie));
+    mockApiService.getMovieById.mockReturnValue(of(mockMovie));
     component.ngOnInit();
 
     expect(mockApiService.getMovieById).toHaveBeenCalledWith('movie-123');
@@ -82,7 +91,7 @@ describe('MovieDetails', () => {
   });
 
   it('should handle movie loading error', () => {
-    mockApiService.getMovieById.and.returnValue(throwError(() => ({ error: 'Not found' })));
+    mockApiService.getMovieById.mockReturnValue(throwError(() => ({ error: 'Not found' })));
     component.ngOnInit();
 
     expect(component.loading).toBe(false);

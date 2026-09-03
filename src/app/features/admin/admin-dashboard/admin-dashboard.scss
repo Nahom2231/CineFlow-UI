@@ -1,0 +1,515 @@
+.admin-dashboard-page {
+  min-height: 90vh;
+  padding: 2rem 1.5rem 4rem;
+  max-width: 1350px;
+  margin: 0 auto;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: #f8fafc;
+}
+
+.dashboard-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2.2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+  .admin-live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    padding: 0.3rem 0.85rem;
+    border-radius: 9999px;
+    margin-bottom: 0.6rem;
+
+    .live-pulse {
+      width: 7px;
+      height: 7px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #10b981;
+      animation: pulse 1.5s infinite;
+    }
+  }
+
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #ffffff;
+    margin: 0 0 0.3rem 0;
+  }
+
+  .subtitle {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 0.95rem;
+  }
+
+  .btn-refresh {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #f1f5f9;
+    padding: 0.65rem 1.25rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .spin {
+      animation: spin 1s linear infinite;
+    }
+  }
+}
+
+.loading-panel {
+  text-align: center;
+  padding: 5rem 2rem;
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  .spinner-lg {
+    display: inline-block;
+    width: 44px;
+    height: 44px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #f43f5e;
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+    margin-bottom: 1.2rem;
+  }
+
+  p {
+    color: #94a3b8;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+}
+
+/* Key Metrics Grid */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.2rem;
+
+  .metric-card {
+    position: relative;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 1.6rem 1.4rem;
+    display: flex;
+    gap: 1.25rem;
+    align-items: center;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    &.metric-rev::after {
+      background: linear-gradient(90deg, #10b981, #059669);
+    }
+    &.metric-today::after {
+      background: linear-gradient(90deg, #f59e0b, #d97706);
+    }
+    &.metric-tickets::after {
+      background: linear-gradient(90deg, #38bdf8, #0284c7);
+    }
+    &.metric-shows::after {
+      background: linear-gradient(90deg, #ec4899, #f43f5e);
+    }
+
+    .metric-icon-wrap {
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.65rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      flex-shrink: 0;
+    }
+
+    .metric-details {
+      flex: 1;
+
+      .metric-label {
+        display: block;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: #94a3b8;
+        margin-bottom: 0.35rem;
+      }
+
+      .metric-value {
+        font-size: 1.7rem;
+        font-weight: 800;
+        color: #ffffff;
+        margin: 0 0 0.25rem 0;
+        letter-spacing: -0.5px;
+      }
+
+      .metric-sub {
+        font-size: 0.78rem;
+        color: #64748b;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+/* Admin Actions Grid */
+.admin-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+
+  .action-card {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .action-icon {
+      font-size: 1.75rem;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .action-info {
+      h4 {
+        margin: 0 0 0.2rem 0;
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: #ffffff;
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.76rem;
+        color: #94a3b8;
+      }
+    }
+  }
+}
+
+/* Analytics Double Column Layout */
+.analytics-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 2rem;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+
+  .analytics-panel {
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 1.8rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.6rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+      h3 {
+        margin: 0;
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #ffffff;
+      }
+
+      .badge-tag {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #38bdf8;
+        background: rgba(56, 189, 248, 0.12);
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        border: 1px solid rgba(56, 189, 248, 0.25);
+      }
+    }
+  }
+}
+
+/* Weekly Revenue Bar Visualizer */
+.revenue-bars-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
+  height: 240px;
+  padding: 1rem 0.5rem 0;
+
+  .bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+
+    .bar-val {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #38bdf8;
+      margin-bottom: 0.5rem;
+      white-space: nowrap;
+    }
+
+    .bar-track {
+      width: 100%;
+      max-width: 38px;
+      height: 140px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 8px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+
+      .bar-fill {
+        width: 100%;
+        background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+        border-radius: 6px 6px 0 0;
+        transition: height 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+      }
+    }
+
+    .bar-day {
+      margin-top: 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      white-space: nowrap;
+    }
+
+    .bar-tix {
+      font-size: 0.7rem;
+      color: #64748b;
+      font-weight: 600;
+    }
+  }
+}
+
+/* Top Movies Ranking */
+.top-movies-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  margin-bottom: 1.5rem;
+
+  .movie-rank-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    padding: 0.9rem 1.1rem;
+
+    .rank-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.top-one {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: #ffffff;
+        box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+      }
+      &.top-two {
+        background: linear-gradient(135deg, #94a3b8, #64748b);
+        color: #ffffff;
+      }
+      &.top-three {
+        background: linear-gradient(135deg, #b45309, #78350f);
+        color: #ffffff;
+      }
+    }
+
+    .movie-rank-info {
+      flex: 1;
+
+      .movie-name-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.45rem;
+
+        h4 {
+          margin: 0;
+          font-size: 0.92rem;
+          font-weight: 700;
+          color: #ffffff;
+        }
+
+        .movie-rev-badge {
+          font-size: 0.85rem;
+          font-weight: 800;
+          color: #10b981;
+        }
+      }
+
+      .movie-progress-wrap {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        .progress-bar {
+          flex: 1;
+          height: 6px;
+          background: rgba(255, 255, 255, 0.06);
+          border-radius: 4px;
+          overflow: hidden;
+
+          .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f43f5e, #ec4899);
+            border-radius: 4px;
+            transition: width 0.6s ease;
+          }
+        }
+
+        .tix-count {
+          font-size: 0.74rem;
+          color: #94a3b8;
+          font-weight: 600;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+}
+
+.featured-popular-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(225, 29, 72, 0.1) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 14px;
+  padding: 0.9rem 1.1rem;
+
+  .pop-icon {
+    font-size: 1.6rem;
+  }
+
+  .pop-label {
+    display: block;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: #f59e0b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .pop-title {
+    font-size: 0.98rem;
+    font-weight: 800;
+    color: #ffffff;
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+@media (max-width: 768px) {
+  .admin-dashboard-page {
+    padding: 1.5rem 1rem;
+  }
+
+  .dashboard-header-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-actions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .revenue-bars-container {
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+}

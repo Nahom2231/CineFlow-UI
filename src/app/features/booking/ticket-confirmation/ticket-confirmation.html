@@ -1,102 +1,201 @@
 <div class="ticket-confirmation-container">
+  <!-- Perforated Notches on Ticket Edges -->
+  <div class="notch notch-left"></div>
+  <div class="notch notch-right"></div>
+
+  <!-- Cinema Pass Header -->
   <div class="confirmation-header">
-    <div class="success-badge">✓ Booking Confirmed</div>
-    <h1>Your Digital Pass</h1>
+    <div class="pass-top-bar">
+      <span class="cinema-brand">
+        <svg class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18"/><path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"/></svg>
+        CINEFLOW OFFICIAL ADMISSION PASS
+      </span>
+      <div class="hologram-badge">{{ 'PASS_VERIFIED' | translate }}</div>
+    </div>
+    <div class="success-badge">
+      <svg class="ui-icon icon-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      Payment Cleared & Ticket Verified
+    </div>
+    <h1>{{ 'PASS_TITLE' | translate }}</h1>
   </div>
 
-  <!-- QR Code Section -->
+  <!-- Phone-Scannable QR Code Section -->
   <div class="qr-section">
-    <h2>Show this QR code at the cinema</h2>
-    <div class="qr-display">
-      <img [src]="qrCodeUrl" alt="Ticket QR Code" class="qr-code" />
+    <div class="qr-wrapper">
+      <div class="qr-display">
+        <img [src]="qrCodeUrl" alt="Scannable Ticket QR Code" class="qr-code" />
+      </div>
+      <div class="qr-watermark">CINEFLOW VERIFIED PASS</div>
     </div>
-    <p class="qr-info">Present your phone with this code to the cinema staff for quick entry</p>
+    
+    <div class="qr-scan-guide">
+      <span class="guide-badge">
+        <svg class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        Official Digital Gate Admission Pass
+      </span>
+      <p class="qr-info">{{ 'PASS_GATE_INSTRUCTION' | translate }}</p>
+      <a [routerLink]="['/booking-details', ticketId]" class="btn-direct-verify" target="_blank">
+        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Open Live Verification Pass Screen →
+      </a>
+    </div>
   </div>
 
-  <!-- Ticket Details -->
+  <!-- Perforated Tear Line -->
+  <div class="perforated-divider">
+    <span class="divider-dot"></span>
+    <span class="divider-line"></span>
+    <span class="divider-dot"></span>
+  </div>
+
+  <!-- Complete Chosen Booking Details Grid -->
   <div class="ticket-details">
-    <div class="detail-section">
-      <h3>Movie</h3>
+    <!-- Movie Title Section -->
+    <div class="detail-section movie-hero-detail">
       <div class="movie-info">
-        <p class="movie-title">{{ movieTitle }}</p>
-        <p class="movie-subtitle">{{ movieTitleAmharic }}</p>
+        <span class="section-tag">SELECTED MOVIE SCREENING</span>
+        <p class="movie-title">{{ translationService.dynamic(movieTitle, movieTitleAmharic) }}</p>
+        <p class="movie-subtitle" *ngIf="movieTitleAmharic && translationService.getLanguage() === 'en'">{{ movieTitleAmharic }}</p>
       </div>
+      <span class="hall-pill">
+        <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v14M21 7v14M6 7V3h12v4M10 11h4M10 16h4"/></svg>
+        {{ cinemaHall }}
+      </span>
     </div>
 
+    <!-- Seat & Tier Details -->
     <div class="detail-section">
-      <h3>Seat Information</h3>
+      <h3>Seat & Seating Tier</h3>
       <div class="grid-2">
         <div>
-          <p class="label">Seat:</p>
-          <p class="value">{{ seatNumber }}</p>
+          <p class="label">{{ 'PASS_SEAT_NUMBER' | translate }}:</p>
+          <p class="value seat-val">
+            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 11V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v6"/><path d="M4 11h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2z"/><path d="M6 19v2M18 19v2"/></svg>
+            Seat {{ seatNumber }}
+          </p>
         </div>
         <div>
-          <p class="label">Price:</p>
-          <p class="value">{{ ticketPrice }} ETB</p>
+          <p class="label">Seating Class:</p>
+          <p class="value provider-val">{{ seatTier }}</p>
         </div>
       </div>
     </div>
 
+    <!-- Location & Showtime Details -->
     <div class="detail-section">
-      <h3>Cinema Information</h3>
+      <h3>{{ 'PASS_LOCATION' | translate }} & {{ 'PASS_SHOWTIME' | translate }}</h3>
       <div class="grid-2">
         <div>
-          <p class="label">Hall:</p>
-          <p class="value">{{ cinemaHall }}</p>
+          <p class="label">{{ 'PASS_LOCATION' | translate }}:</p>
+          <p class="value">
+            <svg class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            {{ cinemaLocation }}
+          </p>
         </div>
         <div>
-          <p class="label">Location:</p>
-          <p class="value">{{ cinemaLocation }}</p>
+          <p class="label">{{ 'PASS_SHOWTIME' | translate }}:</p>
+          <p class="value">
+            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            {{ scheduleTime | date:'EEEE, MMM d • h:mm a' }}
+          </p>
         </div>
       </div>
     </div>
 
+    <!-- Payment & Billing Summary Details -->
     <div class="detail-section">
-      <h3>Show Time</h3>
-      <p class="value">{{ scheduleTime | date:'medium' }}</p>
-    </div>
-
-    <div class="detail-section">
-      <h3>Payment Details</h3>
+      <h3>Payment & Billing Clearance</h3>
       <div class="grid-2">
         <div>
-          <p class="label">Provider:</p>
-          <p class="value">{{ paymentProvider }}</p>
+          <p class="label">Payment Provider / Method:</p>
+          <p class="value provider-val">
+            <svg class="ui-icon icon-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            {{ paymentProvider }}
+          </p>
         </div>
         <div>
-          <p class="label">Transaction Ref:</p>
-          <p class="value ticket-ref">{{ transactionReference }}</p>
+          <p class="label">Total Paid (VAT Incl.):</p>
+          <p class="value price-val">{{ totalAmountPaid }} ETB <span style="font-size: 0.78rem; color: #64748b;">({{ ticketPrice }} + 15% VAT)</span></p>
         </div>
       </div>
     </div>
 
-    <div class="detail-section">
-      <h3>Booking Time</h3>
-      <p class="value">{{ bookingDateTime | date:'medium' }}</p>
+    <!-- Customer Contact Info -->
+    <div class="detail-section" *ngIf="customerEmail || customerPhone">
+      <h3>Customer Account Contact</h3>
+      <div class="grid-2">
+        <div *ngIf="customerEmail">
+          <p class="label">Account Email:</p>
+          <p class="value small" style="color: #0284c7;">
+            <svg class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            {{ customerEmail }}
+          </p>
+        </div>
+        <div *ngIf="customerPhone">
+          <p class="label">Contact Phone:</p>
+          <p class="value small" style="color: #059669;">
+            <svg class="ui-icon icon-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+            {{ customerPhone }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Verification Reference Codes -->
+    <div class="detail-section" style="border-bottom: none;">
+      <h3>Transaction Codes & Timestamps</h3>
+      <div class="grid-2">
+        <div>
+          <p class="label">Pass Ticket ID:</p>
+          <p class="value ticket-ref">{{ ticketId }}</p>
+        </div>
+        <div>
+          <p class="label">{{ 'PASS_TXN_REF' | translate }}:</p>
+          <p class="value ticket-ref" style="color: #059669;">{{ transactionReference }}</p>
+        </div>
+      </div>
+      <div style="margin-top: 0.85rem;">
+        <p class="label">Issued Timestamp:</p>
+        <p class="value small">{{ bookingDateTime | date:'EEEE, MMMM d, y, h:mm:ss a' }}</p>
+      </div>
     </div>
   </div>
 
   <!-- Actions -->
   <div class="actions">
     <button class="btn btn-primary" (click)="downloadQRCode()">
-      📥 Download QR Code
+      <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      {{ 'PASS_DOWNLOAD_QR' | translate }}
+    </button>
+    <button class="btn btn-secondary" (click)="copyReferenceCode()">
+      <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      {{ 'PASS_COPY_REF' | translate }}
+    </button>
+    <button class="btn btn-secondary" (click)="sharePass()">
+      <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      {{ 'PASS_SHARE' | translate }}
     </button>
     <button class="btn btn-secondary" (click)="printTicket()">
-      🖨️ Print Ticket
+      <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      {{ 'PASS_PRINT' | translate }}
     </button>
     <button class="btn btn-outline" (click)="goToMovies()">
-      Back to Movies
+      <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19.8 17.8l-1.6-11.2a2 2 0 0 0-2-1.6H7.8a2 2 0 0 0-2 1.6L4.2 17.8A2 2 0 0 0 6.2 20h11.6a2 2 0 0 0 2-2.2z"/><path d="M7 5a3 3 0 0 1 6 0 3 3 0 0 1 6 0"/></svg>
+      {{ 'HERO_BROWSE_BTN' | translate }}
     </button>
   </div>
 
-  <!-- Important Info -->
+  <!-- Guidelines -->
   <div class="info-box">
-    <h4>Important Information</h4>
+    <h4>
+      <svg class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      Cinema Admission Guidelines
+    </h4>
     <ul>
-      <li>Keep this QR code safe - it's your ticket to the cinema</li>
-      <li>Arrive 15 minutes before show time</li>
-      <li>The QR code is valid only for the selected date and time</li>
-      <li>One QR code per seat - cannot be used for multiple entries</li>
+      <li>Keep this digital pass accessible on your mobile phone screen when arriving at the ticket gate.</li>
+      <li>Show the QR code to cinema staff at the gate for instant digital entry verification.</li>
+      <li>This admission pass is valid exclusively for seat <strong>{{ seatNumber }}</strong> at <strong>{{ cinemaHall }}</strong>.</li>
+      <li>Arrive 15 minutes prior to screening time to find your seat and enjoy refreshments.</li>
     </ul>
   </div>
 </div>

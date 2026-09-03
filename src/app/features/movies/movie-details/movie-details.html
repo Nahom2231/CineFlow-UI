@@ -1,112 +1,143 @@
-<div class="movie-details-container">
-  <button class="back-btn" (click)="goBack()">← Back to Catalog</button>
-
-  <div *ngIf="loading" class="loading">Loading movie details...</div>
-
-  <div *ngIf="!loading && movie" class="movie-content">
-    <!-- Movie Header -->
-    <div class="movie-header">
-      <div class="poster-section">
-        <img [src]="movie.featuredImageUrl || 'assets/placeholder.jpg'" 
-             (error)="$event.target.src='https://via.placeholder.com/400x600?text=No+Poster'"
-             [alt]="movie.titleEnglish"
-             class="poster" />
-      </div>
-
-      <div class="info-section">
-        <h1>{{ movie.titleEnglish }}</h1>
-        <p class="subtitle">{{ movie.titleAmharic }}</p>
-
-        <div class="metadata">
-          <span class="badge genre">{{ movie.genre }}</span>
-          <span class="badge language">{{ movie.audioLanguage }}</span>
-          <span class="badge duration">{{ movie.durationMinutes }}min</span>
-        </div>
-
-        <div class="cast-crew">
-          <div class="crew-item" *ngIf="movie.directorName">
-            <strong>Director:</strong> {{ movie.directorName }}
-          </div>
-          <div class="crew-item" *ngIf="movie.starName && movie.starName.length">
-            <strong>Cast:</strong> {{ movie.starName.join(', ') }}
-          </div>
-        </div>
-
-        <div class="synopsis">
-          <h3>Synopsis</h3>
-          <p>{{ movie.descriptionEnglish }}</p>
-          <p *ngIf="movie.descriptionAmharic" class="synopsis-amharic">
-            {{ movie.descriptionAmharic }}
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Gallery -->
-    <div class="gallery-section" *ngIf="movie.galleryImageUrl && movie.galleryImageUrl.length">
-      <h2>Photo Gallery</h2>
-      <div class="gallery">
-        <img *ngFor="let img of movie.galleryImageUrl" 
-             [src]="img" 
-             (error)="$event.target.src='https://via.placeholder.com/200x200?text=Image'"
-             [alt]="movie.titleEnglish"
-             class="gallery-img" />
-      </div>
-    </div>
-
-    <!-- Available Showtimes -->
-    <div class="showtimes-section" *ngIf="movie.schedules && movie.schedules.length">
-      <h2>Available Showtimes</h2>
-      <div class="showtimes-grid">
-        <div *ngFor="let schedule of movie.schedules"
-             class="showtime-card"
-             [class.selected]="selectedSchedule?.id === schedule.id"
-             (click)="selectSchedule(schedule)">
-          <div class="time">
-            {{ schedule.startTime | date:'HH:mm' }}
-          </div>
-          <div class="date">
-            {{ schedule.startTime | date:'MMM dd' }}
-          </div>
-          <div class="hall">
-            {{ schedule.cinemaHallName }}
-          </div>
-          <div class="price">
-            {{ schedule.price }} ETB
-          </div>
-        </div>
-      </div>
-
-      <!-- Selected Showtime Details -->
-      <div class="booking-section" *ngIf="selectedSchedule">
-        <div class="selected-details">
-          <div class="detail">
-            <span class="label">Selected Date & Time:</span>
-            <span class="value">{{ selectedSchedule.startTime | date:'medium' }}</span>
-          </div>
-          <div class="detail">
-            <span class="label">Cinema Hall:</span>
-            <span class="value">{{ selectedSchedule.cinemaHallName }}</span>
-          </div>
-          <div class="detail">
-            <span class="label">Price per Seat:</span>
-            <span class="value">{{ selectedSchedule.price }} ETB</span>
-          </div>
-        </div>
-
-        <button class="btn-book-now" (click)="bookNow()">
-          Proceed to Seat Selection →
-        </button>
-      </div>
-    </div>
-
-    <!-- No Showtimes Message -->
-    <div *ngIf="!movie.schedules || movie.schedules.length === 0" class="no-showtimes">
-      <p>No showtimes available for this movie at the moment.</p>
+<div class="movie-details-page">
+  <!-- Top Navigation & Breadcrumbs -->
+  <div class="top-nav-bar">
+    <button class="btn-back" (click)="goBack()">
+      <span>‹</span> {{ 'HERO_BROWSE_BTN' | translate }}
+    </button>
+    <div class="quick-admin-actions">
+      <a [routerLink]="['/admin/create-schedule']" class="btn-schedule-shortcut">
+        <span>📅</span> {{ 'ADMIN_CREATE_SCHEDULE_BTN' | translate }}
+      </a>
+      <a routerLink="/admin/create-movie" class="btn-movie-shortcut">
+        <span>🎬</span> {{ 'NAV_ADD_MOVIE' | translate }}
+      </a>
     </div>
   </div>
 
-  <div *ngIf="!loading && !movie" class="error">
-    <p>Movie not found</p>
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading movie & showtime details...</p>
+  </div>
+
+  <!-- Main Movie Content -->
+  <div *ngIf="!loading && movie" class="movie-details-container animate-fade-in">
+    <!-- Hero Banner with Blurred Backdrop -->
+    <div class="movie-hero">
+      <div class="backdrop-glow" [style.backgroundImage]="'url(' + (movie.featuredImageUrl || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&auto=format&fit=crop&q=80') + ')'"></div>
+
+      <div class="hero-inner">
+        <!-- Poster Frame -->
+        <div class="poster-frame">
+          <img
+            [src]="movie.featuredImageUrl || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&auto=format&fit=crop&q=80'"
+            (error)="onImageError($event)"
+            [alt]="movie.titleEnglish"
+            class="poster-img"
+          />
+          <div class="poster-badge-row">
+            <span class="badge genre">{{ movie.genre || 'Action' }}</span>
+            <span class="badge lang">{{ movie.audioLanguage || 'English' }}</span>
+          </div>
+        </div>
+
+        <!-- Movie Header Info -->
+        <div class="movie-header-info">
+          <div class="title-wrap">
+            <h1 class="title-en">{{ translationService.dynamic(movie.titleEnglish, movie.titleAmharic) }}</h1>
+            <h2 class="title-am" *ngIf="movie.titleAmharic && translationService.getLanguage() === 'en'">{{ movie.titleAmharic }}</h2>
+          </div>
+
+          <div class="meta-chips">
+            <span class="chip">⏱️ {{ movie.durationMinutes || 120 }} {{ 'MINUTES' | translate }}</span>
+            <span class="chip">⭐ 4.9 (Audience Choice)</span>
+            <span class="chip">🔊 Dolby Atmos / IMAX</span>
+            <span class="chip">⚡ Chapa Real-Time API</span>
+          </div>
+
+          <div class="crew-info-box">
+            <div class="crew-item" *ngIf="movie.directorName">
+              <span class="label">{{ 'DIRECTOR' | translate }}:</span>
+              <span class="val">{{ movie.directorName }}</span>
+            </div>
+            <div class="crew-item" *ngIf="movie.starName && movie.starName.length">
+              <span class="label">{{ 'MOVIE_CAST' | translate }}:</span>
+              <span class="val">{{ movie.starName.join(', ') }}</span>
+            </div>
+          </div>
+
+          <div class="synopsis-box">
+            <h3>{{ 'MOVIE_SYNOPSIS' | translate }}</h3>
+            <p class="synopsis-text">{{ translationService.dynamic(movie.descriptionEnglish, movie.descriptionAmharic) }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Showtimes & Booking Section -->
+    <div class="showtimes-booking-container">
+      <div class="section-title-wrap">
+        <h2>🎟️ {{ 'SELECT_CINEMA_HALL' | translate }}</h2>
+        <p class="section-sub">{{ 'SELECT_TIME_PROMPT' | translate }}</p>
+      </div>
+
+      <!-- Showtimes Grid -->
+      <div class="showtimes-grid" *ngIf="movie.schedules && movie.schedules.length > 0">
+        <div
+          *ngFor="let schedule of movie.schedules"
+          class="showtime-card"
+          [class.active]="selectedSchedule?.id === schedule.id"
+          (click)="selectSchedule(schedule)"
+        >
+          <div class="hall-badge">
+            <span class="hall-icon">🏛️</span>
+            <span class="hall-name">{{ schedule.cinemaHallName || 'Grand Bole Screen' }}</span>
+          </div>
+
+          <div class="time-block">
+            <span class="time-val">{{ schedule.startTime | date:'hh:mm a' }}</span>
+            <span class="date-val">{{ schedule.startTime | date:'EEE, MMM d' }}</span>
+          </div>
+
+          <div class="price-row">
+            <span class="price-label">Price / ዋጋ:</span>
+            <span class="price-amount">{{ schedule.price || 300 }} ETB</span>
+          </div>
+
+          <div class="select-indicator">
+            <span *ngIf="selectedSchedule?.id === schedule.id">✓ Selected</span>
+            <span *ngIf="selectedSchedule?.id !== schedule.id">Click to Select</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- If no schedules found -->
+      <div *ngIf="!movie.schedules || movie.schedules.length === 0" class="no-showtimes-alert">
+        <p>No screening schedules currently listed for this movie.</p>
+        <a routerLink="/admin/create-schedule" class="btn-create-sch">➕ Create Schedule for this Movie</a>
+      </div>
+
+      <!-- Sticky Booking Action Banner -->
+      <div class="booking-action-bar" *ngIf="selectedSchedule">
+        <div class="booking-summary">
+          <div class="summary-col">
+            <span class="summary-label">Selected Hall</span>
+            <strong class="summary-val">{{ selectedSchedule.cinemaHallName || 'Grand Bole Screen' }}</strong>
+          </div>
+          <div class="summary-col">
+            <span class="summary-label">Date & Time</span>
+            <strong class="summary-val">{{ selectedSchedule.startTime | date:'EEE, MMM d, hh:mm a' }}</strong>
+          </div>
+          <div class="summary-col">
+            <span class="summary-label">Admission</span>
+            <strong class="summary-val price-highlight">{{ selectedSchedule.price || 300 }} ETB</strong>
+          </div>
+        </div>
+
+        <button class="btn-proceed-seats" (click)="bookNow()">
+          <span>🎟️</span> {{ 'PROCEED_SEAT_SELECTION' | translate }} →
+        </button>
+      </div>
+    </div>
   </div>
 </div>

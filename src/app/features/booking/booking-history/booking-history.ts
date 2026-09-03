@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { CineFlowApiService } from '../../../core/services/cineflow-api.service';
+import { AuthService } from '../../../core/services/auth';
 
 export interface BookingHistory {
   ticketId: string;
@@ -26,24 +27,34 @@ export interface BookingHistory {
 })
 export class BookingHistory implements OnInit {
   private apiService = inject(CineFlowApiService);
+  private authService = inject(AuthService);
   private router = inject(Router);
 
   bookings: BookingHistory[] = [];
   loading: boolean = true;
   activeTab: 'upcoming' | 'completed' | 'all' = 'upcoming';
 
+  get isLoggedIn(): boolean {
+    return this.authService.isLoggedIn();
+  }
+
+  get userEmail(): string | null {
+    return this.authService.getUserEmail();
+  }
+
   ngOnInit(): void {
     this.loadBookings();
   }
 
   loadBookings(): void {
+    this.loading = true;
     this.apiService.getUserBookings().subscribe({
       next: (data) => {
-        this.bookings = data;
+        this.bookings = data || [];
         this.loading = false;
       },
-      error: (err) => {
-        console.error('Failed to load bookings', err);
+      error: () => {
+        this.bookings = [];
         this.loading = false;
       }
     });
@@ -57,16 +68,28 @@ export class BookingHistory implements OnInit {
   }
 
   downloadQR(booking: BookingHistory): void {
-    if (booking.qrCodeUrl) {
-      const link = document.createElement('a');
-      link.href = booking.qrCodeUrl;
-      link.download = `ticket-${booking.ticketId}.png`;
-      link.click();
-    }
+    const qrUrl = booking.qrCodeUrl || this.apiService.createSvgQrDataUri(booking.ticketId);
+    const link = document.createElement('a');
+    link.href = qrUrl;
+    link.download = `cineflow-ticket-${booking.ticketId}.svg`;
+    link.click();
   }
 
   viewTicket(booking: BookingHistory): void {
-    this.router.navigate(['/booking-details', booking.ticketId]);
+    this.router.navigate(['/booking-details', booking.ticketId], {
+      state: {
+        ticketId: booking.ticketId,
+        movieTitle: booking.movieTitle,
+        movieTitleAmharic: booking.movieTitleAmharic,
+        seatNumber: booking.seatNumber,
+        scheduleTime: booking.scheduleTime,
+        cinemaHall: booking.cinemaHall,
+        cinemaLocation: booking.cinemaLocation,
+        ticketPrice: booking.price,
+        bookingDateTime: booking.bookingDate,
+        qrCodeUrl: booking.qrCodeUrl
+      }
+    });
   }
 
   getStatusColor(status: string): string {

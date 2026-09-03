@@ -1,67 +1,159 @@
-<div class="schedule-container">
-  <h2>Create Movie Schedule</h2>
-
-  <div *ngIf="message" [class]="isSuccess ? 'alert alert-success' : 'alert alert-danger'">
-    {{ message }}
+<div class="create-schedule-page">
+  <!-- Top Navigation & Header -->
+  <div class="page-header">
+    <div class="header-inner">
+      <div class="title-group">
+        <a routerLink="/admin/dashboard" class="btn-back">
+          <span>‹</span> Back to Admin Hub
+        </a>
+        <h1>📅 Create Screening Schedule</h1>
+        <p class="subtitle">Assign a movie to a cinema hall, select the screening time, and set ticket pricing</p>
+      </div>
+      <div class="header-actions">
+        <a routerLink="/movies" class="btn-view-catalog">
+          <span>🍿</span> Movie Catalog
+        </a>
+      </div>
+    </div>
   </div>
 
-  <form (ngSubmit)="onSubmit()">
-    <div class="form-group">
-      <label for="movie">Select Movie</label>
-      <select id="movie" [(ngModel)]="schedule.movieId" name="movieId" required>
-        <option value="" disabled selected>-- Select a Movie --</option>
-        <option *ngFor="let m of movies" [value]="m.id">
-          {{ m.titleEnglish || m.titleAmharic }}
-        </option>
-      </select>
+  <!-- Admin Auth Status Banner -->
+  <div *ngIf="!isAdmin" class="admin-auth-warning animate-fade-in">
+    <div class="warning-content">
+      <span class="warning-icon">⚡</span>
+      <div class="warning-text">
+        <strong>Administrator Authorization</strong>
+        <p>Creating showtimes requires an active Administrator role session.</p>
+      </div>
     </div>
-
-    <div class="form-group">
-      <label for="cinemaHallId">Cinema Hall ID / Name</label>
-      <input 
-        type="text" 
-        id="cinemaHallId" 
-        [(ngModel)]="schedule.cinemaHallId" 
-        name="cinemaHallId" 
-        placeholder="e.g. Hall 1" 
-        required 
-      />
-    </div>
-
-    <div class="form-group">
-      <label for="showtime">Showtime Date & Time</label>
-      <input 
-        type="datetime-local" 
-        id="showtime" 
-        [(ngModel)]="showtimeInput" 
-        name="showtimeInput" 
-        required 
-      />
-    </div>
-
-    <div class="form-group">
-      <label for="ticketPrice">Ticket Price ($)</label>
-      <input 
-        type="number" 
-        id="ticketPrice" 
-        [(ngModel)]="schedule.ticketPrice" 
-        name="ticketPrice" 
-        min="1" 
-        required 
-      />
-    </div>
-    <div class="form-group">
-  <label for="cinemaHallId">Select Cinema Hall</label>
-  <select id="cinemaHallId" [(ngModel)]="schedule.cinemaHallId" name="cinemaHallId" class="form-control" required>
-    <option value="" disabled selected>-- Select Cinema Hall --</option>
-    <option *ngFor="let hall of cinemaHalls" [value]="hall.id">
-      {{ hall.hallName }} ({{ hall.branchName }})
-    </option>
-  </select>
-</div>
-
-    <button type="submit" [disabled]="loading" class="btn-submit">
-      {{ loading ? 'Creating...' : 'Create Schedule' }}
+    <button (click)="quickAdminLogin()" [disabled]="adminLoginLoading" class="btn-quick-admin">
+      <span *ngIf="!adminLoginLoading">🔑 Quick Sign-In as Admin</span>
+      <span *ngIf="adminLoginLoading">Activating Admin Session...</span>
     </button>
-  </form>
+  </div>
+
+  <div *ngIf="isAdmin" class="admin-auth-success animate-fade-in">
+    <span>✓ Active Admin Session: <strong>{{ userEmail }}</strong> (Full Permissions)</span>
+  </div>
+
+  <div class="content-grid">
+    <!-- Left Column: Form -->
+    <div class="form-container">
+      <!-- Status Message Banner -->
+      <div *ngIf="message" [class.alert-success]="isSuccess" [class.alert-error]="!isSuccess" class="schedule-alert-banner animate-pop">
+        <span>{{ isSuccess ? '✓' : '⚠️' }}</span>
+        <span>{{ message }}</span>
+      </div>
+
+      <form (ngSubmit)="onSubmit()" class="schedule-form">
+        <!-- Movie Selection -->
+        <div class="form-group">
+          <label for="movieSelect">Select Movie <span class="required">*</span></label>
+          <div class="input-container">
+            <span class="field-icon">🎬</span>
+            <select id="movieSelect" [(ngModel)]="schedule.movieId" name="movieId" required>
+              <option value="" disabled>-- Choose Movie Title --</option>
+              <option *ngFor="let m of movies" [value]="m.id">
+                {{ m.titleEnglish }} {{ m.titleAmharic ? '(' + m.titleAmharic + ')' : '' }}
+              </option>
+            </select>
+          </div>
+          <span class="field-hint">Need to add a new title? <a routerLink="/admin/create-movie" style="color: #38bdf8; text-decoration: underline;">Click here to Create Movie →</a></span>
+        </div>
+
+        <!-- Cinema Hall Selection -->
+        <div class="form-group">
+          <label for="hallSelect">Cinema Hall & Auditorium <span class="required">*</span></label>
+          <div class="input-container">
+            <span class="field-icon">🏛️</span>
+            <select id="hallSelect" [(ngModel)]="schedule.cinemaHallId" name="cinemaHallId" required>
+              <option value="" disabled>-- Choose Cinema Hall --</option>
+              <option *ngFor="let hall of cinemaHalls" [value]="hall.id || hall.cinemaHallId">
+                {{ getHallDisplayName(hall) }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Showtime Date and Time -->
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="showtimeDate">Screening Date & Time <span class="required">*</span></label>
+            <div class="input-container">
+              <span class="field-icon">⏱️</span>
+              <input
+                type="datetime-local"
+                id="showtimeDate"
+                [(ngModel)]="showtimeInput"
+                name="showtimeInput"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- Ticket Price (ETB) -->
+          <div class="form-group flex-1">
+            <label for="ticketPrice">Ticket Price (ETB) <span class="required">*</span></label>
+            <div class="input-container">
+              <span class="field-icon">💵</span>
+              <input
+                type="number"
+                id="ticketPrice"
+                [(ngModel)]="schedule.ticketPrice"
+                name="ticketPrice"
+                min="50"
+                step="25"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+          <button type="submit" [disabled]="loading || !schedule.movieId || !schedule.cinemaHallId || !showtimeInput" class="btn-submit-schedule">
+            <span *ngIf="!loading">🚀 Publish & Open Showtimes for Booking</span>
+            <span *ngIf="loading" class="btn-spinner-wrap">
+              <span class="spinner-sm"></span> Publishing Schedule...
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Right Column: Live Schedule Card Preview -->
+    <div class="preview-column">
+      <div class="preview-sticky">
+        <h3 class="preview-heading"><span>👁️</span> Live Screening Pass Preview</h3>
+
+        <div class="schedule-preview-card">
+          <div class="preview-header">
+            <span class="hall-tag">{{ getSelectedHallDisplayName() }}</span>
+            <span class="price-tag">{{ schedule.ticketPrice || 300 }} ETB</span>
+          </div>
+
+          <div class="preview-movie-title">
+            <h4>{{ getSelectedMovie()?.titleEnglish || 'Select a movie title' }}</h4>
+            <h5 *ngIf="getSelectedMovie()?.titleAmharic">{{ getSelectedMovie()?.titleAmharic }}</h5>
+          </div>
+
+          <div class="preview-timing">
+            <div class="time-block">
+              <span class="label">Showtime:</span>
+              <strong class="time-val">{{ (showtimeInput | date:'hh:mm a') || '06:00 PM' }}</strong>
+            </div>
+            <div class="date-block">
+              <span class="label">Date:</span>
+              <strong class="date-val">{{ (showtimeInput | date:'EEEE, MMMM d, y') || 'Tomorrow' }}</strong>
+            </div>
+          </div>
+
+          <div class="preview-footer">
+            <span>🎟️ {{ getSelectedHall()?.totalCapacity || getSelectedHall()?.capacity || 36 }} Seats Available</span>
+            <span class="status-live">● Live Booking Ready</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

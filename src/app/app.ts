@@ -1,12 +1,87 @@
-import { Component, signal } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/router';
+import { AuthService } from './core/services/auth';
+import { TranslationService, LanguageCode } from './core/services/translation.service';
+import { ThemeService, ThemeMode } from './core/services/theme.service';
+import { NotificationService } from './core/services/notification.service';
+import { TranslatePipe } from './core/pipes/translate.pipe';
+import { ToastComponent } from './core/components/toast/toast.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink],
+  standalone: true,
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, TranslatePipe, ToastComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class AppComponent {
-  protected readonly title = signal('CineFlow-UI');
+  authService = inject(AuthService);
+  translationService = inject(TranslationService);
+  themeService = inject(ThemeService);
+  notificationService = inject(NotificationService);
+  router = inject(Router);
+
+  isLoggedIn$ = this.authService.isLoggedIn$;
+  mobileMenuOpen = false;
+  langDropdownOpen = false;
+
+  get currentLang(): LanguageCode {
+    return this.translationService.getLanguage();
+  }
+
+  get languages() {
+    return this.translationService.languages;
+  }
+
+  get currentTheme(): ThemeMode {
+    return this.themeService.currentTheme();
+  }
+
+  toggleTheme(): void {
+    const newTheme = this.themeService.toggleTheme();
+    const modeName = newTheme === 'dark' 
+      ? this.translationService.t('THEME_DARK', 'Dark Mode') 
+      : this.translationService.t('THEME_LIGHT', 'Light Mode');
+    this.notificationService.info(`Switched to ${modeName}`, 'Theme Changed');
+  }
+
+  toggleLanguage(): void {
+    const nextLang = this.translationService.toggleLanguage();
+    const langLabel = nextLang === 'am' ? 'አማርኛ' : 'English';
+    this.notificationService.info(`Language set to ${langLabel}`, 'Language');
+  }
+
+  setLanguage(lang: LanguageCode): void {
+    this.translationService.setLanguage(lang);
+    this.langDropdownOpen = false;
+  }
+
+  toggleLangDropdown(): void {
+    this.langDropdownOpen = !this.langDropdownOpen;
+  }
+
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  closeMobileMenu(): void {
+    this.mobileMenuOpen = false;
+    this.langDropdownOpen = false;
+  }
+
+  getUserEmail(): string {
+    return this.authService.getUserEmail() || 'Member';
+  }
+
+  isAdmin(): boolean {
+    return this.authService.isAdmin();
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.closeMobileMenu();
+    this.notificationService.success('Signed out successfully', 'Logged Out');
+    this.router.navigate(['/movies']);
+  }
 }

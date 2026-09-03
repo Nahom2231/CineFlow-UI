@@ -1,111 +1,126 @@
-<div class="booking-history-container">
-  <div class="header">
-    <h1>My Bookings</h1>
-    <p class="subtitle">View your ticket history and manage upcoming shows</p>
+<div class="booking-history-page">
+  <div class="page-header">
+    <div class="header-inner">
+      <div class="title-group">
+        <a routerLink="/movies" class="btn-back">
+          <span>‹</span> Back to Movies Catalog
+        </a>
+        <h1>🎫 My Cinema Bookings & Passes</h1>
+        <p class="subtitle">View your digital ticket passes, download QR codes, and review showtimes</p>
+        
+        <div *ngIf="!isLoggedIn" class="guest-sync-banner">
+          <span>📱 Viewing digital tickets stored on this device.</span>
+          <a routerLink="/auth/login" class="link-signin">Sign In to sync across devices →</a>
+        </div>
+        
+        <div *ngIf="isLoggedIn" class="user-sync-banner">
+          <span>✓ Synchronized with account: <strong>{{ userEmail }}</strong></span>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Tabs -->
-  <div class="tabs">
+  <!-- Navigation Tabs -->
+  <div class="history-tabs">
     <button 
-      class="tab"
+      class="tab-btn"
       [class.active]="activeTab === 'upcoming'"
       (click)="activeTab = 'upcoming'">
-      📅 Upcoming Shows
+      <span>📅</span> Upcoming Screenings
     </button>
     <button 
-      class="tab"
+      class="tab-btn"
       [class.active]="activeTab === 'completed'"
       (click)="activeTab = 'completed'">
-      ✓ Attended Shows
+      <span>✓</span> Attended Shows
     </button>
     <button 
-      class="tab"
+      class="tab-btn"
       [class.active]="activeTab === 'all'"
       (click)="activeTab = 'all'">
-      📋 All Bookings
+      <span>📋</span> All Passes
     </button>
   </div>
 
   <!-- Loading State -->
-  <div *ngIf="loading" class="loading">
+  <div *ngIf="loading" class="loading-panel">
     <div class="spinner"></div>
-    <p>Loading your bookings...</p>
+    <p>Loading your verified cinema passes...</p>
   </div>
 
   <!-- Bookings List -->
-  <div *ngIf="!loading && filteredBookings.length > 0" class="bookings-list">
+  <div *ngIf="!loading && filteredBookings.length > 0" class="bookings-grid animate-fade-in">
     <div *ngFor="let booking of filteredBookings" 
-         class="booking-card"
+         class="booking-pass-card glass-panel"
          [class]="'status-' + booking.status">
       
-      <div class="booking-header">
+      <div class="card-top-row">
         <div class="status-badge" [class]="booking.status">
-          {{ booking.status === 'upcoming' ? '📅 Upcoming' : 
+          {{ booking.status === 'upcoming' ? '🟢 Confirmed / Upcoming' : 
              booking.status === 'completed' ? '✓ Attended' : '✗ Cancelled' }}
         </div>
-        <div class="booking-id">
-          Ticket ID: {{ booking.ticketId }}
+        <div class="ticket-pass-id">
+          Pass: <span>{{ booking.ticketId }}</span>
         </div>
       </div>
 
-      <div class="booking-main">
-        <div class="movie-info">
-          <h3>{{ booking.movieTitle }}</h3>
-          <p class="movie-subtitle">{{ booking.movieTitleAmharic }}</p>
+      <div class="card-main-content">
+        <div class="movie-header">
+          <h3 class="movie-title">{{ booking.movieTitle }}</h3>
+          <p class="movie-subtitle" *ngIf="booking.movieTitleAmharic">{{ booking.movieTitleAmharic }}</p>
         </div>
 
-        <div class="booking-details">
-          <div class="detail-item">
-            <span class="label">📍 Seat</span>
-            <span class="value">{{ booking.seatNumber }}</span>
+        <div class="booking-specs-grid">
+          <div class="spec-box highlight-seat">
+            <span class="label">Seat</span>
+            <span class="val">💺 {{ booking.seatNumber }}</span>
           </div>
-          <div class="detail-item">
-            <span class="label">🕐 Date & Time</span>
-            <span class="value">{{ booking.scheduleTime | date:'medium' }}</span>
+          <div class="spec-box">
+            <span class="label">Date & Time</span>
+            <span class="val">🕒 {{ booking.scheduleTime | date:'EEE, MMM d • h:mm a' }}</span>
           </div>
-          <div class="detail-item">
-            <span class="label">🎬 Cinema Hall</span>
-            <span class="value">{{ booking.cinemaHall }}</span>
+          <div class="spec-box">
+            <span class="label">Auditorium</span>
+            <span class="val">🎭 {{ booking.cinemaHall }}</span>
           </div>
-          <div class="detail-item">
-            <span class="label">📍 Location</span>
-            <span class="value">{{ booking.cinemaLocation }}</span>
+          <div class="spec-box">
+            <span class="label">Location</span>
+            <span class="val">📍 {{ booking.cinemaLocation }}</span>
           </div>
-          <div class="detail-item">
-            <span class="label">💰 Price</span>
-            <span class="value price">{{ booking.price }} ETB</span>
+          <div class="spec-box">
+            <span class="label">Ticket Price</span>
+            <span class="val price">{{ booking.price }} ETB</span>
           </div>
-          <div class="detail-item">
-            <span class="label">📅 Booked On</span>
-            <span class="value">{{ booking.bookingDate | date:'short' }}</span>
+          <div class="spec-box">
+            <span class="label">Booked Date</span>
+            <span class="val">{{ booking.bookingDate | date:'MMM d, y' }}</span>
           </div>
         </div>
       </div>
 
-      <div class="booking-actions">
+      <div class="card-actions-row">
         <button 
           *ngIf="booking.status === 'upcoming' && booking.qrCodeUrl"
-          class="btn btn-primary"
+          class="btn btn-download-qr"
           (click)="downloadQR(booking)">
-          📥 Download QR
+          <span>📥</span> Download QR Pass
         </button>
         <button 
-          class="btn btn-secondary"
+          class="btn btn-view-ticket"
           (click)="viewTicket(booking)">
-          View Details
+          <span>👁️</span> View Digital Pass
         </button>
       </div>
     </div>
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!loading && filteredBookings.length === 0" class="empty-state">
-    <div class="empty-icon">🎬</div>
-    <h2>No {{ activeTab === 'upcoming' ? 'Upcoming' : 
-                  activeTab === 'completed' ? 'Attended' : '' }} Bookings</h2>
-    <p>Start booking your favorite movies to see them here</p>
-    <button class="btn btn-primary" routerLink="/movies">
-      Browse Movies
-    </button>
+  <div *ngIf="!loading && filteredBookings.length === 0" class="empty-state-panel glass-panel">
+    <div class="empty-icon">🍿</div>
+    <h2>No {{ activeTab === 'upcoming' ? 'Upcoming' : activeTab === 'completed' ? 'Attended' : '' }} Cinema Passes</h2>
+    <p>Explore today's showtimes and book your seats for the latest movie releases.</p>
+    <a routerLink="/movies" class="btn-browse-movies">
+      <span>🎬</span> Browse Cinema Catalog
+    </a>
   </div>
 </div>

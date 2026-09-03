@@ -1,45 +1,120 @@
-<div class=" auth-container">
-    <div class ="auth-card">
-        <h2> Create a CineFlow Account </h2>
-        <p class= "subtitle"> Join to reserve seats and book movie tickets </p>
+<div class="auth-page-container">
+  <div class="auth-card-panel animate-fade-in">
+    <!-- Header -->
+    <div class="auth-header">
+      <div class="brand-badge">
+        <span class="badge-icon">🎬</span>
+        <span>CINEFLOW ACCOUNT</span>
+      </div>
+      <h2>Create Your Account</h2>
+      <p class="subtitle">Join to reserve seats, track booking passes, and receive instant digital tickets</p>
+    </div>
 
-        <form (ngSubmit)="onRegister()">
-            <div class ="form-group">
-            <label for="email"> Email Address</label>
-            <input
+    <!-- Form -->
+    <form (ngSubmit)="onRegister()" class="auth-form">
+      <!-- Email -->
+      <div class="form-group">
+        <label for="regEmail">Email Address</label>
+        <div class="input-container">
+          <span class="field-icon">✉️</span>
+          <input
             type="email"
-            id="email"
+            id="regEmail"
             [(ngModel)]="email"
             name="email"
             placeholder="e.g. user@cineflow.com"
             required
-            />
-            </div>
-            <div class ="form-group">
-            <label for ="password">Password</label>
-            <input
+            autocomplete="email"
+          />
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="regPassword">Password</label>
+        <div class="input-container">
+          <span class="field-icon">🔒</span>
+          <input
             type="password"
-            id="password"
+            id="regPassword"
             [(ngModel)]="password"
             name="password"
-            placeholder="........."
+            placeholder="Create a secure password"
             required
-            />
-            </div>
-            <div class="form-group">
-            <label for ="confirmPassword">Confirm Password</label>
-            <input
+            autocomplete="new-password"
+          />
+        </div>
+
+        <!-- Interactive Password Requirements Checklist -->
+        <div class="password-checklist" *ngIf="password">
+          <div class="check-item" [class.valid]="hasMinLength">
+            <span class="icon">{{ hasMinLength ? '✓' : '○' }}</span> 6+ characters
+          </div>
+          <div class="check-item" [class.valid]="hasUpperCase">
+            <span class="icon">{{ hasUpperCase ? '✓' : '○' }}</span> Uppercase (A-Z)
+          </div>
+          <div class="check-item" [class.valid]="hasLowerCase">
+            <span class="icon">{{ hasLowerCase ? '✓' : '○' }}</span> Lowercase (a-z)
+          </div>
+          <div class="check-item" [class.valid]="hasNumber">
+            <span class="icon">{{ hasNumber ? '✓' : '○' }}</span> Number (0-9)
+          </div>
+          <div class="check-item" [class.valid]="hasSpecialChar">
+            <span class="icon">{{ hasSpecialChar ? '✓' : '○' }}</span> Symbol (!@#$)
+          </div>
+        </div>
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="form-group">
+        <label for="regConfirmPassword">Confirm Password</label>
+        <div class="input-container">
+          <span class="field-icon">🛡️</span>
+          <input
             type="password"
-            id="confirmPassword"
+            id="regConfirmPassword"
             [(ngModel)]="confirmPassword"
             name="confirmPassword"
-            placeholder="........."
+            placeholder="Repeat password"
             required
-            />
-            </div>
-            <button type ="submit" [disabled]="loading " class ="btn-primary">
-                {{loading? 'Creating Account...' : 'Register' }}
-            </button>
-        </form>
-    </div>
+            autocomplete="new-password"
+          />
+        </div>
+        <p *ngIf="confirmPassword && !passwordsMatch" class="mismatch-hint">
+          ⚠️ Passwords do not match
+        </p>
+      </div>
+
+      <!-- Error / Success Feedback Banner -->
+      <div *ngIf="message" [class.alert-success]="isSuccess" [class.alert-error]="!isSuccess" class="auth-message-banner">
+        <span>{{ isSuccess ? '✓' : '⚠️' }}</span>
+        <div class="banner-content" style="display: flex; flex-direction: column; gap: 0.35rem;">
+          <span>{{ message }}</span>
+          <a *ngIf="isEmailTaken" routerLink="/auth/login" style="color: #38bdf8; font-weight: 700; text-decoration: underline; font-size: 0.85rem; cursor: pointer;">
+            Already registered? Click here to Sign In →
+          </a>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button 
+        type="submit" 
+        [disabled]="loading || !email || !password || !confirmPassword" 
+        class="btn-auth-submit"
+      >
+        <span *ngIf="!loading">Create CineFlow Account</span>
+        <span *ngIf="loading" class="btn-spinner-wrap">
+          <span class="spinner-sm"></span> Registering Account...
+        </span>
+      </button>
+
+      <!-- Footer / Switch to Login -->
+      <div class="auth-footer">
+        <p>Already have an account?</p>
+        <a routerLink="/auth/login" class="btn-switch-auth">
+          Sign in here →
+        </a>
+      </div>
+    </form>
+  </div>
 </div>

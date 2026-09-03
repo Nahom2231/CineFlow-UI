@@ -1,12 +1,212 @@
-<header class="navbar">
-    <div class="Logo" routerLink="/movies"> CineFlow</div>
-    <nav>
-        <a routerLink="/movies"> Catalog </a>
-        <a routerLink="/admin/validate-ticket">validate Ticket </a>
-        <a routerLink="/auth/login" class="nav-btn">Sign In </a>
-    </nav>
-</header>
-<main class="main-content">
+<header class="app-header">
+  <div class="header-container">
+    <!-- Brand Logo -->
+    <a routerLink="/movies" class="brand-logo" (click)="closeMobileMenu()">
+      <div class="logo-icon">
+        <span class="reel-dot"></span>
+        🎬
+      </div>
+      <div class="logo-text">
+        <span class="title">Cine<span class="highlight">Flow</span></span>
+        <span class="tagline">{{ 'NAV_TAGLINE' | translate }}</span>
+      </div>
+    </a>
 
-<router-outlet></router-outlet>
+    <!-- Desktop Navigation Links -->
+    <nav class="desktop-nav">
+      <a routerLink="/movies" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+        <span class="icon">🍿</span> {{ 'NAV_MOVIES' | translate }}
+      </a>
+      <a routerLink="/booking-history" routerLinkActive="active" class="nav-link">
+        <span class="icon">🎫</span> {{ 'NAV_MY_TICKETS' | translate }}
+      </a>
+      <a *ngIf="isAdmin()" routerLink="/admin/create-movie" routerLinkActive="active" class="nav-link">
+        <span class="icon">🎬</span> {{ 'NAV_ADD_MOVIE' | translate }}
+      </a>
+      <a *ngIf="isAdmin()" routerLink="/admin/manage-halls" routerLinkActive="active" class="nav-link">
+        <span class="icon">🏛️</span> {{ 'NAV_CINEMA_HALLS' | translate }}
+      </a>
+      <a *ngIf="isAdmin()" routerLink="/admin/dashboard" routerLinkActive="active" class="nav-link admin-pill">
+        <span class="icon">⚡</span> {{ 'NAV_ADMIN_HUB' | translate }}
+      </a>
+    </nav>
+
+    <!-- Header Actions & Top Right Language & Theme Switcher -->
+    <div class="header-actions">
+      <!-- Dark / Light Theme Toggle Button -->
+      <button 
+        type="button" 
+        class="btn-theme-toggle" 
+        (click)="toggleTheme()"
+        [attr.aria-label]="'THEME_TOGGLE_TITLE' | translate"
+        [title]="currentTheme === 'dark' ? ('THEME_LIGHT' | translate) : ('THEME_DARK' | translate)"
+      >
+        <span class="theme-icon" *ngIf="currentTheme === 'dark'">☀️</span>
+        <span class="theme-icon" *ngIf="currentTheme === 'light'">🌙</span>
+        <span class="theme-text">{{ currentTheme === 'dark' ? ('THEME_LIGHT' | translate) : ('THEME_DARK' | translate) }}</span>
+      </button>
+
+      <!-- Standardized ISO Language Switcher Button (Top Right) -->
+      <div class="lang-switcher-container">
+        <button 
+          type="button" 
+          class="btn-lang-iso" 
+          (click)="toggleLanguage()"
+          [attr.aria-label]="'Switch language between English and Amharic'"
+          [title]="currentLang === 'en' ? 'Switch to Amharic (አማርኛ - ISO 639-1: am)' : 'Switch to English (ISO 639-1: en)'"
+        >
+          <span class="lang-globe">🌐</span>
+          <span class="lang-code-active">{{ currentLang === 'en' ? 'EN' : 'አማ' }}</span>
+          <span class="lang-divider">/</span>
+          <span class="lang-code-alt">{{ currentLang === 'en' ? 'AM' : 'EN' }}</span>
+          <span class="lang-flag">{{ currentLang === 'en' ? '🇪🇹' : '🇺🇸' }}</span>
+        </button>
+      </div>
+
+      <!-- Auth Actions -->
+      <ng-container *ngIf="isLoggedIn$ | async; else guestActions">
+        <div class="user-badge" [class.admin-user]="isAdmin()">
+          <div class="user-avatar">{{ isAdmin() ? '👑' : '👤' }}</div>
+          <span class="user-name">{{ getUserEmail() }}</span>
+        </div>
+        <button (click)="logout()" class="btn-logout" title="Sign out">
+          <span>{{ 'NAV_SIGN_OUT' | translate }}</span> 🚪
+        </button>
+      </ng-container>
+
+      <ng-template #guestActions>
+        <a routerLink="/auth/login" class="btn-signin" (click)="closeMobileMenu()">
+          <span>{{ 'NAV_SIGN_IN' | translate }}</span>
+        </a>
+        <a routerLink="/auth/register" class="btn-register" (click)="closeMobileMenu()">
+          <span>{{ 'NAV_JOIN_FREE' | translate }}</span>
+        </a>
+      </ng-template>
+
+      <!-- Mobile Hamburger Toggle -->
+      <button class="mobile-toggle" (click)="toggleMobileMenu()" aria-label="Toggle Menu">
+        <span class="bar" [class.open]="mobileMenuOpen"></span>
+        <span class="bar" [class.open]="mobileMenuOpen"></span>
+        <span class="bar" [class.open]="mobileMenuOpen"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Dropdown Menu -->
+  <div class="mobile-menu" *ngIf="mobileMenuOpen">
+    <div class="mobile-lang-row">
+      <button 
+        type="button" 
+        class="mobile-lang-btn" 
+        [class.active]="currentLang === 'en'" 
+        (click)="setLanguage('en'); closeMobileMenu()"
+      >
+        🇺🇸 English (EN - ISO 639-1)
+      </button>
+      <button 
+        type="button" 
+        class="mobile-lang-btn" 
+        [class.active]="currentLang === 'am'" 
+        (click)="setLanguage('am'); closeMobileMenu()"
+      >
+        🇪🇹 አማርኛ (AM - ISO 639-1)
+      </button>
+    </div>
+
+    <a routerLink="/movies" (click)="closeMobileMenu()" class="mobile-link">🍿 {{ 'NAV_MOVIES' | translate }}</a>
+    <a routerLink="/booking-history" (click)="closeMobileMenu()" class="mobile-link">🎫 {{ 'NAV_MY_TICKETS' | translate }}</a>
+    <ng-container *ngIf="isAdmin()">
+      <a routerLink="/admin/create-movie" (click)="closeMobileMenu()" class="mobile-link">🎬 {{ 'NAV_ADD_MOVIE' | translate }}</a>
+      <a routerLink="/admin/manage-halls" (click)="closeMobileMenu()" class="mobile-link">🏛️ {{ 'NAV_CINEMA_HALLS' | translate }}</a>
+      <a routerLink="/admin/dashboard" (click)="closeMobileMenu()" class="mobile-link admin-link">⚡ {{ 'NAV_ADMIN_HUB' | translate }}</a>
+      <a routerLink="/admin/create-schedule" (click)="closeMobileMenu()" class="mobile-link">📅 {{ 'ADMIN_CREATE_SCHEDULE_BTN' | translate }}</a>
+      <a routerLink="/admin/validate-ticket" (click)="closeMobileMenu()" class="mobile-link">🔍 {{ 'ADMIN_VALIDATE_BTN' | translate }}</a>
+    </ng-container>
+    
+    <div class="mobile-auth" *ngIf="!(isLoggedIn$ | async)">
+      <a routerLink="/auth/login" (click)="closeMobileMenu()" class="btn-signin w-100">{{ 'NAV_SIGN_IN' | translate }}</a>
+      <a routerLink="/auth/register" (click)="closeMobileMenu()" class="btn-register w-100">{{ 'NAV_CREATE_ACCOUNT' | translate }}</a>
+    </div>
+    <div class="mobile-auth" *ngIf="isLoggedIn$ | async">
+      <button (click)="logout()" class="btn-logout w-100">{{ 'NAV_SIGN_OUT' | translate }}</button>
+    </div>
+  </div>
+</header>
+
+<main class="app-main">
+  <router-outlet></router-outlet>
 </main>
+
+<footer class="app-footer">
+  <div class="footer-container">
+    <div class="footer-brand">
+      <div class="brand-logo footer-logo">
+        <div class="logo-icon">🎬</div>
+        <div class="logo-text">
+          <span class="title">Cine<span class="highlight">Flow</span></span>
+        </div>
+      </div>
+      <p class="footer-desc">
+        {{ 'FOOTER_DESC' | translate }}
+      </p>
+      <div class="payment-badges">
+        <span class="pay-pill">⚡ Chapa Real-Time API</span>
+        <span class="pay-pill">📱 Telebirr</span>
+        <span class="pay-pill">🏦 CBE Birr</span>
+        <span class="pay-pill">💳 Visa / Master</span>
+      </div>
+    </div>
+
+    <div class="footer-links-group">
+      <h4>{{ 'FOOTER_QUICK_NAV' | translate }}</h4>
+      <ul>
+        <li><a routerLink="/movies">{{ 'HERO_BROWSE_BTN' | translate }}</a></li>
+        <li><a routerLink="/movies">{{ 'CATALOG_TITLE' | translate }}</a></li>
+        <li><a routerLink="/booking-history">{{ 'NAV_MY_TICKETS' | translate }}</a></li>
+        <li><a routerLink="/admin/manage-halls">{{ 'NAV_CINEMA_HALLS' | translate }}</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-links-group">
+      <h4>{{ 'FOOTER_BRANCHES' | translate }}</h4>
+      <ul>
+        <li>📍 Addis Ababa (Bole Medhanialem)</li>
+        <li>📍 Addis Ababa (Edna Mall)</li>
+        <li>📍 Hawassa Lake Screen</li>
+        <li>📍 Dire Dawa Grand Hall</li>
+      </ul>
+    </div>
+
+    <div class="footer-links-group">
+      <h4>{{ 'FOOTER_ADMIN' | translate }}</h4>
+      <ul>
+        <li><a routerLink="/admin/dashboard">{{ 'NAV_ADMIN_HUB' | translate }}</a></li>
+        <li><a routerLink="/admin/validate-ticket">{{ 'ADMIN_VALIDATE_BTN' | translate }}</a></li>
+        <li><a routerLink="/admin/create-movie">{{ 'NAV_ADD_MOVIE' | translate }}</a></li>
+        <li><a routerLink="/admin/create-schedule">{{ 'ADMIN_CREATE_SCHEDULE_BTN' | translate }}</a></li>
+        <li><a routerLink="/admin/revenue-report">{{ 'ADMIN_REVENUE_REPORT_BTN' | translate }}</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>{{ 'FOOTER_RIGHTS' | translate }}</p>
+    <div class="status-indicator">
+      <span class="status-dot"></span> {{ 'FOOTER_LIVE' | translate }}
+    </div>
+  </div>
+</footer>
+
+<!-- Global Ambient Cinema Playback Background Layer -->
+<div class="ambient-cinema-bg" aria-hidden="true">
+  <div class="cinema-projector-beam"></div>
+  <div class="ambient-orb orb-indigo"></div>
+  <div class="ambient-orb orb-rose"></div>
+  <div class="ambient-orb orb-cyan"></div>
+  <div class="ambient-orb orb-gold"></div>
+  <div class="cinema-particles"></div>
+  <div class="ambient-grid-overlay"></div>
+</div>
+
+<!-- Global Floating Toast Notifications -->
+<app-toast></app-toast>
