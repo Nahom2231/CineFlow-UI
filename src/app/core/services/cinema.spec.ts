@@ -1,13 +1,13 @@
+import { describe, it, expect, beforeEach } from 'vitest';
 import { TestBed } from '@angular/core/testing';
+import { CinemaService } from './cinema';
 
-import { Cinema } from './cinema';
-
-describe('Cinema', () => {
-  let service: Cinema;
+describe('CinemaService', () => {
+  let service: CinemaService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(Cinema);
+    service = TestBed.inject(CinemaService);
   });
 
   it('should be created', () => {

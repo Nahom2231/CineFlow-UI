@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BookingHistory } from './booking-history';
 import { CineFlowApiService } from '../../../core/services/cineflow-api.service';
@@ -7,12 +8,16 @@ import { of, throwError } from 'rxjs';
 describe('BookingHistory', () => {
   let component: BookingHistory;
   let fixture: ComponentFixture<BookingHistory>;
-  let mockApiService: jasmine.SpyObj<CineFlowApiService>;
-  let mockRouter: jasmine.SpyObj<Router>;
+  let mockApiService: any;
+  let mockRouter: any;
 
   beforeEach(async () => {
-    mockApiService = jasmine.createSpyObj('CineFlowApiService', ['getUserBookings']);
-    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+    mockApiService = {
+      getUserBookings: vi.fn().mockReturnValue(of([]))
+    };
+    mockRouter = {
+      navigate: vi.fn()
+    };
 
     await TestBed.configureTestingModule({
       imports: [BookingHistory],
@@ -27,7 +32,7 @@ describe('BookingHistory', () => {
   });
 
   it('should create', () => {
-    mockApiService.getUserBookings.and.returnValue(of([]));
+    mockApiService.getUserBookings.mockReturnValue(of([]));
     expect(component).toBeTruthy();
   });
 
@@ -47,7 +52,7 @@ describe('BookingHistory', () => {
       }
     ];
 
-    mockApiService.getUserBookings.and.returnValue(of(mockBookings));
+    mockApiService.getUserBookings.mockReturnValue(of(mockBookings));
     component.ngOnInit();
 
     expect(mockApiService.getUserBookings).toHaveBeenCalled();

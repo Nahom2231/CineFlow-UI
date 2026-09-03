@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TicketConfirmation } from './ticket-confirmation';
 import { Router } from '@angular/router';
@@ -5,10 +6,13 @@ import { Router } from '@angular/router';
 describe('TicketConfirmation', () => {
   let component: TicketConfirmation;
   let fixture: ComponentFixture<TicketConfirmation>;
-  let mockRouter: jasmine.SpyObj<Router>;
+  let mockRouter: any;
 
   beforeEach(async () => {
-    mockRouter = jasmine.createSpyObj('Router', ['navigate', 'getCurrentNavigation']);
+    mockRouter = {
+      navigate: vi.fn(),
+      getCurrentNavigation: vi.fn().mockReturnValue(null)
+    };
 
     await TestBed.configureTestingModule({
       imports: [TicketConfirmation],
@@ -29,8 +33,9 @@ describe('TicketConfirmation', () => {
     component.qrCodeUrl = 'data:image/png;base64,...';
     component.ticketId = 'test-123';
     
-    spyOn(document, 'createElement').and.returnValue({
-      click: jasmine.createSpy('click'),
+    const clickSpy = vi.fn();
+    vi.spyOn(document, 'createElement').mockReturnValue({
+      click: clickSpy,
       href: '',
       download: ''
     } as any);

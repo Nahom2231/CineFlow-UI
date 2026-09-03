@@ -1,4 +1,7 @@
-import { Service } from '@angular/core';
+import { Injectable } from '@angular/core';
 
-@Service()
-export class Cinema {}
+@Injectable({
+  providedIn: 'root'
+})
+export class CinemaService {}
+
