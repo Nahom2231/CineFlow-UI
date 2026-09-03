@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CineFlowApiService } from '../../../core/services/cineflow-api.service';
 import { TranslationService } from '../../../core/services/translation.service';
 import { NotificationService } from '../../../core/services/notification.service';
@@ -9,7 +9,7 @@ import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 @Component({
   selector: 'app-ticket-confirmation',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslatePipe],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './ticket-confirmation.html',
   styleUrl: './ticket-confirmation.scss'
 })
@@ -52,11 +52,48 @@ export class TicketConfirmation implements OnInit {
     return this.ticketPrice + this.vatAmount;
   }
 
+  get mobileLink(): string {
+    return this.apiService.getTicketVerificationUrl(this.ticketId, {
+      movieTitle: this.movieTitle,
+      movieTitleAmharic: this.movieTitleAmharic,
+      seatNumber: this.seatNumber,
+      cinemaHall: this.cinemaHall,
+      cinemaLocation: this.cinemaLocation,
+      ticketPrice: this.ticketPrice,
+      paymentProvider: this.paymentProvider,
+      scheduleTime: this.scheduleTime,
+      transactionReference: this.transactionReference,
+      customerEmail: this.customerEmail,
+      phoneNumber: this.customerPhone
+    });
+  }
+
   ngOnInit(): void {
-    // 1. Check if returning directly from Chapa redirect (?tx_ref=... or ?trx_ref=...)
     const qParams = this.route.snapshot.queryParams;
     const txRef = qParams['tx_ref'] || qParams['trx_ref'] || qParams['reference'];
+    const routeTicketId = this.route.snapshot.paramMap.get('ticketId');
 
+    // 1. Check if URL contains query parameters with ticket details (from QR scan on phone)
+    if (qParams['m'] || qParams['s'] || qParams['h']) {
+      this.ticketId = routeTicketId || qParams['ref'] || ('TKT-' + Math.floor(100000 + Math.random() * 900000));
+      this.transactionReference = qParams['ref'] || ('TXN-CF-' + this.ticketId);
+      this.movieTitle = qParams['m'] || 'CineFlow Movie';
+      this.movieTitleAmharic = qParams['am'] || '';
+      this.seatNumber = qParams['s'] || 'C4';
+      this.cinemaHall = qParams['h'] || 'Grand Bole Screen';
+      this.cinemaLocation = qParams['loc'] || 'Bole, Addis Ababa';
+      this.ticketPrice = Number(qParams['p']) || 300;
+      this.paymentProvider = qParams['pr'] || 'Chapa Payment Gateway';
+      this.scheduleTime = qParams['t'] || new Date().toISOString();
+      this.customerEmail = qParams['em'] || 'customer@cineflow.et';
+      this.customerPhone = qParams['ph'] || '0911223344';
+      this.bookingDateTime = new Date().toISOString();
+      this.updateQrCode();
+      this.loading = false;
+      return;
+    }
+
+    // 2. Check if returning directly from Chapa redirect (?tx_ref=... or ?trx_ref=...)
     if (txRef) {
       this.loading = true;
       const pendingStr = sessionStorage.getItem(`cineflow_pending_chapa_${txRef}`);
@@ -77,7 +114,7 @@ export class TicketConfirmation implements OnInit {
           this.customerEmail = pending?.customerEmail || 'customer@cineflow.et';
           this.customerPhone = pending?.phoneNumber || '0911223344';
           this.bookingDateTime = new Date().toISOString();
-          this.qrCodeUrl = this.apiService.createSvgQrDataUri(this.ticketId);
+          this.updateQrCode();
           this.loading = false;
         },
         error: () => {
@@ -87,7 +124,7 @@ export class TicketConfirmation implements OnInit {
       return;
     }
 
-    // 2. Retrieve state passed from SeatPicker router navigation
+    // 3. Retrieve state passed from SeatPicker router navigation
     const state = history.state || {};
 
     if (state && state['ticketId']) {
@@ -104,15 +141,15 @@ export class TicketConfirmation implements OnInit {
       this.customerEmail = state['customerEmail'] || 'customer@cineflow.et';
       this.customerPhone = state['phoneNumber'] || state['customerPhone'] || '0911223344';
       this.bookingDateTime = state['bookingDateTime'] || new Date().toISOString();
-      this.qrCodeUrl = state['qrCodeUrl'] || this.apiService.createSvgQrDataUri(this.ticketId);
+      this.updateQrCode();
     } else {
-      // 3. Fallback for /booking-details/:ticketId route
-      const routeTicketId = this.route.snapshot.paramMap.get('ticketId') || 'TKT-849201';
+      // 4. Fallback for /booking-details/:ticketId route
+      const fallbackTicketId = routeTicketId || 'TKT-849201';
       this.loading = true;
-      this.apiService.getBookingDetails(routeTicketId).subscribe({
+      this.apiService.getBookingDetails(fallbackTicketId).subscribe({
         next: (data) => {
-          this.ticketId = data.ticketId || routeTicketId;
-          this.transactionReference = data.transactionReference || 'TXN-CF-' + routeTicketId;
+          this.ticketId = data.ticketId || fallbackTicketId;
+          this.transactionReference = data.transactionReference || 'TXN-CF-' + fallbackTicketId;
           this.movieTitle = data.movieTitle || 'CineFlow Ticket';
           this.movieTitleAmharic = data.movieTitleAmharic || '';
           this.seatNumber = data.seatNumber || 'D4';
@@ -124,12 +161,12 @@ export class TicketConfirmation implements OnInit {
           this.customerEmail = data.customerEmail || 'customer@cineflow.et';
           this.customerPhone = data.phoneNumber || '0911223344';
           this.bookingDateTime = data.bookingDateTime || data.bookingDate || new Date().toISOString();
-          this.qrCodeUrl = data.qrCodeUrl || this.apiService.createSvgQrDataUri(this.ticketId);
+          this.updateQrCode();
           this.loading = false;
         },
         error: () => {
-          this.ticketId = routeTicketId;
-          this.transactionReference = 'TXN-CF-' + routeTicketId;
+          this.ticketId = fallbackTicketId;
+          this.transactionReference = 'TXN-CF-' + fallbackTicketId;
           this.movieTitle = 'fugitive';
           this.movieTitleAmharic = 'ፊዩጂቲቭ';
           this.seatNumber = 'D4';
@@ -139,10 +176,37 @@ export class TicketConfirmation implements OnInit {
           this.paymentProvider = 'Chapa Payment Gateway';
           this.scheduleTime = new Date().toISOString();
           this.bookingDateTime = new Date().toISOString();
-          this.qrCodeUrl = this.apiService.createSvgQrDataUri(this.ticketId);
+          this.updateQrCode();
           this.loading = false;
         }
       });
+    }
+  }
+
+  updateQrCode(): void {
+    this.qrCodeUrl = this.apiService.createSvgQrDataUri(this.ticketId, {
+      movieTitle: this.movieTitle,
+      movieTitleAmharic: this.movieTitleAmharic,
+      seatNumber: this.seatNumber,
+      cinemaHall: this.cinemaHall,
+      cinemaLocation: this.cinemaLocation,
+      ticketPrice: this.ticketPrice,
+      paymentProvider: this.paymentProvider,
+      scheduleTime: this.scheduleTime,
+      transactionReference: this.transactionReference,
+      customerEmail: this.customerEmail,
+      phoneNumber: this.customerPhone
+    });
+  }
+
+  // Copy Direct Link for Phone
+  copyMobileLink(): void {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(this.mobileLink).then(() => {
+        this.notificationService.success('Mobile verification link copied to clipboard', 'Link Copied');
+      });
+    } else {
+      this.notificationService.info(this.mobileLink, 'Mobile Link');
     }
   }
 

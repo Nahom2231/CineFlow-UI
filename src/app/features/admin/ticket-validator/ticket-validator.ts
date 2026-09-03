@@ -75,8 +75,39 @@ export class TicketValidator implements OnDestroy {
   validate(): void {
     if (!this.txnRef.trim()) return;
 
-    // Clean URL prefixes or whitespace
-    const cleanRef = this.txnRef.replace('https://', '').trim();
+    let cleanRef = this.txnRef.trim();
+    let urlMovieTitle = '';
+    let urlMovieTitleAmharic = '';
+    let urlSeatNumber = '';
+    let urlCinemaHall = '';
+    let urlCinemaLocation = '';
+    let urlScheduleTime = '';
+    let urlTicketPrice = 300;
+
+    // Parse URL if scanned QR code contains full booking-details URL
+    if (cleanRef.includes('/booking-details/')) {
+      try {
+        const urlObj = new URL(cleanRef.startsWith('http') ? cleanRef : `http://${cleanRef}`);
+        const pathParts = urlObj.pathname.split('/booking-details/');
+        if (pathParts.length > 1) {
+          cleanRef = decodeURIComponent(pathParts[1].split('/')[0].split('?')[0]);
+        }
+        urlMovieTitle = urlObj.searchParams.get('m') || '';
+        urlMovieTitleAmharic = urlObj.searchParams.get('am') || '';
+        urlSeatNumber = urlObj.searchParams.get('s') || '';
+        urlCinemaHall = urlObj.searchParams.get('h') || '';
+        urlCinemaLocation = urlObj.searchParams.get('loc') || '';
+        urlScheduleTime = urlObj.searchParams.get('t') || '';
+        if (urlObj.searchParams.get('p')) {
+          urlTicketPrice = Number(urlObj.searchParams.get('p')) || 300;
+        }
+      } catch {
+        const match = cleanRef.match(/booking-details\/([^\/?#]+)/);
+        if (match) cleanRef = match[1];
+      }
+    } else {
+      cleanRef = cleanRef.replace(/^https?:\/\//, '').trim();
+    }
 
     this.apiService.validateTicket({ transactionReference: cleanRef, codeOrReference: cleanRef }).subscribe({
       next: (res: any) => {
@@ -90,22 +121,22 @@ export class TicketValidator implements OnDestroy {
           this.isSuccess = true;
           this.message = responseMsg || 'Ticket verified! Customer allowed entry!';
           
-          let formattedTime = res?.scheduleTime || 'N/A';
-          if (res?.scheduleTime && !isNaN(new Date(res.scheduleTime).getTime())) {
-            formattedTime = new Date(res.scheduleTime).toLocaleString();
+          let formattedTime = res?.scheduleTime || urlScheduleTime || 'N/A';
+          if (formattedTime && formattedTime !== 'N/A' && !isNaN(new Date(formattedTime).getTime())) {
+            formattedTime = new Date(formattedTime).toLocaleString();
           }
 
           // Capture ticket details
           this.validatedTicket = {
             ticketId: res?.ticketId || cleanRef,
-            movieTitle: res?.movieTitle || 'fugitive',
-            movieTitleAmharic: res?.movieTitleAmharic || '',
+            movieTitle: res?.movieTitle || urlMovieTitle || 'CineFlow Ticket',
+            movieTitleAmharic: res?.movieTitleAmharic || urlMovieTitleAmharic || '',
             customerName: res?.customerName || 'Verified Customer',
-            seatNumber: res?.seatNumber || 'A1',
-            cinemaHall: res?.cinemaHall || 'Grand Bole Screen (Dolby Atmos)',
-            cinemaLocation: res?.cinemaLocation || 'Addis Ababa (Bole)',
+            seatNumber: res?.seatNumber || urlSeatNumber || 'A1',
+            cinemaHall: res?.cinemaHall || urlCinemaHall || 'Grand Bole Screen (Dolby Atmos)',
+            cinemaLocation: res?.cinemaLocation || urlCinemaLocation || 'Addis Ababa (Bole)',
             scheduleTime: formattedTime,
-            ticketPrice: res?.ticketPrice || 300,
+            ticketPrice: res?.ticketPrice || urlTicketPrice || 300,
             validatedAt: new Date().toLocaleTimeString(),
             validatedBy: localStorage.getItem('staffName') || 'Staff Member'
           };

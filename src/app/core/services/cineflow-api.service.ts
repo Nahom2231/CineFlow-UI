@@ -1132,7 +1132,17 @@ export class CineFlowApiService {
         ticketPrice: command.ticketPrice || movieInfo.price,
         paymentProvider: command.paymentProvider || 'Telebirr',
         bookingDateTime: new Date().toISOString(),
-        qrCodeUrl: this.createSvgQrDataUri(ticketId),
+        qrCodeUrl: this.createSvgQrDataUri(ticketId, {
+          movieTitle: command.movieTitle || movieInfo.titleEnglish,
+          movieTitleAmharic: command.movieTitleAmharic || movieInfo.titleAmharic,
+          seatNumber: command.seatNumber,
+          cinemaHall: command.cinemaHall || movieInfo.cinemaHall,
+          cinemaLocation: command.cinemaLocation || movieInfo.location,
+          ticketPrice: command.ticketPrice || movieInfo.price,
+          paymentProvider: command.paymentProvider || 'Telebirr',
+          scheduleTime: movieInfo.time,
+          transactionReference: command.transactionReference || ref
+        }),
         message: 'Booking confirmed successfully!'
       };
 
@@ -1163,19 +1173,36 @@ export class CineFlowApiService {
         let matched = allLocal.find(m => m.schedules?.some(s => s.id === command.scheduleId) || (command.scheduleId && command.scheduleId.includes(m.id)));
         if (!matched && allLocal.length > 0) matched = allLocal[0];
 
+        const movieTitle = command.movieTitle || (matched ? matched.titleEnglish : 'CineFlow Premiere');
+        const movieTitleAmharic = command.movieTitleAmharic || (matched ? matched.titleAmharic : '');
+        const cinemaHall = command.cinemaHall || 'Grand Bole Screen';
+        const cinemaLocation = command.cinemaLocation || 'Bole, Addis Ababa';
+        const ticketPrice = command.ticketPrice || 300;
+        const scheduleTime = new Date().toISOString();
+
         const ticketResult = {
           ticketId: ticketId,
           transactionReference: ref,
-          movieTitle: command.movieTitle || (matched ? matched.titleEnglish : 'CineFlow Premiere'),
-          movieTitleAmharic: command.movieTitleAmharic || (matched ? matched.titleAmharic : ''),
+          movieTitle: movieTitle,
+          movieTitleAmharic: movieTitleAmharic,
           seatNumber: command.seatNumber,
-          scheduleTime: new Date().toISOString(),
-          cinemaHall: command.cinemaHall || 'Grand Bole Screen',
-          cinemaLocation: command.cinemaLocation || 'Bole, Addis Ababa',
-          ticketPrice: command.ticketPrice || 300,
+          scheduleTime: scheduleTime,
+          cinemaHall: cinemaHall,
+          cinemaLocation: cinemaLocation,
+          ticketPrice: ticketPrice,
           paymentProvider: command.paymentProvider || 'Telebirr',
           bookingDateTime: new Date().toISOString(),
-          qrCodeUrl: this.createSvgQrDataUri(ticketId),
+          qrCodeUrl: this.createSvgQrDataUri(ticketId, {
+            movieTitle,
+            movieTitleAmharic,
+            seatNumber: command.seatNumber,
+            cinemaHall,
+            cinemaLocation,
+            ticketPrice,
+            paymentProvider: command.paymentProvider || 'Telebirr',
+            scheduleTime,
+            transactionReference: ref
+          }),
           message: 'Booking confirmed successfully!'
         };
         this.saveBookingLocally({
@@ -1250,7 +1277,17 @@ export class CineFlowApiService {
           ticketPrice: movieInfo.price,
           paymentProvider: command.paymentProvider || 'Telebirr',
           bookingDateTime: new Date().toISOString(),
-          qrCodeUrl: this.createSvgQrDataUri(ticketId),
+          qrCodeUrl: this.createSvgQrDataUri(ticketId, {
+            movieTitle: movieInfo.titleEnglish,
+            movieTitleAmharic: movieInfo.titleAmharic,
+            seatNumber: command.seatNumber,
+            cinemaHall: movieInfo.cinemaHall,
+            cinemaLocation: movieInfo.location,
+            ticketPrice: movieInfo.price,
+            paymentProvider: command.paymentProvider || 'Telebirr',
+            scheduleTime: movieInfo.time,
+            transactionReference: ref
+          }),
           message: 'Booking confirmed successfully!'
         };
 
@@ -1322,10 +1359,42 @@ export class CineFlowApiService {
     return Array.from(new Set([...baseOccupied, ...bookedForSch]));
   }
 
-  public createSvgQrDataUri(ticketId: string): string {
-    const origin = typeof window !== 'undefined' && window.location?.origin ? window.location.origin : 'http://localhost:4200';
-    const verifyUrl = `${origin}/booking-details/${ticketId}`;
-    return `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=8&color=0f172a&bgcolor=ffffff&data=${encodeURIComponent(verifyUrl)}`;
+  public getNetworkHost(): string {
+    if (typeof window !== 'undefined' && window.location) {
+      const hostname = window.location.hostname;
+      const port = window.location.port ? `:${window.location.port}` : ':4200';
+      if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        // Active Wi-Fi IPv4 address for local phone testing on same Wi-Fi
+        return `http://192.168.187.182${port}`;
+      }
+      return window.location.origin;
+    }
+    return 'http://localhost:4200';
+  }
+
+  public getTicketVerificationUrl(ticketId: string, details?: any): string {
+    const host = this.getNetworkHost();
+    const params = new URLSearchParams();
+    if (details) {
+      if (details.movieTitle) params.set('m', details.movieTitle);
+      if (details.movieTitleAmharic) params.set('am', details.movieTitleAmharic);
+      if (details.seatNumber) params.set('s', details.seatNumber);
+      if (details.cinemaHall) params.set('h', details.cinemaHall);
+      if (details.cinemaLocation) params.set('loc', details.cinemaLocation);
+      if (details.ticketPrice) params.set('p', String(details.ticketPrice));
+      if (details.paymentProvider) params.set('pr', details.paymentProvider);
+      if (details.scheduleTime || details.showTime) params.set('t', details.scheduleTime || details.showTime);
+      if (details.transactionReference) params.set('ref', details.transactionReference);
+      if (details.customerEmail) params.set('em', details.customerEmail);
+      if (details.phoneNumber || details.customerPhone) params.set('ph', details.phoneNumber || details.customerPhone);
+    }
+    const queryStr = params.toString() ? `?${params.toString()}` : '';
+    return `${host}/booking-details/${ticketId}${queryStr}`;
+  }
+
+  public createSvgQrDataUri(ticketId: string, details?: any): string {
+    const verifyUrl = this.getTicketVerificationUrl(ticketId, details);
+    return `https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=10&color=0f172a&bgcolor=ffffff&data=${encodeURIComponent(verifyUrl)}`;
   }
 
   // ADMIN METHODS

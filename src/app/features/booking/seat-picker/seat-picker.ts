@@ -399,7 +399,19 @@ export class SeatPicker implements OnInit, OnDestroy {
           paymentProvider: 'chapa',
           transactionReference: finalRef,
           encryptedReference: encryptedRef,
-          qrCodeUrl: this.apiService.createSvgQrDataUri(ticketId)
+          qrCodeUrl: this.apiService.createSvgQrDataUri(ticketId, {
+            movieTitle: this.movieTitle,
+            movieTitleAmharic: this.movieTitleAmharic,
+            seatNumber: this.selectedSeat!,
+            cinemaHall: this.cinemaHall,
+            cinemaLocation: this.cinemaLocation,
+            ticketPrice: this.ticketPrice,
+            scheduleTime: this.showTime,
+            paymentProvider: 'chapa',
+            transactionReference: finalRef,
+            customerEmail: this.customerEmail,
+            phoneNumber: cleanPhone
+          })
         };
 
         // Cache pending transaction in sessionStorage
