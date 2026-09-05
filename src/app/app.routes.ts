@@ -18,6 +18,7 @@ import { authGuard } from './core/guards/auth.guard';
 export const routes: Routes = [
   { path: '', redirectTo: 'movies', pathMatch: 'full' },
   { path: 'auth/login', component: Login },
+  { path: 'auth/reset-password', component: Login },
   { path: 'auth/register', component: Register },
   { path: 'movies', component: MovieCatalog },
   { path: 'movie/:movieId', component: MovieDetails },
@@ -32,6 +33,7 @@ export const routes: Routes = [
   { path: 'admin/manage-halls', component: ManageHalls, canActivate: [adminGuard] },
   { path: 'admin/revenue-report', component: RevenueReport, canActivate: [adminGuard] },
   { path: 'admin/create-movie', component: CreateMovie, canActivate: [adminGuard] },
+  { path: 'admin/edit-movie/:id', component: CreateMovie, canActivate: [adminGuard] },
   { path: 'admin/create-schedule', component: CreateSchedule, canActivate: [adminGuard] },
   { path: '**', redirectTo: 'movies' }
 ];

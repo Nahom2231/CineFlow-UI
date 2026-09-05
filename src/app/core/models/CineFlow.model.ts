@@ -8,6 +8,11 @@ export interface LoginRequest {
     password?: string;
 }
 
+export interface ResetPasswordRequest {
+    email: string;
+    newPassword: string;
+}
+
 export interface AuthResponse {
     token: string;
     expiration: string;

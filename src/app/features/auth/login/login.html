@@ -1,35 +1,58 @@
 <div class="auth-container">
-  <div class="auth-card">
+  <div class="auth-card glass-panel">
     <div class="brand-badge">
-      <span>🎬</span>
+      <svg class="ui-icon icon-rose icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18"/><path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"/></svg>
       <span>CineFlow ID</span>
     </div>
 
-    <h2>Welcome Back to CineFlow</h2>
-    <p class="subtitle">Log in to reserve your favorite seats and access digital tickets</p>
+    <!-- Dynamic Headers: Login vs Reset Mode -->
+    <ng-container *ngIf="!isResetMode">
+      <h2>Welcome Back to CineFlow</h2>
+      <p class="subtitle">Log in to reserve your favorite seats and access digital tickets</p>
+    </ng-container>
 
-    <!-- Dynamic Alert Banners -->
-    <!-- 1. Lockout Security Alert -->
-    <div *ngIf="isLockedOut" class="alert-box alert-lockout animate-shake">
+    <ng-container *ngIf="isResetMode">
+      <h2>{{ 'AUTH_RESET_PASSWORD_TITLE' | translate }}</h2>
+      <p class="subtitle">{{ 'AUTH_RESET_PASSWORD_SUB' | translate }}</p>
+    </ng-container>
+
+    <!-- Reset Mode Alert Banner -->
+    <div *ngIf="isResetMode && resetMessage" class="alert-box" [ngClass]="'alert-' + resetMessageType">
       <div class="alert-header">
-        <span class="alert-icon">🔒</span>
+        <svg *ngIf="resetMessageType === 'error'" class="ui-icon icon-rose" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <svg *ngIf="resetMessageType === 'success'" class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span class="alert-text">{{ resetMessage }}</span>
+      </div>
+    </div>
+
+    <!-- Login Mode Dynamic Alert Banners -->
+    <!-- 1. Lockout Security Alert -->
+    <div *ngIf="!isResetMode && isLockedOut" class="alert-box alert-lockout animate-shake">
+      <div class="alert-header">
+        <svg class="ui-icon icon-rose" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         <strong class="alert-title">Account Temporarily Locked</strong>
       </div>
       <p class="alert-desc">
         Maximum login attempts exceeded (5 failed attempts limit). Access is temporarily rate-limited for 60 seconds to protect your CineFlow account.
       </p>
       <div class="lockout-countdown-badge">
-        <span class="hourglass">⏳</span>
+        <svg class="ui-icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         <span>Try again in <strong>{{ lockoutCountdown }}s</strong></span>
+      </div>
+      <div class="lockout-reset-hint">
+        <span>Forgot your password?</span>
+        <button type="button" class="btn-lockout-reset" (click)="toggleResetMode(true)">
+          {{ 'AUTH_FORGOT_PASSWORD' | translate }}
+        </button>
       </div>
     </div>
 
     <!-- 2. Warning / Standard Error Alert -->
-    <div *ngIf="!isLockedOut && errorMessage" class="alert-box" [ngClass]="'alert-' + alertType">
+    <div *ngIf="!isResetMode && !isLockedOut && errorMessage" class="alert-box" [ngClass]="'alert-' + alertType">
       <div class="alert-header">
-        <span class="alert-icon" *ngIf="alertType === 'warning'">⚠️</span>
-        <span class="alert-icon" *ngIf="alertType === 'error'">❌</span>
-        <span class="alert-icon" *ngIf="alertType === 'info'">ℹ️</span>
+        <svg *ngIf="alertType === 'warning'" class="ui-icon icon-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <svg *ngIf="alertType === 'error'" class="ui-icon icon-rose" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <svg *ngIf="alertType === 'info'" class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
         <span class="alert-text">{{ errorMessage }}</span>
       </div>
       <div class="attempt-counter-pill" *ngIf="alertType === 'warning' && failedAttempts > 0">
@@ -37,11 +60,14 @@
       </div>
     </div>
 
-    <form (ngSubmit)="onLogin()">
+    <!-- MODE 1: Standard Login Form -->
+    <form *ngIf="!isResetMode" (ngSubmit)="onLogin()">
       <div class="form-group">
         <label for="loginEmail">Email Address</label>
         <div class="input-wrap">
-          <span class="input-icon">✉️</span>
+          <span class="input-icon">
+            <svg class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </span>
           <input
             type="email"
             id="loginEmail"
@@ -56,9 +82,16 @@
       </div>
 
       <div class="form-group">
-        <label for="loginPassword">Password</label>
+        <div class="label-with-action">
+          <label for="loginPassword">Password</label>
+          <button type="button" class="btn-forgot-password" (click)="toggleResetMode(true)">
+            {{ 'AUTH_FORGOT_PASSWORD' | translate }}
+          </button>
+        </div>
         <div class="input-wrap">
-          <span class="input-icon">🔒</span>
+          <span class="input-icon">
+            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
           <input
             type="password"
             id="loginPassword"
@@ -73,18 +106,113 @@
 
       <button type="submit" [disabled]="loading || isLockedOut" class="btn-primary" [class.btn-locked]="isLockedOut">
         <span *ngIf="!loading && !isLockedOut">Sign In →</span>
-        <span *ngIf="isLockedOut">🔒 Locked (Wait {{ lockoutCountdown }}s)</span>
+        <span *ngIf="isLockedOut">Locked (Wait {{ lockoutCountdown }}s)</span>
         <span *ngIf="loading && !isLockedOut" class="btn-loading-wrap">
           <span class="spinner-sm"></span> Signing In...
         </span>
       </button>
     </form>
 
+    <!-- MODE 2: Reset Password Form -->
+    <form *ngIf="isResetMode" (ngSubmit)="onResetPassword()">
+      <div class="form-group">
+        <label for="resetEmail">Email Address</label>
+        <div class="input-wrap">
+          <span class="input-icon">
+            <svg class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </span>
+          <input
+            type="email"
+            id="resetEmail"
+            [(ngModel)]="resetEmail"
+            name="resetEmail"
+            placeholder="e.g. user@cineflow.com"
+            [disabled]="resetLoading"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="resetNewPassword">{{ 'AUTH_NEW_PASSWORD' | translate }}</label>
+        <div class="input-wrap">
+          <span class="input-icon">
+            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          <input
+            [type]="showResetNewPassword ? 'text' : 'password'"
+            id="resetNewPassword"
+            [(ngModel)]="resetNewPassword"
+            name="resetNewPassword"
+            placeholder="At least 6 characters"
+            [disabled]="resetLoading"
+            required
+          />
+          <button type="button" class="btn-toggle-eye" (click)="toggleShowResetNewPassword()" [title]="showResetNewPassword ? 'Hide password' : 'Show password'">
+            <svg *ngIf="!showResetNewPassword" class="ui-icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg *ngIf="showResetNewPassword" class="ui-icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="resetConfirmPassword">{{ 'AUTH_CONFIRM_PASSWORD' | translate }}</label>
+        <div class="input-wrap">
+          <span class="input-icon">
+            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          <input
+            [type]="showResetConfirmPassword ? 'text' : 'password'"
+            id="resetConfirmPassword"
+            [(ngModel)]="resetConfirmPassword"
+            name="resetConfirmPassword"
+            placeholder="Confirm your new password"
+            [disabled]="resetLoading"
+            required
+          />
+          <button type="button" class="btn-toggle-eye" (click)="toggleShowResetConfirmPassword()" [title]="showResetConfirmPassword ? 'Hide password' : 'Show password'">
+            <svg *ngIf="!showResetConfirmPassword" class="ui-icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg *ngIf="showResetConfirmPassword" class="ui-icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" [disabled]="resetLoading" class="btn-primary">
+        <span *ngIf="!resetLoading">{{ 'AUTH_RESET_SUBMIT_BTN' | translate }}</span>
+        <span *ngIf="resetLoading" class="btn-loading-wrap">
+          <span class="spinner-sm"></span> Resetting & Redirecting...
+        </span>
+      </button>
+
+      <div class="reset-back-wrap">
+        <button type="button" class="btn-back-login" (click)="toggleResetMode(false)">
+          ← {{ 'AUTH_BACK_TO_LOGIN' | translate }}
+        </button>
+      </div>
+    </form>
+
     <div class="auth-footer">
-      <p>Don't have an account?</p>
-      <a class="btn-secondary" routerLink="/auth/register">
-        Create an Account →
-      </a>
+      <ng-container *ngIf="!isResetMode">
+        <p>Don't have an account?</p>
+        <div class="auth-footer-actions">
+          <a class="btn-secondary" routerLink="/auth/register">
+            Create an Account →
+          </a>
+          <a class="btn-guest-browse" routerLink="/movies">
+            <svg class="ui-icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Continue as Guest →
+          </a>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="isResetMode">
+        <div class="auth-footer-actions">
+          <a class="btn-guest-browse" routerLink="/movies">
+            <svg class="ui-icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Return to Movies & Home →
+          </a>
+        </div>
+      </ng-container>
     </div>
   </div>
 </div>

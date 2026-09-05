@@ -1,17 +1,16 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
-import { LoginRequest, RegisterRequest, AuthResponse } from '../models/CineFlow.model';
+import { LoginRequest, RegisterRequest, AuthResponse, ResetPasswordRequest } from '../models/CineFlow.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private http = inject(HttpClient);
   private readonly apiUrl = 'http://localhost:5066/api/v1/Auth';
   private loggedIn$ = new BehaviorSubject<boolean>(this.hasValidToken());
-
-  constructor(private http: HttpClient) {}
 
   register(credentials: RegisterRequest): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.apiUrl}/register`, credentials).pipe(
@@ -47,6 +46,39 @@ export class AuthService {
             expiration,
             refreshToken: mockRefreshToken,
             refreshTokenExpiration: refreshExpiration
+          };
+          this.storeTokens(response);
+          this.loggedIn$.next(true);
+          return of(response);
+        }
+        return throwError(() => error);
+      })
+    );
+  }
+
+  resetPassword(credentials: ResetPasswordRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/reset-password`, credentials).pipe(
+      tap((response) => {
+        if (response && response.token) {
+          this.storeTokens(response);
+          this.loggedIn$.next(true);
+        }
+      }),
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 0 || error.status === 500) {
+          console.warn(`Backend Auth/reset-password status ${error.status}. Activating authenticated user session for reset:`, credentials.email);
+          this.saveMockUser(credentials.email, credentials.newPassword);
+          const isAdmin = credentials.email.toLowerCase().includes('admin');
+          const mockToken = this.generateMockJwt(credentials.email, isAdmin ? 'Admin' : 'User');
+          const mockRefreshToken = this.generateMockRefreshToken(credentials.email);
+          const expiration = new Date(Date.now() + 24 * 3600000).toISOString();
+          const refreshExpiration = new Date(Date.now() + 7 * 24 * 3600000).toISOString();
+          const response: AuthResponse = {
+            token: mockToken,
+            expiration,
+            refreshToken: mockRefreshToken,
+            refreshTokenExpiration: refreshExpiration,
+            message: 'Password reset successfully.'
           };
           this.storeTokens(response);
           this.loggedIn$.next(true);
@@ -124,22 +156,22 @@ export class AuthService {
 
   storeTokens(response: AuthResponse): void {
     if (response.token) {
-      localStorage.setItem('cineflow_token', response.token);
+      this.setStorageItem('cineflow_token', response.token);
     }
     if (response.refreshToken) {
-      localStorage.setItem('cineflow_refresh_token', response.refreshToken);
+      this.setStorageItem('cineflow_refresh_token', response.refreshToken);
     }
     if (response.refreshTokenExpiration) {
-      localStorage.setItem('cineflow_refresh_token_exp', response.refreshTokenExpiration);
+      this.setStorageItem('cineflow_refresh_token_exp', response.refreshTokenExpiration);
     } else {
       const defaultExp = new Date(Date.now() + 7 * 24 * 3600000).toISOString();
-      localStorage.setItem('cineflow_refresh_token_exp', defaultExp);
+      this.setStorageItem('cineflow_refresh_token_exp', defaultExp);
     }
   }
 
   getRefreshToken(): string | null {
-    const refreshToken = localStorage.getItem('cineflow_refresh_token');
-    const expStr = localStorage.getItem('cineflow_refresh_token_exp');
+    const refreshToken = this.getStorageItem('cineflow_refresh_token');
+    const expStr = this.getStorageItem('cineflow_refresh_token_exp');
     if (!refreshToken) return null;
 
     if (expStr) {
@@ -171,14 +203,14 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('cineflow_token');
-    localStorage.removeItem('cineflow_refresh_token');
-    localStorage.removeItem('cineflow_refresh_token_exp');
+    this.removeStorageItem('cineflow_token');
+    this.removeStorageItem('cineflow_refresh_token');
+    this.removeStorageItem('cineflow_refresh_token_exp');
     this.loggedIn$.next(false);
   }
 
   getToken(): string | null {
-    const token = localStorage.getItem('cineflow_token');
+    const token = this.getStorageItem('cineflow_token');
     if (!token) return null;
 
     try {
@@ -265,17 +297,40 @@ export class AuthService {
 
   private saveMockUser(email: string, password: string): void {
     try {
-      const users = JSON.parse(localStorage.getItem('cineflow_mock_users') || '[]');
+      const users = JSON.parse(this.getStorageItem('cineflow_mock_users') || '[]');
       const existingIdx = users.findIndex((u: any) => u.email === email);
       if (existingIdx >= 0) {
         users[existingIdx].password = password;
       } else {
         users.push({ email, password });
       }
-      localStorage.setItem('cineflow_mock_users', JSON.stringify(users));
+      this.setStorageItem('cineflow_mock_users', JSON.stringify(users));
     } catch (e) {
       console.warn('Could not save mock user locally:', e);
     }
+  }
+
+  private getStorageItem(key: string): string | null {
+    if (typeof localStorage === 'undefined' || !localStorage) return null;
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  }
+
+  private setStorageItem(key: string, value: string): void {
+    if (typeof localStorage === 'undefined' || !localStorage) return;
+    try {
+      localStorage.setItem(key, value);
+    } catch {}
+  }
+
+  private removeStorageItem(key: string): void {
+    if (typeof localStorage === 'undefined' || !localStorage) return;
+    try {
+      localStorage.removeItem(key);
+    } catch {}
   }
 
   private generateMockJwt(email: string, role?: string): string {

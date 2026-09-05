@@ -39,6 +39,8 @@ export class TranslationService {
       'NAV_JOIN_FREE': 'Join Free',
       'NAV_CREATE_ACCOUNT': 'Create Account',
       'NAV_TAGLINE': 'Cinema & Ticketing',
+      'NAV_GUEST_ACCESS': 'Guests',
+      'NAV_GUEST_HOME': 'Guests / Home',
 
       // Hero & Catalog
       'HERO_TAG': '✨ CINEMA EXPERIENCE IN ADDIS ABABA',
@@ -101,11 +103,11 @@ export class TranslationService {
       'CHAPA_PHONE_LABEL': 'Payment Phone Number',
       'CHAPA_PAY_BUTTON': 'Pay with Chapa Gateway',
       'CHAPA_PROCESSING': 'Connecting to Chapa Gateway...',
-      'CHAPA_SECURE_BADGE': '🔒 256-Bit Encrypted Real Payment via Chapa API',
-      'CHAPA_FREE_API_BADGE': '⚡ Real Chapa Free Sandbox/Production API Clearance',
+      'CHAPA_SECURE_BADGE': '256-Bit Encrypted Real Payment via Chapa API',
+      'CHAPA_FREE_API_BADGE': 'Real Chapa Free Sandbox/Production API Clearance',
 
       // Ticket Confirmation & Pass
-      'PASS_VERIFIED': '✨ VERIFIED AUTHENTIC PASS',
+      'PASS_VERIFIED': 'VERIFIED AUTHENTIC PASS',
       'PASS_TITLE': 'CineFlow Cinema Admission Pass',
       'PASS_GATE_INSTRUCTION': 'Present this QR pass on your phone at the auditorium entrance.',
       'PASS_SEAT_NUMBER': 'Assigned Seat',
@@ -160,7 +162,17 @@ export class TranslationService {
       'FOOTER_BRANCHES': 'Cinema Branches',
       'FOOTER_ADMIN': 'Admin & Staff',
       'FOOTER_RIGHTS': '© 2026 CineFlow Digital Cinema Network. All rights reserved.',
-      'FOOTER_LIVE': 'Online & Booking Live'
+      'FOOTER_LIVE': 'Online & Booking Live',
+
+      // Reset Password
+      'AUTH_FORGOT_PASSWORD': 'Forgot Password?',
+      'AUTH_RESET_PASSWORD_TITLE': 'Reset Account Password',
+      'AUTH_RESET_PASSWORD_SUB': 'Enter your registered email and your new password. You will be redirected directly to movies upon completion.',
+      'AUTH_NEW_PASSWORD': 'New Password',
+      'AUTH_CONFIRM_PASSWORD': 'Confirm New Password',
+      'AUTH_RESET_SUBMIT_BTN': 'Reset Password & Go to Movies →',
+      'AUTH_BACK_TO_LOGIN': 'Back to Sign In',
+      'AUTH_RESET_SUCCESS': 'Password successfully reset! Welcome back.'
     },
 
     am: {
@@ -175,6 +187,8 @@ export class TranslationService {
       'NAV_JOIN_FREE': 'አካውንት ክፈት',
       'NAV_CREATE_ACCOUNT': 'አዲስ አካውንት',
       'NAV_TAGLINE': 'ዘመናዊ የሲኒማ ትኬት መቁረጫ',
+      'NAV_GUEST_ACCESS': 'እንግዳ',
+      'NAV_GUEST_HOME': 'እንግዳ (መነሻ ገጽ)',
 
       // Hero & Catalog
       'HERO_TAG': '✨ በአዲስ አበባ ምርጥ የሲኒማ ተሞክሮ',
@@ -237,11 +251,11 @@ export class TranslationService {
       'CHAPA_PHONE_LABEL': 'የክፍያ ስልክ ቁጥር',
       'CHAPA_PAY_BUTTON': 'በቻፓ (Chapa) ክፍያ ፈጽም',
       'CHAPA_PROCESSING': 'ከቻፓ ክፍያ ስርዓት ጋር እየተገናኘ ነው...',
-      'CHAPA_SECURE_BADGE': '🔒 በ256-ቢት የተጠበቀ የቀጥታ የቻፓ ክፍያ',
-      'CHAPA_FREE_API_BADGE': '⚡ በቻፓ የቀጥታ ኤፒአይ (Chapa API) የተረጋገጠ',
+      'CHAPA_SECURE_BADGE': 'በ256-ቢት የተጠበቀ የቀጥታ የቻፓ ክፍያ',
+      'CHAPA_FREE_API_BADGE': 'በቻፓ የቀጥታ ኤፒአይ (Chapa API) የተረጋገጠ',
 
       // Ticket Confirmation & Pass
-      'PASS_VERIFIED': '✨ ትክክለኛ የሲኒማ ትኬት ማለፊያ',
+      'PASS_VERIFIED': 'ትክክለኛ የሲኒማ ትኬት ማለፊያ',
       'PASS_TITLE': 'የሲኒፍሎው የሲኒማ መግቢያ ትኬት',
       'PASS_GATE_INSTRUCTION': 'ወደ አዳራሹ ሲገቡ ይህንን የQR ኮድ በስልክዎ ያሳዩ።',
       'PASS_SEAT_NUMBER': 'የመቀመጫ ቁጥር',
@@ -296,30 +310,48 @@ export class TranslationService {
       'FOOTER_BRANCHES': 'የሲኒማ ቅርንጫፎች',
       'FOOTER_ADMIN': 'የአስተዳዳሪ ክፍል',
       'FOOTER_RIGHTS': '© 2026 ሲኒፍሎው (CineFlow) ዲጂታል ሲኒማ ኔትወርክ። መብቱ በህግ የተጠበቀ ነው።',
-      'FOOTER_LIVE': 'ክፍት እና ትኬት እየተቆረጠ ነው'
+      'FOOTER_LIVE': 'ክፍት እና ትኬት እየተቆረጠ ነው',
+
+      // Reset Password
+      'AUTH_FORGOT_PASSWORD': 'የይለፍ ቃል ረሱ?',
+      'AUTH_RESET_PASSWORD_TITLE': 'የይለፍ ቃል መቀየር',
+      'AUTH_RESET_PASSWORD_SUB': 'የተመዘገቡበትን ኢሜይል እና አዲሱን የይለፍ ቃል ያስገቡ። እንደተጠናቀቀ በቀጥታ ወደ ፊልሞች መነሻ ገጽ ይወሰዳሉ።',
+      'AUTH_NEW_PASSWORD': 'አዲስ የይለፍ ቃል',
+      'AUTH_CONFIRM_PASSWORD': 'አዲሱን የይለፍ ቃል ያረጋግጡ',
+      'AUTH_RESET_SUBMIT_BTN': 'የይለፍ ቃል ቀይር እና ወደ ፊልሞች ሂድ →',
+      'AUTH_BACK_TO_LOGIN': 'ወደ መግቢያ ተመለስ',
+      'AUTH_RESET_SUCCESS': 'የይለፍ ቃልዎ በተሳካ ሁኔታ ተቀይሯል! እንኳን ደህና መጡ።'
     }
   };
 
   constructor() {
-    const saved = localStorage.getItem(this.STORAGE_KEY) as LanguageCode;
-    if (saved && (saved === 'en' || saved === 'am')) {
-      this.setLanguage(saved);
+    if (typeof localStorage !== 'undefined' && localStorage) {
+      const saved = localStorage.getItem(this.STORAGE_KEY) as LanguageCode;
+      if (saved && (saved === 'en' || saved === 'am')) {
+        this.setLanguage(saved);
+      }
     }
   }
 
   private getInitialLanguage(): LanguageCode {
-    const saved = localStorage.getItem(this.STORAGE_KEY) as LanguageCode;
-    if (saved === 'am' || saved === 'en') {
-      return saved;
+    if (typeof localStorage !== 'undefined' && localStorage) {
+      const saved = localStorage.getItem(this.STORAGE_KEY) as LanguageCode;
+      if (saved === 'am' || saved === 'en') {
+        return saved;
+      }
     }
     return 'en';
   }
 
   setLanguage(lang: LanguageCode): void {
-    localStorage.setItem(this.STORAGE_KEY, lang);
+    if (typeof localStorage !== 'undefined' && localStorage) {
+      localStorage.setItem(this.STORAGE_KEY, lang);
+    }
     this.currentLang.set(lang);
     this.currentLangSubject.next(lang);
-    document.documentElement.lang = lang;
+    if (typeof document !== 'undefined' && document?.documentElement) {
+      document.documentElement.lang = lang;
+    }
   }
 
   toggleLanguage(): LanguageCode {
