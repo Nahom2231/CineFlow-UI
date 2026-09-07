@@ -1,6 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet, Router, NavigationEnd, Event as RouterEvent } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { AuthService } from './core/services/auth';
 import { TranslationService, LanguageCode } from './core/services/translation.service';
 import { ThemeService, ThemeMode } from './core/services/theme.service';
@@ -25,6 +26,20 @@ export class AppComponent {
   isLoggedIn$ = this.authService.isLoggedIn$;
   mobileMenuOpen = false;
   langDropdownOpen = false;
+  currentUrl = signal<string>(this.router.url || '');
+
+  constructor() {
+    this.router.events
+      .pipe(filter((event: RouterEvent): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        this.currentUrl.set(event.urlAfterRedirects || event.url);
+      });
+  }
+
+  isLoginPage(): boolean {
+    const url = this.currentUrl().toLowerCase();
+    return url.includes('/auth/login') || url.includes('/auth');
+  }
 
   get currentLang(): LanguageCode {
     return this.translationService.getLanguage();

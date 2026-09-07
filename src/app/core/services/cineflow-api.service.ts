@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of, forkJoin } from 'rxjs';
+import { Observable, of, forkJoin, BehaviorSubject } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 import {
   MovieResponseDto,
@@ -18,6 +18,14 @@ import {
 })
 export class CineFlowApiService {
   private readonly baseUrl = 'http://localhost:5066/api/v1';
+
+  // Reactive event notifier so all components instantly update when a movie is added, edited, or deleted
+  private moviesUpdatedSubject = new BehaviorSubject<number>(Date.now());
+  public moviesUpdated$: Observable<number> = this.moviesUpdatedSubject.asObservable();
+
+  public notifyMoviesChanged(): void {
+    this.moviesUpdatedSubject.next(Date.now());
+  }
 
   // Fallback curated movies with high quality visuals and showtimes
   private readonly fallbackMovies: MovieResponseDto[] = [
@@ -169,10 +177,20 @@ export class CineFlowApiService {
         }
 
         const localList = this.getAllLocalMovies();
+        const deletedIds = this.getDeletedMovieIds();
 
         if (list.length > 0) {
-          const enrichedBackend = list.map((m) => {
-            const localMatch = localList.find((loc) => loc.id === m.id || loc.titleEnglish?.toLowerCase() === m.titleEnglish?.toLowerCase());
+          // Filter out deleted movies from backend response
+          const activeBackend = list.filter(m => m.id && !deletedIds.includes(String(m.id).toLowerCase().trim()));
+          const customList: MovieResponseDto[] = JSON.parse(localStorage.getItem('cineflow_custom_movies') || '[]');
+
+          const enrichedBackend = activeBackend.map((m) => {
+            const mId = String(m.id).toLowerCase().trim();
+            const customMatch = customList.find(c => String(c.id).toLowerCase().trim() === mId);
+            if (customMatch) {
+              return customMatch;
+            }
+            const localMatch = localList.find((loc) => String(loc.id).toLowerCase().trim() === mId || loc.titleEnglish?.toLowerCase() === m.titleEnglish?.toLowerCase());
             if (!m.featuredImageUrl || m.featuredImageUrl.trim() === '') {
               m.featuredImageUrl = localMatch?.featuredImageUrl || 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&auto=format&fit=crop&q=80';
             }
@@ -182,17 +200,25 @@ export class CineFlowApiService {
             return m;
           });
 
-          // Cache backend movies locally so they are accessible to seat picker and bookings
+          // Cache backend movies
           this.cacheMovies(enrichedBackend);
 
-          // Merge backend movies with default showcase movies
-          const combined = [...enrichedBackend];
-          for (const loc of localList) {
-            if (!combined.some((c) => c.id === loc.id || c.titleEnglish?.toLowerCase() === loc.titleEnglish?.toLowerCase())) {
-              combined.push(loc);
+          // Merge backend movies with local custom movies and default showcase movies (excluding deleted)
+          const combinedMap = new Map<string, MovieResponseDto>();
+          for (const m of enrichedBackend) {
+            if (m.id && !deletedIds.includes(String(m.id).toLowerCase().trim())) {
+              combinedMap.set(String(m.id).toLowerCase().trim(), m);
             }
           }
-          return this.applyLocalFilters(combined, filters);
+          for (const loc of localList) {
+            if (loc.id && !deletedIds.includes(String(loc.id).toLowerCase().trim())) {
+              const key = String(loc.id).toLowerCase().trim();
+              if (!combinedMap.has(key)) {
+                combinedMap.set(key, loc);
+              }
+            }
+          }
+          return this.applyLocalFilters(Array.from(combinedMap.values()), filters);
         }
 
         return this.applyLocalFilters(localList, filters);
@@ -210,12 +236,13 @@ export class CineFlowApiService {
       const existing: MovieResponseDto[] = JSON.parse(localStorage.getItem('cineflow_cached_movies') || '[]');
       const map = new Map<string, MovieResponseDto>();
       for (const m of existing) {
-        if (m.id) map.set(m.id, m);
+        if (m.id) map.set(String(m.id).toLowerCase().trim(), m);
       }
       for (const m of movies) {
         if (m.id) {
-          const prev = map.get(m.id);
-          map.set(m.id, { ...prev, ...m });
+          const key = String(m.id).toLowerCase().trim();
+          const prev = map.get(key);
+          map.set(key, { ...prev, ...m });
         }
       }
       localStorage.setItem('cineflow_cached_movies', JSON.stringify(Array.from(map.values())));
@@ -224,30 +251,67 @@ export class CineFlowApiService {
     }
   }
 
+  public getDeletedMovieIds(): string[] {
+    try {
+      const arr = JSON.parse(localStorage.getItem('cineflow_deleted_movie_ids') || '[]');
+      return Array.isArray(arr) ? arr.map((id: string) => String(id).toLowerCase().trim()) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  public removeCachedMovie(movieId: string): void {
+    try {
+      const cleanId = String(movieId).toLowerCase().trim();
+      const deleted = this.getDeletedMovieIds();
+      if (!deleted.includes(cleanId)) {
+        deleted.push(cleanId);
+        localStorage.setItem('cineflow_deleted_movie_ids', JSON.stringify(deleted));
+      }
+      const custom: MovieResponseDto[] = JSON.parse(localStorage.getItem('cineflow_custom_movies') || '[]');
+      const filteredCustom = custom.filter(m => String(m.id).toLowerCase().trim() !== cleanId);
+      localStorage.setItem('cineflow_custom_movies', JSON.stringify(filteredCustom));
+
+      const cached: MovieResponseDto[] = JSON.parse(localStorage.getItem('cineflow_cached_movies') || '[]');
+      const filteredCached = cached.filter(m => String(m.id).toLowerCase().trim() !== cleanId);
+      localStorage.setItem('cineflow_cached_movies', JSON.stringify(filteredCached));
+    } catch (e) {
+      console.warn('Could not record deleted movie ID:', e);
+    }
+    this.notifyMoviesChanged();
+  }
+
   public getAllLocalMovies(): MovieResponseDto[] {
     try {
       const custom: MovieResponseDto[] = JSON.parse(localStorage.getItem('cineflow_custom_movies') || '[]');
       const cached: MovieResponseDto[] = JSON.parse(localStorage.getItem('cineflow_cached_movies') || '[]');
+      const deletedIds = this.getDeletedMovieIds();
       
       const map = new Map<string, MovieResponseDto>();
-      // Fallback showcase movies
+      // 1. Fallback showcase movies
       for (const m of this.fallbackMovies) {
-        if (m.id) map.set(m.id, m);
-      }
-      // Backend cached movies
-      for (const m of cached) {
-        if (m.id) {
-          const prev = map.get(m.id);
-          map.set(m.id, { ...prev, ...m });
+        if (m.id && !deletedIds.includes(String(m.id).toLowerCase().trim())) {
+          map.set(String(m.id).toLowerCase().trim(), m);
         }
       }
-      // User custom movies (highest priority)
+      // 2. Backend cached movies
+      for (const m of cached) {
+        if (m.id && !deletedIds.includes(String(m.id).toLowerCase().trim())) {
+          const key = String(m.id).toLowerCase().trim();
+          const prev = map.get(key);
+          map.set(key, { ...prev, ...m });
+        }
+      }
+      // 3. User custom & edited movies (highest priority, always overrides everything)
       for (const m of custom) {
-        if (m.id) map.set(m.id, m);
+        if (m.id && !deletedIds.includes(String(m.id).toLowerCase().trim())) {
+          const key = String(m.id).toLowerCase().trim();
+          map.set(key, m);
+        }
       }
       return Array.from(map.values());
     } catch {
-      return this.fallbackMovies;
+      return this.fallbackMovies.filter(m => !this.getDeletedMovieIds().includes(String(m.id).toLowerCase().trim()));
     }
   }
 
@@ -285,11 +349,20 @@ export class CineFlowApiService {
   }
 
   getMovieById(movieId: string): Observable<MovieResponseDto> {
+    const cleanId = String(movieId).toLowerCase().trim();
+    const allMovies = this.getAllLocalMovies();
+    const customList: MovieResponseDto[] = JSON.parse(localStorage.getItem('cineflow_custom_movies') || '[]');
+    const customMatch = customList.find(c => String(c.id).toLowerCase().trim() === cleanId);
+    
+    // If the movie has a custom local edit, return the custom edit immediately
+    if (customMatch) {
+      return of(customMatch);
+    }
+
     return this.http.get<any>(`${this.baseUrl}/Movies/${movieId}`).pipe(
       map((res) => {
         const movie: MovieResponseDto = res?.value || res;
-        const allMovies = this.getAllLocalMovies();
-        const localMatch = allMovies.find((m) => m.id === movieId || m.titleEnglish?.toLowerCase() === movie?.titleEnglish?.toLowerCase());
+        const localMatch = allMovies.find((m) => String(m.id).toLowerCase().trim() === cleanId || m.titleEnglish?.toLowerCase() === movie?.titleEnglish?.toLowerCase());
 
         if (!movie || !movie.titleEnglish) {
           return localMatch || allMovies[0];
@@ -305,9 +378,8 @@ export class CineFlowApiService {
       }),
       catchError((err) => {
         console.warn(`Movie ${movieId} lookup falling back to local dataset:`, err?.status);
-        const allMovies = this.getAllLocalMovies();
-        const match = allMovies.find((m) => m.id === movieId) || allMovies[0];
-        if (!match.schedules || match.schedules.length === 0) {
+        const match = allMovies.find((m) => String(m.id).toLowerCase().trim() === cleanId) || allMovies[0];
+        if (match && (!match.schedules || match.schedules.length === 0)) {
           match.schedules = this.getDefaultMovieSchedules(movieId, match.titleEnglish);
         }
         return of(match);
@@ -375,48 +447,114 @@ export class CineFlowApiService {
     const duration = Number(formData.get('DurationMinutes') || formData.get('durationMinutes')) || 120;
     const genre = (formData.get('Genre') || formData.get('genre')) as string || 'Action';
     const audio = (formData.get('AudioLanguage') || formData.get('audioLanguage')) as string || 'English';
-    const poster = (formData.get('FeaturedImageUrl') || formData.get('featuredImageUrl')) as string || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&auto=format&fit=crop&q=80';
+    let poster = (formData.get('FeaturedImageUrl') || formData.get('featuredImageUrl')) as string || '';
     const directorName = (formData.get('DirectorName') || formData.get('directorName') || formData.get('Director') || formData.get('director')) as string || 'Special Feature';
     
+    // Check if we are updating an existing movie
+    const allLocal = this.getAllLocalMovies();
+    const existingMovie = explicitId ? allLocal.find(m => m.id === explicitId || String(m.id).toLowerCase().trim() === String(explicitId).toLowerCase().trim()) : null;
+    
+    if (!poster && existingMovie?.featuredImageUrl) {
+      poster = existingMovie.featuredImageUrl;
+    }
+    if (!poster) {
+      poster = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&auto=format&fit=crop&q=80';
+    }
+
     const newMovieId = explicitId || ('custom-m-' + Date.now());
     const newMovie: MovieResponseDto = {
       id: newMovieId,
       titleEnglish: titleEn,
-      titleAmharic: titleAm,
-      descriptionEnglish: descEn,
-      descriptionAmharic: descAm,
+      titleAmharic: titleAm || existingMovie?.titleAmharic || titleEn,
+      descriptionEnglish: descEn || existingMovie?.descriptionEnglish || '',
+      descriptionAmharic: descAm || existingMovie?.descriptionAmharic || '',
       durationMinutes: duration,
       genre: genre,
       audioLanguage: audio,
       featuredImageUrl: poster,
-      galleryImageUrl: [],
+      galleryImageUrl: existingMovie?.galleryImageUrl || [],
       directorName: directorName,
-      starName: ['Featured Cast'],
-      schedules: [
-        {
-          id: 'sch-' + Date.now(),
-          startTime: new Date(Date.now() + 4 * 3600000).toISOString(),
-          cinemaHallId: 'hall-1',
-          cinemaHallName: 'Grand Bole Screen (Dolby Atmos)',
-          price: 300
-        }
-      ]
+      starName: existingMovie?.starName || ['Featured Cast'],
+      schedules: existingMovie?.schedules && existingMovie.schedules.length > 0 
+        ? existingMovie.schedules 
+        : [
+            {
+              id: 'sch-' + newMovieId + '-1',
+              startTime: new Date(Date.now() + 4 * 3600000).toISOString(),
+              cinemaHallId: 'hall-1',
+              cinemaHallName: 'Grand Bole Screen (Dolby Atmos)',
+              price: 300
+            }
+          ]
     };
 
     try {
+      // 1. Remove from deleted IDs if present
+      const cleanId = String(newMovieId).toLowerCase().trim();
+      const deleted = this.getDeletedMovieIds().filter(id => id !== cleanId);
+      localStorage.setItem('cineflow_deleted_movie_ids', JSON.stringify(deleted));
+
+      // 2. Save into custom movies
       const custom = JSON.parse(localStorage.getItem('cineflow_custom_movies') || '[]');
-      const existingIdx = custom.findIndex((m: any) => m.id === newMovieId);
+      const existingIdx = custom.findIndex((m: any) => String(m.id).toLowerCase().trim() === cleanId);
       if (existingIdx >= 0) {
         custom[existingIdx] = newMovie;
       } else {
         custom.unshift(newMovie);
       }
       localStorage.setItem('cineflow_custom_movies', JSON.stringify(custom));
+
+      // 3. Update cached movies map as well
+      const cached = JSON.parse(localStorage.getItem('cineflow_cached_movies') || '[]');
+      const cachedIdx = cached.findIndex((m: any) => String(m.id).toLowerCase().trim() === cleanId);
+      if (cachedIdx >= 0) {
+        cached[cachedIdx] = newMovie;
+      } else {
+        cached.unshift(newMovie);
+      }
+      localStorage.setItem('cineflow_cached_movies', JSON.stringify(cached));
     } catch (e) {
       console.warn('Could not save custom movie to localStorage:', e);
     }
 
+    this.notifyMoviesChanged();
     return newMovieId;
+  }
+
+  updateMovie(movieId: string, formData: FormData): Observable<{ message: string }> {
+    if (!this.hasRealBackendToken() || !this.isGuid(movieId)) {
+      this.saveMovieLocally(formData, movieId);
+      return of({ message: 'Movie updated successfully!' });
+    }
+
+    return this.http.put<{ message: string }>(`${this.baseUrl}/Movies/${movieId}`, formData).pipe(
+      tap(() => {
+        this.saveMovieLocally(formData, movieId);
+      }),
+      catchError((err) => {
+        console.warn('Backend updateMovie endpoint unreachable or returned error, saving locally:', err?.status);
+        this.saveMovieLocally(formData, movieId);
+        return of({ message: 'Movie updated successfully!' });
+      })
+    );
+  }
+
+  deleteMovie(movieId: string): Observable<{ message: string }> {
+    if (!this.hasRealBackendToken() || !this.isGuid(movieId)) {
+      this.removeCachedMovie(movieId);
+      return of({ message: 'Movie deleted successfully!' });
+    }
+
+    return this.http.delete<{ message: string }>(`${this.baseUrl}/Movies/${movieId}`).pipe(
+      tap(() => {
+        this.removeCachedMovie(movieId);
+      }),
+      catchError((err) => {
+        console.warn('Backend deleteMovie endpoint unreachable or unauthorized, deleting locally:', err?.status);
+        this.removeCachedMovie(movieId);
+        return of({ message: 'Movie deleted successfully!' });
+      })
+    );
   }
 
   createSchedule(command: CreateScheduleCommand): Observable<{ scheduleId: string; message: string }> {
@@ -972,6 +1110,7 @@ export class CineFlowApiService {
     reference?: string;
     scheduleId?: string | null;
     seatNumber?: string | null;
+    returnUrl?: string;
   }): Observable<{
     success: boolean;
     message: string;
@@ -981,6 +1120,10 @@ export class CineFlowApiService {
     publicKey?: string;
     callbackUrl?: string;
   }> {
+    const defaultReturnUrl = typeof window !== 'undefined' && window.location?.origin
+      ? `${window.location.origin}/ticket-confirmation`
+      : 'http://localhost:4200/ticket-confirmation';
+
     const payload = {
       amount: request.amount,
       email: request.email,
@@ -990,7 +1133,8 @@ export class CineFlowApiService {
       currency: request.currency || 'ETB',
       reference: request.reference,
       scheduleId: request.scheduleId || null,
-      seatNumber: request.seatNumber || null
+      seatNumber: request.seatNumber || null,
+      returnUrl: request.returnUrl || defaultReturnUrl
     };
 
     return this.http.post<any>(`${this.baseUrl}/Payment/initialize`, payload).pipe(
@@ -1010,7 +1154,8 @@ export class CineFlowApiService {
           success: true,
           message: 'Payment initialized successfully (Simulation Mode)',
           reference: ref,
-          encryptedReference: `ENC-${ref}`
+          encryptedReference: `ENC-${ref}`,
+          checkoutUrl: `https://checkout.chapa.co/checkout/web/pay/${ref}`
         });
       })
     );
@@ -1024,13 +1169,19 @@ export class CineFlowApiService {
     reference: string;
     status: string;
     message: string;
+    amount?: number;
+    currency?: string;
+    paymentMethod?: string;
   }> {
     return this.http.get<any>(`${this.baseUrl}/Payment/verify/${encodeURIComponent(reference)}`).pipe(
       map((res) => ({
-        success: res?.success ?? true,
+        success: res?.success ?? (res?.status?.toLowerCase() === 'success'),
         reference: res?.reference || reference,
         status: res?.status || 'Success',
-        message: res?.message || 'Payment verified successfully.'
+        message: res?.message || 'Payment verified successfully.',
+        amount: res?.amount,
+        currency: res?.currency,
+        paymentMethod: res?.paymentMethod
       })),
       catchError((err) => {
         console.warn('Backend Payment/verify unreachable, using local verified fallback:', err?.status);
@@ -1347,6 +1498,28 @@ export class CineFlowApiService {
     } catch (e) {
       console.warn('Could not save booking to localStorage:', e);
     }
+  }
+
+  public cancelBooking(ticketId: string): Observable<{ message: string; success: boolean }> {
+    try {
+      const all = this.getAllStoredBookings();
+      const target = all.find((b: any) => b.ticketId === ticketId || b.transactionReference === ticketId);
+      if (target) {
+        target.status = 'cancelled';
+        localStorage.setItem('cineflow_bookings', JSON.stringify(all));
+      }
+    } catch (e) {
+      console.warn('Could not mark booking as cancelled in localStorage:', e);
+    }
+
+    if (!this.hasRealBackendToken()) {
+      return of({ message: 'Booking cancelled successfully!', success: true });
+    }
+
+    return this.http.post<any>(`${this.baseUrl}/Tickets/${ticketId}/cancel`, {}).pipe(
+      map(() => ({ message: 'Booking cancelled successfully!', success: true })),
+      catchError(() => of({ message: 'Booking cancelled successfully!', success: true }))
+    );
   }
 
   public getOccupiedSeatsForSchedule(scheduleId: string): string[] {

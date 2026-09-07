@@ -42,6 +42,8 @@
     margin: 0 0 0.25rem 0;
     letter-spacing: -0.5px;
     color: #ffffff;
+    display: flex;
+    align-items: center;
   }
 
   .subtitle {
@@ -80,6 +82,7 @@
 .glass-panel {
   background: rgba(15, 23, 42, 0.75);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
   padding: 1.8rem;
@@ -182,6 +185,7 @@
     position: relative;
     background: rgba(15, 23, 42, 0.75);
     backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 18px;
     padding: 1.6rem 1.4rem;
@@ -300,6 +304,8 @@
       font-size: 1.15rem;
       font-weight: 800;
       color: #ffffff;
+      display: flex;
+      align-items: center;
     }
 
     .badge-tag {
@@ -370,6 +376,9 @@
       &.top-movie-cell {
         font-weight: 600;
         color: #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
       }
     }
 
@@ -481,6 +490,202 @@
   }
 }
 
+/* Light Theme Overrides */
+[data-theme="light"],
+body.light-theme {
+  .revenue-report-page {
+    color: #0f172a;
+  }
+
+  .page-header {
+    border-bottom-color: rgba(226, 232, 240, 0.9);
+
+    .btn-back {
+      color: #64748b;
+      &:hover { color: #0284c7; }
+    }
+
+    h1 {
+      color: #0f172a;
+    }
+
+    .subtitle {
+      color: #475569;
+    }
+
+    .quick-nav-actions {
+      .btn-quick-action {
+        background: #ffffff;
+        border-color: #cbd5e1;
+        color: #0f172a;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+
+        &:hover {
+          background: #f1f5f9;
+          border-color: #94a3b8;
+        }
+      }
+    }
+  }
+
+  .glass-panel {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  }
+
+  .filters-panel {
+    .filter-group {
+      label {
+        color: #475569;
+      }
+
+      .filter-select {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+        color: #0f172a;
+
+        &:focus {
+          border-color: #0284c7;
+          background: #ffffff;
+        }
+
+        option {
+          background: #ffffff;
+          color: #0f172a;
+        }
+      }
+    }
+
+    .filter-actions {
+      .btn.btn-print {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #0f172a;
+
+        &:hover {
+          background: #e2e8f0;
+        }
+      }
+    }
+  }
+
+  .summary-grid {
+    .summary-card {
+      background: #ffffff;
+      border-color: #e2e8f0;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+
+      .icon {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+      }
+
+      .card-details {
+        .label {
+          color: #64748b;
+        }
+
+        .value {
+          color: #0f172a;
+
+          &.small-text {
+            color: #e11d48;
+          }
+        }
+      }
+    }
+  }
+
+  .report-section {
+    .section-title-row {
+      border-bottom-color: #e2e8f0;
+
+      h2 {
+        color: #0f172a;
+      }
+    }
+
+    .table-container {
+      .report-table {
+        thead tr {
+          background: #f1f5f9;
+        }
+
+        th {
+          color: #475569;
+          border-bottom-color: #e2e8f0;
+        }
+
+        td {
+          border-bottom-color: #f1f5f9;
+          color: #334155;
+
+          &.date-cell {
+            color: #0f172a;
+          }
+
+          &.value {
+            color: #059669;
+          }
+
+          &.tickets-cell {
+            color: #0284c7;
+          }
+
+          &.top-movie-cell {
+            color: #0f172a;
+          }
+        }
+
+        tbody tr:hover {
+          background: #f8fafc;
+        }
+      }
+    }
+
+    .movies-stats-grid {
+      .movie-stat-card {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+
+        &:hover {
+          background: #f1f5f9;
+          border-color: #cbd5e1;
+        }
+
+        .movie-details {
+          h3 {
+            color: #0f172a;
+          }
+
+          .stats-row {
+            .stat-pill {
+              background: #ffffff;
+              border-color: #cbd5e1;
+
+              .label {
+                color: #64748b;
+              }
+
+              .val {
+                color: #0f172a;
+              }
+
+              &.revenue-pill {
+                border-color: #a7f3d0;
+                .val {
+                  color: #059669;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -518,3 +723,4 @@
     }
   }
 }
+

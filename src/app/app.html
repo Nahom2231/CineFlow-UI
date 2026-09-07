@@ -3,8 +3,10 @@
     <!-- Brand Logo -->
     <a routerLink="/movies" class="brand-logo" (click)="closeMobileMenu()">
       <div class="logo-icon">
-        <span class="reel-dot"></span>
-        🎬
+        <svg class="ui-icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2">
+          <rect x="2" y="2" width="20" height="20" rx="2.18"/>
+          <path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"/>
+        </svg>
       </div>
       <div class="logo-text">
         <span class="title">Cine<span class="highlight">Flow</span></span>
@@ -14,21 +16,35 @@
 
     <!-- Desktop Navigation Links -->
     <nav class="desktop-nav">
-      <a routerLink="/movies" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
-        <span class="icon">🍿</span> {{ 'NAV_MOVIES' | translate }}
-      </a>
-      <a routerLink="/booking-history" routerLinkActive="active" class="nav-link">
-        <span class="icon">🎫</span> {{ 'NAV_MY_TICKETS' | translate }}
-      </a>
-      <a *ngIf="isAdmin()" routerLink="/admin/create-movie" routerLinkActive="active" class="nav-link">
-        <span class="icon">🎬</span> {{ 'NAV_ADD_MOVIE' | translate }}
-      </a>
-      <a *ngIf="isAdmin()" routerLink="/admin/manage-halls" routerLinkActive="active" class="nav-link">
-        <span class="icon">🏛️</span> {{ 'NAV_CINEMA_HALLS' | translate }}
-      </a>
-      <a *ngIf="isAdmin()" routerLink="/admin/dashboard" routerLinkActive="active" class="nav-link admin-pill">
-        <span class="icon">⚡</span> {{ 'NAV_ADMIN_HUB' | translate }}
-      </a>
+      <ng-container *ngIf="!isLoginPage()">
+        <a routerLink="/movies" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+          <svg class="ui-icon icon-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19.8 17.8l-1.6-11.2a2 2 0 0 0-2-1.6H7.8a2 2 0 0 0-2 1.6L4.2 17.8A2 2 0 0 0 6.2 20h11.6a2 2 0 0 0 2-2.2z"/><path d="M7 5a3 3 0 0 1 6 0 3 3 0 0 1 6 0"/></svg>
+          <span>{{ 'NAV_MOVIES' | translate }}</span>
+        </a>
+        <a routerLink="/booking-history" routerLinkActive="active" class="nav-link">
+          <svg class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="13" y1="5" x2="13" y2="19" stroke-dasharray="2"/></svg>
+          <span>{{ 'NAV_MY_TICKETS' | translate }}</span>
+        </a>
+        <a routerLink="/admin/create-movie" routerLinkActive="active" class="nav-link">
+          <svg class="ui-icon icon-rose" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2z"/></svg>
+          <span>{{ 'NAV_ADD_MOVIE' | translate }}</span>
+        </a>
+        <a routerLink="/admin/manage-halls" routerLinkActive="active" class="nav-link">
+          <svg class="ui-icon icon-cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v14M21 7v14M6 7V3h12v4M10 11h4M10 16h4"/></svg>
+          <span>{{ 'NAV_CINEMA_HALLS' | translate }}</span>
+        </a>
+        <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-link admin-pill">
+          <svg class="ui-icon icon-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <span>{{ 'NAV_ADMIN_HUB' | translate }}</span>
+        </a>
+      </ng-container>
+
+      <ng-container *ngIf="isLoginPage()">
+        <a routerLink="/movies" class="nav-link nav-guest-link" title="Explore home page and movie showtimes as guest">
+          <svg class="ui-icon icon-cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>{{ 'NAV_GUEST_HOME' | translate }}</span>
+        </a>
+      </ng-container>
     </nav>
 
     <!-- Header Actions & Top Right Language & Theme Switcher -->
@@ -41,8 +57,12 @@
         [attr.aria-label]="'THEME_TOGGLE_TITLE' | translate"
         [title]="currentTheme === 'dark' ? ('THEME_LIGHT' | translate) : ('THEME_DARK' | translate)"
       >
-        <span class="theme-icon" *ngIf="currentTheme === 'dark'">☀️</span>
-        <span class="theme-icon" *ngIf="currentTheme === 'light'">🌙</span>
+        <span class="theme-icon" *ngIf="currentTheme === 'dark'">
+          <svg class="ui-icon icon-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </span>
+        <span class="theme-icon" *ngIf="currentTheme === 'light'">
+          <svg class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </span>
         <span class="theme-text">{{ currentTheme === 'dark' ? ('THEME_LIGHT' | translate) : ('THEME_DARK' | translate) }}</span>
       </button>
 
@@ -55,27 +75,32 @@
           [attr.aria-label]="'Switch language between English and Amharic'"
           [title]="currentLang === 'en' ? 'Switch to Amharic (አማርኛ - ISO 639-1: am)' : 'Switch to English (ISO 639-1: en)'"
         >
-          <span class="lang-globe">🌐</span>
+          <span class="lang-globe">
+            <svg class="ui-icon icon-cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </span>
           <span class="lang-code-active">{{ currentLang === 'en' ? 'EN' : 'አማ' }}</span>
           <span class="lang-divider">/</span>
           <span class="lang-code-alt">{{ currentLang === 'en' ? 'AM' : 'EN' }}</span>
-          <span class="lang-flag">{{ currentLang === 'en' ? '🇪🇹' : '🇺🇸' }}</span>
         </button>
       </div>
 
       <!-- Auth Actions -->
       <ng-container *ngIf="isLoggedIn$ | async; else guestActions">
         <div class="user-badge" [class.admin-user]="isAdmin()">
-          <div class="user-avatar">{{ isAdmin() ? '👑' : '👤' }}</div>
+          <div class="user-avatar">
+            <svg *ngIf="isAdmin()" class="ui-icon icon-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m2 4 3 12h14l3-12-6 7-4-5-4 5-6-7z"/><path d="M5 20h14"/></svg>
+            <svg *ngIf="!isAdmin()" class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
           <span class="user-name">{{ getUserEmail() }}</span>
         </div>
         <button (click)="logout()" class="btn-logout" title="Sign out">
-          <span>{{ 'NAV_SIGN_OUT' | translate }}</span> 🚪
+          <span>{{ 'NAV_SIGN_OUT' | translate }}</span>
+          <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         </button>
       </ng-container>
 
       <ng-template #guestActions>
-        <a routerLink="/auth/login" class="btn-signin" (click)="closeMobileMenu()">
+        <a *ngIf="!isLoginPage()" routerLink="/auth/login" class="btn-signin" (click)="closeMobileMenu()">
           <span>{{ 'NAV_SIGN_IN' | translate }}</span>
         </a>
         <a routerLink="/auth/register" class="btn-register" (click)="closeMobileMenu()">
@@ -101,7 +126,7 @@
         [class.active]="currentLang === 'en'" 
         (click)="setLanguage('en'); closeMobileMenu()"
       >
-        🇺🇸 English (EN - ISO 639-1)
+        English (EN)
       </button>
       <button 
         type="button" 
@@ -109,19 +134,46 @@
         [class.active]="currentLang === 'am'" 
         (click)="setLanguage('am'); closeMobileMenu()"
       >
-        🇪🇹 አማርኛ (AM - ISO 639-1)
+        አማርኛ (AM)
       </button>
     </div>
 
-    <a routerLink="/movies" (click)="closeMobileMenu()" class="mobile-link">🍿 {{ 'NAV_MOVIES' | translate }}</a>
-    <a routerLink="/booking-history" (click)="closeMobileMenu()" class="mobile-link">🎫 {{ 'NAV_MY_TICKETS' | translate }}</a>
-    <ng-container *ngIf="isAdmin()">
-      <a routerLink="/admin/create-movie" (click)="closeMobileMenu()" class="mobile-link">🎬 {{ 'NAV_ADD_MOVIE' | translate }}</a>
-      <a routerLink="/admin/manage-halls" (click)="closeMobileMenu()" class="mobile-link">🏛️ {{ 'NAV_CINEMA_HALLS' | translate }}</a>
-      <a routerLink="/admin/dashboard" (click)="closeMobileMenu()" class="mobile-link admin-link">⚡ {{ 'NAV_ADMIN_HUB' | translate }}</a>
-      <a routerLink="/admin/create-schedule" (click)="closeMobileMenu()" class="mobile-link">📅 {{ 'ADMIN_CREATE_SCHEDULE_BTN' | translate }}</a>
-      <a routerLink="/admin/validate-ticket" (click)="closeMobileMenu()" class="mobile-link">🔍 {{ 'ADMIN_VALIDATE_BTN' | translate }}</a>
+    <ng-container *ngIf="!isLoginPage()">
+      <a routerLink="/movies" (click)="closeMobileMenu()" class="mobile-link">
+        <svg class="ui-icon icon-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19.8 17.8l-1.6-11.2a2 2 0 0 0-2-1.6H7.8a2 2 0 0 0-2 1.6L4.2 17.8A2 2 0 0 0 6.2 20h11.6a2 2 0 0 0 2-2.2z"/><path d="M7 5a3 3 0 0 1 6 0 3 3 0 0 1 6 0"/></svg>
+        {{ 'NAV_MOVIES' | translate }}
+      </a>
+      <a routerLink="/booking-history" (click)="closeMobileMenu()" class="mobile-link">
+        <svg class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="13" y1="5" x2="13" y2="19" stroke-dasharray="2"/></svg>
+        {{ 'NAV_MY_TICKETS' | translate }}
+      </a>
     </ng-container>
+
+    <a *ngIf="isLoginPage()" routerLink="/movies" (click)="closeMobileMenu()" class="mobile-link guest-link">
+      <svg class="ui-icon icon-cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      {{ 'NAV_GUEST_HOME' | translate }}
+    </a>
+
+    <a routerLink="/admin/create-movie" (click)="closeMobileMenu()" class="mobile-link">
+      <svg class="ui-icon icon-rose" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2z"/></svg>
+      {{ 'NAV_ADD_MOVIE' | translate }}
+    </a>
+    <a routerLink="/admin/manage-halls" (click)="closeMobileMenu()" class="mobile-link">
+      <svg class="ui-icon icon-cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v14M21 7v14M6 7V3h12v4M10 11h4M10 16h4"/></svg>
+      {{ 'NAV_CINEMA_HALLS' | translate }}
+    </a>
+    <a routerLink="/admin/dashboard" (click)="closeMobileMenu()" class="mobile-link admin-link">
+      <svg class="ui-icon icon-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      {{ 'NAV_ADMIN_HUB' | translate }}
+    </a>
+    <a routerLink="/admin/create-schedule" (click)="closeMobileMenu()" class="mobile-link">
+      <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      {{ 'ADMIN_CREATE_SCHEDULE_BTN' | translate }}
+    </a>
+    <a routerLink="/admin/validate-ticket" (click)="closeMobileMenu()" class="mobile-link">
+      <svg class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      {{ 'ADMIN_VALIDATE_BTN' | translate }}
+    </a>
     
     <div class="mobile-auth" *ngIf="!(isLoggedIn$ | async)">
       <a routerLink="/auth/login" (click)="closeMobileMenu()" class="btn-signin w-100">{{ 'NAV_SIGN_IN' | translate }}</a>
@@ -141,7 +193,12 @@
   <div class="footer-container">
     <div class="footer-brand">
       <div class="brand-logo footer-logo">
-        <div class="logo-icon">🎬</div>
+        <div class="logo-icon">
+          <svg class="ui-icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2">
+            <rect x="2" y="2" width="20" height="20" rx="2.18"/>
+            <path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"/>
+          </svg>
+        </div>
         <div class="logo-text">
           <span class="title">Cine<span class="highlight">Flow</span></span>
         </div>
@@ -150,10 +207,22 @@
         {{ 'FOOTER_DESC' | translate }}
       </p>
       <div class="payment-badges">
-        <span class="pay-pill">⚡ Chapa Real-Time API</span>
-        <span class="pay-pill">📱 Telebirr</span>
-        <span class="pay-pill">🏦 CBE Birr</span>
-        <span class="pay-pill">💳 Visa / Master</span>
+        <span class="pay-pill">
+          <svg class="ui-icon icon-zap icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Chapa Real-Time API
+        </span>
+        <span class="pay-pill">
+          <svg class="ui-icon icon-primary icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          Telebirr
+        </span>
+        <span class="pay-pill">
+          <svg class="ui-icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 10v11M9 10v11M13 10v11M17 10v11M12 3l9 7H3l9-7z"/></svg>
+          CBE Birr
+        </span>
+        <span class="pay-pill">
+          <svg class="ui-icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Visa / Master
+        </span>
       </div>
     </div>
 
@@ -170,10 +239,22 @@
     <div class="footer-links-group">
       <h4>{{ 'FOOTER_BRANCHES' | translate }}</h4>
       <ul>
-        <li>📍 Addis Ababa (Bole Medhanialem)</li>
-        <li>📍 Addis Ababa (Edna Mall)</li>
-        <li>📍 Hawassa Lake Screen</li>
-        <li>📍 Dire Dawa Grand Hall</li>
+        <li>
+          <svg class="ui-icon icon-primary icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Addis Ababa (Bole Medhanialem)
+        </li>
+        <li>
+          <svg class="ui-icon icon-primary icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Addis Ababa (Edna Mall)
+        </li>
+        <li>
+          <svg class="ui-icon icon-primary icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Hawassa Lake Screen
+        </li>
+        <li>
+          <svg class="ui-icon icon-primary icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Dire Dawa Grand Hall
+        </li>
       </ul>
     </div>
 

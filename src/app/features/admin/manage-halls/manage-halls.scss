@@ -42,6 +42,8 @@
     margin: 0;
     color: #ffffff;
     letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
   }
 
   .subtitle {
@@ -94,16 +96,13 @@
     border: 1px solid rgba(239, 68, 68, 0.4);
     color: #fca5a5;
   }
-
-  .icon {
-    font-size: 1.15rem;
-  }
 }
 
 /* Form Panel */
 .form-panel {
   background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
   padding: 2.25rem;
@@ -120,6 +119,8 @@
       font-weight: 800;
       color: #ffffff;
       margin: 0 0 0.35rem;
+      display: flex;
+      align-items: center;
     }
 
     p {
@@ -157,7 +158,21 @@
         color: #cbd5e1;
       }
 
+      .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        .field-icon-svg {
+          position: absolute;
+          left: 1rem;
+          pointer-events: none;
+          z-index: 2;
+        }
+      }
+
       .form-input, .form-select {
+        width: 100%;
         padding: 0.85rem 1rem;
         background: rgba(30, 41, 59, 0.8);
         border: 1px solid rgba(255, 255, 255, 0.12);
@@ -166,6 +181,10 @@
         font-size: 0.95rem;
         outline: none;
         transition: all 0.2s ease;
+
+        &.has-icon {
+          padding-left: 2.75rem;
+        }
 
         &:focus {
           border-color: #6366f1;
@@ -209,6 +228,9 @@
     border-top: 1px solid rgba(255, 255, 255, 0.08);
 
     .btn-submit {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
       padding: 0.85rem 2rem;
       background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: #ffffff;
@@ -274,6 +296,7 @@
   .hall-card {
     background: rgba(15, 23, 42, 0.8);
     backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 18px;
     padding: 1.75rem;
@@ -298,13 +321,15 @@
 
         .hall-badge {
           display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
           align-self: flex-start;
           font-size: 0.72rem;
           font-weight: 800;
           color: #fbbf24;
           background: rgba(245, 158, 11, 0.15);
           border: 1px solid rgba(245, 158, 11, 0.3);
-          padding: 0.2rem 0.6rem;
+          padding: 0.25rem 0.6rem;
           border-radius: 6px;
           letter-spacing: 0.5px;
           margin-bottom: 0.25rem;
@@ -320,6 +345,9 @@
         .location-tag {
           font-size: 0.85rem;
           color: #94a3b8;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
         }
       }
     }
@@ -370,6 +398,10 @@
         font-weight: 700;
         cursor: pointer;
         transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
       }
 
       .btn-action-edit {
@@ -406,10 +438,15 @@
   max-width: 500px;
   margin: 2rem auto;
   border-radius: 20px;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 
-  .empty-icon {
-    font-size: 3.5rem;
-    margin-bottom: 1rem;
+  .empty-icon-box {
+    margin-bottom: 1.25rem;
+    display: flex;
+    justify-content: center;
   }
 
   h3 {
@@ -433,9 +470,154 @@
     border-radius: 10px;
     font-weight: 700;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+/* Light Theme Overrides */
+[data-theme="light"],
+body.light-theme {
+  .manage-halls-page {
+    color: #0f172a;
+  }
+
+  .page-header {
+    border-bottom-color: rgba(226, 232, 240, 0.9);
+
+    .btn-back {
+      color: #64748b;
+      &:hover { color: #0284c7; }
+    }
+
+    h1 {
+      color: #0f172a;
+    }
+
+    .subtitle {
+      color: #475569;
+    }
+  }
+
+  .form-panel {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+
+    .form-header {
+      border-bottom-color: #f1f5f9;
+
+      h2 {
+        color: #0f172a;
+      }
+      p {
+        color: #64748b;
+      }
+    }
+
+    .form-grid {
+      .form-group {
+        label {
+          color: #1e293b;
+        }
+
+        .form-input, .form-select {
+          background: #f8fafc;
+          border-color: #cbd5e1;
+          color: #0f172a;
+
+          &:focus {
+            background: #ffffff;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+          }
+        }
+
+        .capacity-preview-box {
+          background: #eef2ff;
+          border-color: #c7d2fe;
+
+          .cap-val {
+            color: #4f46e5;
+          }
+          .cap-calc {
+            color: #64748b;
+          }
+        }
+      }
+    }
+
+    .form-actions {
+      border-top-color: #f1f5f9;
+
+      .btn-cancel {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #334155;
+
+        &:hover {
+          background: #e2e8f0;
+          color: #0f172a;
+        }
+      }
+    }
+  }
+
+  .hall-card {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+
+    &:hover {
+      border-color: #6366f1;
+      box-shadow: 0 12px 30px rgba(99, 102, 241, 0.12);
+    }
+
+    .hall-card-header {
+      .hall-title-wrap {
+        h3 {
+          color: #0f172a;
+        }
+        .location-tag {
+          color: #475569;
+        }
+      }
+    }
+
+    .hall-details-grid {
+      background: #f8fafc;
+      border-color: #e2e8f0;
+
+      .detail-cell {
+        .label {
+          color: #64748b;
+        }
+        .val {
+          color: #1e293b;
+          &.highlight {
+            color: #0284c7;
+          }
+        }
+      }
+    }
+  }
+
+  .empty-state {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+
+    h3 {
+      color: #0f172a;
+    }
+    p {
+      color: #64748b;
+    }
   }
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+

@@ -3,15 +3,21 @@
     <div class="header-inner">
       <div class="header-left">
         <a routerLink="/admin/dashboard" class="btn-back">
-          <span>‹</span> Back to Admin Hub
+          <svg class="ui-icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          Back to Admin Hub
         </a>
-        <h1>🏛️ Cinema Hall Management</h1>
+        <h1>
+          <svg class="ui-icon icon-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 28px; height: 28px; vertical-align: middle; margin-right: 8px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Cinema Hall Management
+        </h1>
         <p class="subtitle">Create, configure auditorium layouts, seat matrix capacity, and screen locations</p>
       </div>
 
       <div class="header-actions">
         <button class="btn-add" (click)="toggleAddForm()">
-          <span>{{ showAddForm ? '✕ Cancel' : '➕ Add Cinema Hall' }}</span>
+          <svg *ngIf="!showAddForm" class="ui-icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <svg *ngIf="showAddForm" class="ui-icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <span>{{ showAddForm ? 'Cancel' : 'Add Cinema Hall' }}</span>
         </button>
       </div>
     </div>
@@ -19,36 +25,47 @@
 
   <!-- Message Alert Banner -->
   <div *ngIf="message" class="message-banner animate-fade-in" [class.success]="isSuccess" [class.error]="!isSuccess">
-    <span class="icon">{{ isSuccess ? '✓' : '⚠️' }}</span>
+    <svg *ngIf="isSuccess" class="ui-icon icon-emerald" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    <svg *ngIf="!isSuccess" class="ui-icon icon-rose" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
     <span>{{ message }}</span>
   </div>
 
   <!-- Add/Edit Cinema Hall Form -->
   <div *ngIf="showAddForm" class="form-panel glass-panel animate-fade-in">
     <div class="form-header">
-      <h2>{{ editingId ? '✏️ Edit Cinema Hall' : '➕ Create New Cinema Hall' }}</h2>
+      <h2>
+        <svg *ngIf="editingId" class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        <svg *ngIf="!editingId" class="ui-icon icon-emerald" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        {{ editingId ? 'Edit Cinema Hall' : 'Create New Cinema Hall' }}
+      </h2>
       <p>Configure auditorium location, name, and interactive seat matrix</p>
     </div>
     
     <div class="form-grid">
       <div class="form-group">
         <label>Cinema Branch / Location</label>
-        <input 
-          type="text" 
-          [(ngModel)]="newHall.branchName" 
-          placeholder="e.g. Addis Ababa (Bole), Edna Mall, Hawassa"
-          class="form-input"
-        />
+        <div class="input-wrapper">
+          <svg class="field-icon-svg ui-icon icon-rose" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <input 
+            type="text" 
+            [(ngModel)]="newHall.branchName" 
+            placeholder="e.g. Addis Ababa (Bole), Edna Mall, Hawassa"
+            class="form-input has-icon"
+          />
+        </div>
       </div>
 
       <div class="form-group">
         <label>Cinema Hall Name</label>
-        <input 
-          type="text" 
-          [(ngModel)]="newHall.hallName" 
-          placeholder="e.g. IMAX Laser Screen, VIP Dolby Atmos"
-          class="form-input"
-        />
+        <div class="input-wrapper">
+          <svg class="field-icon-svg ui-icon icon-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <input 
+            type="text" 
+            [(ngModel)]="newHall.hallName" 
+            placeholder="e.g. IMAX Laser Screen, VIP Dolby Atmos"
+            class="form-input has-icon"
+          />
+        </div>
       </div>
 
       <div class="form-group">
@@ -83,6 +100,7 @@
       <div class="form-group span-2">
         <label>Total Auditorium Capacity</label>
         <div class="capacity-preview-box">
+          <svg class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9Z"/><path d="M7 15h10"/><path d="M9 19v2"/><path d="M15 19v2"/></svg>
           <span class="cap-val">{{ newHall.totalCapacity }} Total Seats</span>
           <span class="cap-calc">({{ selectedRows }} rows × {{ selectedSeatsPerRow }} seats per row)</span>
         </div>
@@ -91,11 +109,13 @@
 
     <div class="form-actions">
       <button 
-        type="button"
+        type="button" 
         class="btn-submit"
         (click)="editingId ? updateHall() : submitHall()"
       >
-        {{ editingId ? '💾 Update Cinema Hall' : '✓ Save Cinema Hall' }}
+        <svg *ngIf="editingId" class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <svg *ngIf="!editingId" class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>{{ editingId ? 'Update Cinema Hall' : 'Save Cinema Hall' }}</span>
       </button>
       <button type="button" class="btn-cancel" (click)="toggleAddForm()">
         Cancel
@@ -114,9 +134,15 @@
     <div *ngFor="let hall of halls" class="hall-card glass-panel animate-fade-in">
       <div class="hall-card-header">
         <div class="hall-title-wrap">
-          <span class="hall-badge">🏛️ SCREEN</span>
+          <span class="hall-badge">
+            <svg class="ui-icon icon-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+            SCREEN
+          </span>
           <h3>{{ hall.hallName }}</h3>
-          <span class="location-tag">📍 {{ hall.branchName }}</span>
+          <span class="location-tag">
+            <svg class="ui-icon icon-rose icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            {{ hall.branchName }}
+          </span>
         </div>
       </div>
 
@@ -133,10 +159,12 @@
 
       <div class="hall-card-actions">
         <button type="button" class="btn-action-edit" (click)="editHall(hall)" title="Edit auditorium details">
-          ✏️ Edit
+          <svg class="ui-icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          Edit
         </button>
         <button type="button" class="btn-action-delete" (click)="deleteHall(hall.id)" title="Delete cinema hall">
-          🗑️ Delete
+          <svg class="ui-icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+          Delete
         </button>
       </div>
     </div>
@@ -144,11 +172,14 @@
 
   <!-- Empty State -->
   <div *ngIf="!loading && halls.length === 0" class="empty-state glass-panel animate-fade-in">
-    <div class="empty-icon">🏛️</div>
+    <div class="empty-icon-box">
+      <svg class="ui-icon icon-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width: 56px; height: 56px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
     <h3>No Cinema Halls Found</h3>
     <p>Get started by creating your first cinema screen and seating arrangement.</p>
     <button class="btn-add primary" (click)="toggleAddForm()">
-      ➕ Create First Cinema Hall
+      <svg class="ui-icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Create First Cinema Hall
     </button>
   </div>
 </div>

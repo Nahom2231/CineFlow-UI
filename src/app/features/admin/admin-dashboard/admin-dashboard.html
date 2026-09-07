@@ -5,18 +5,22 @@
       <div class="admin-live-badge">
         <span class="live-pulse"></span> SYSTEM LIVE • REAL-TIME METRICS
       </div>
-      <h1>🏢 Cinema Executive Dashboard</h1>
+      <h1>
+        <svg class="ui-icon icon-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v14M21 7v14M6 7V3h12v4M10 11h4M10 16h4"/></svg>
+        Cinema Executive Dashboard
+      </h1>
       <p class="subtitle">Real-time box office analytics, schedule tracking & revenue management</p>
     </div>
     <div class="header-right">
       <button class="btn-refresh" (click)="loadDashboardStats()" [disabled]="loading">
-        <span [class.spin]="loading">🔄</span> Refresh Live Stats
+        <svg class="ui-icon icon-sm" [class.spin]="loading" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/></svg>
+        Refresh Live Stats
       </button>
     </div>
   </div>
 
   <!-- Loading State -->
-  <div *ngIf="loading" class="loading-panel">
+  <div *ngIf="loading" class="loading-panel glass-panel">
     <div class="spinner-lg"></div>
     <p>Synchronizing real-time cinema box office metrics...</p>
   </div>
@@ -24,8 +28,10 @@
   <div *ngIf="!loading" class="dashboard-body animate-fade-in">
     <!-- Key Metrics Row -->
     <div class="metrics-grid">
-      <div class="metric-card metric-rev">
-        <div class="metric-icon-wrap">💰</div>
+      <div class="metric-card metric-rev glass-panel">
+        <div class="metric-icon-wrap">
+          <svg class="ui-icon icon-emerald icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
         <div class="metric-details">
           <span class="metric-label">Total Box Office</span>
           <h2 class="metric-value">{{ formatCurrency(stats.totalRevenue) }}</h2>
@@ -33,8 +39,10 @@
         </div>
       </div>
 
-      <div class="metric-card metric-today">
-        <div class="metric-icon-wrap">⚡</div>
+      <div class="metric-card metric-today glass-panel">
+        <div class="metric-icon-wrap">
+          <svg class="ui-icon icon-zap icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
         <div class="metric-details">
           <span class="metric-label">Today's Revenue</span>
           <h2 class="metric-value">{{ formatCurrency(stats.todayRevenue) }}</h2>
@@ -42,8 +50,10 @@
         </div>
       </div>
 
-      <div class="metric-card metric-tickets">
-        <div class="metric-icon-wrap">🎫</div>
+      <div class="metric-card metric-tickets glass-panel">
+        <div class="metric-icon-wrap">
+          <svg class="ui-icon icon-primary icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><line x1="13" y1="5" x2="13" y2="19" stroke-dasharray="2"/></svg>
+        </div>
         <div class="metric-details">
           <span class="metric-label">Total Tickets Sold</span>
           <h2 class="metric-value">{{ stats.totalTicketsSold }}</h2>
@@ -51,8 +61,10 @@
         </div>
       </div>
 
-      <div class="metric-card metric-shows">
-        <div class="metric-icon-wrap">🎬</div>
+      <div class="metric-card metric-shows glass-panel">
+        <div class="metric-icon-wrap">
+          <svg class="ui-icon icon-rose icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18"/><path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"/></svg>
+        </div>
         <div class="metric-details">
           <span class="metric-label">Upcoming Shows</span>
           <h2 class="metric-value">{{ stats.upcomingShowsCount }}</h2>
@@ -63,36 +75,46 @@
 
     <!-- Quick Management Action Grid -->
     <div class="admin-actions-grid">
-      <a routerLink="/admin/create-movie" class="action-card action-movie">
-        <span class="action-icon">➕🎬</span>
+      <a routerLink="/admin/create-movie" class="action-card action-movie glass-panel">
+        <span class="action-icon">
+          <svg class="ui-icon icon-rose icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2z"/></svg>
+        </span>
         <div class="action-info">
           <h4>Publish Movie</h4>
           <p>Add new film to catalog</p>
         </div>
       </a>
-      <a routerLink="/admin/create-schedule" class="action-card action-schedule">
-        <span class="action-icon">📅</span>
+      <a routerLink="/admin/create-schedule" class="action-card action-schedule glass-panel">
+        <span class="action-icon">
+          <svg class="ui-icon icon-cyan icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </span>
         <div class="action-info">
           <h4>Create Schedule</h4>
           <p>Set dates, halls & times</p>
         </div>
       </a>
-      <a routerLink="/admin/manage-halls" class="action-card action-halls">
-        <span class="action-icon">🏛️</span>
+      <a routerLink="/admin/manage-halls" class="action-card action-halls glass-panel">
+        <span class="action-icon">
+          <svg class="ui-icon icon-gold icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v14M21 7v14M6 7V3h12v4M10 11h4M10 16h4"/></svg>
+        </span>
         <div class="action-info">
           <h4>Cinema Auditoriums</h4>
           <p>Configure halls & seatmaps</p>
         </div>
       </a>
-      <a routerLink="/admin/validate-ticket" class="action-card action-scan">
-        <span class="action-icon">📱</span>
+      <a routerLink="/admin/validate-ticket" class="action-card action-scan glass-panel">
+        <span class="action-icon">
+          <svg class="ui-icon icon-primary icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        </span>
         <div class="action-info">
           <h4>QR Gate Scanner</h4>
           <p>Verify digital guest passes</p>
         </div>
       </a>
-      <a routerLink="/admin/revenue-report" class="action-card action-report">
-        <span class="action-icon">📊</span>
+      <a routerLink="/admin/revenue-report" class="action-card action-report glass-panel">
+        <span class="action-icon">
+          <svg class="ui-icon icon-success icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </span>
         <div class="action-info">
           <h4>Revenue Reports</h4>
           <p>Export analytics & CSVs</p>
@@ -103,9 +125,12 @@
     <!-- Analytics Double Column Layout -->
     <div class="analytics-layout">
       <!-- 7-Day Visual Revenue Chart -->
-      <div class="analytics-panel weekly-revenue-panel">
+      <div class="analytics-panel weekly-revenue-panel glass-panel">
         <div class="panel-header">
-          <h3>📈 7-Day Revenue Trend</h3>
+          <h3>
+            <svg class="ui-icon icon-primary icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            7-Day Revenue Trend
+          </h3>
           <span class="badge-tag">Daily Breakdown</span>
         </div>
 
@@ -126,9 +151,12 @@
       </div>
 
       <!-- Top Movies Ranking -->
-      <div class="analytics-panel top-movies-panel">
+      <div class="analytics-panel top-movies-panel glass-panel">
         <div class="panel-header">
-          <h3>🌟 Top Performing Movies</h3>
+          <h3>
+            <svg class="ui-icon icon-gold icon-sm" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Top Performing Movies
+          </h3>
           <span class="badge-tag">By Box Office</span>
         </div>
 
@@ -153,12 +181,88 @@
         </div>
 
         <div class="featured-popular-banner">
-          <span class="pop-icon">🏆</span>
+          <span class="pop-icon">
+            <svg class="ui-icon icon-gold icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H7.5a1.5 1.5 0 0 0 0 3h9a1.5 1.5 0 0 0 0-3H15c-.55 0-1-.45-1-1v-2.34"/><path d="M18 4H6v7a6 6 0 0 0 12 0V4z"/></svg>
+          </span>
           <div>
             <span class="pop-label">Overall Most In-Demand Film:</span>
             <strong class="pop-title">{{ stats.mostPopularMovie }}</strong>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Movie Catalog Management Section -->
+    <div class="movies-management-section glass-panel" style="margin-top: 2rem; padding: 1.5rem; border-radius: 16px;">
+      <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <h3 style="margin: 0; font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; color: var(--text-main);">
+            <svg class="ui-icon icon-rose icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2z"/></svg>
+            Cinema Catalog Titles & Movie Operations
+          </h3>
+          <p style="margin: 0.25rem 0 0; font-size: 0.82rem; color: var(--text-muted);">Manage all screening movies with instant CRUD editing and deletion</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <a routerLink="/admin/create-movie" class="btn-primary" style="padding: 0.45rem 0.9rem; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.4rem; text-decoration: none; border-radius: 8px;">
+            <svg class="ui-icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add New Movie
+          </a>
+        </div>
+      </div>
+
+      <div *ngIf="moviesList.length === 0" style="text-align: center; padding: 2rem 1rem; color: var(--text-muted);">
+        <p>No active movies found in catalog.</p>
+      </div>
+
+      <div *ngIf="moviesList.length > 0" class="admin-movies-table-wrap" style="overflow-x: auto;">
+        <table class="admin-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.86rem;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-muted);">
+              <th style="padding: 0.75rem 0.5rem;">Movie</th>
+              <th style="padding: 0.75rem 0.5rem;">Genre / Lang</th>
+              <th style="padding: 0.75rem 0.5rem;">Duration</th>
+              <th style="padding: 0.75rem 0.5rem;">Director</th>
+              <th style="padding: 0.75rem 0.5rem;">Showtimes</th>
+              <th style="padding: 0.75rem 0.5rem; text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let movie of moviesList" style="border-bottom: 1px solid rgba(255,255,255,0.06); transition: background 0.2s;">
+              <td style="padding: 0.75rem 0.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                <img 
+                  [src]="movie.featuredImageUrl || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=100&auto=format&fit=crop&q=80'" 
+                  [alt]="movie.titleEnglish"
+                  style="width: 38px; height: 50px; object-fit: cover; border-radius: 6px;"
+                />
+                <div>
+                  <strong style="display: block; color: var(--text-main); font-weight: 600;">{{ movie.titleEnglish }}</strong>
+                  <span style="font-size: 0.75rem; color: var(--text-muted);" *ngIf="movie.titleAmharic">{{ movie.titleAmharic }}</span>
+                </div>
+              </td>
+              <td style="padding: 0.75rem 0.5rem;">
+                <span style="display: inline-block; padding: 0.15rem 0.45rem; border-radius: 4px; background: rgba(99, 102, 241, 0.12); color: #818cf8; font-size: 0.75rem; font-weight: 600; margin-right: 0.35rem;">{{ movie.genre }}</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">{{ movie.audioLanguage }}</span>
+              </td>
+              <td style="padding: 0.75rem 0.5rem; color: var(--text-main);">{{ movie.durationMinutes }}m</td>
+              <td style="padding: 0.75rem 0.5rem; color: var(--text-muted);">{{ movie.directorName || 'N/A' }}</td>
+              <td style="padding: 0.75rem 0.5rem;">
+                <span style="display: inline-block; padding: 0.15rem 0.45rem; border-radius: 4px; background: rgba(16, 185, 129, 0.12); color: #34d399; font-size: 0.75rem; font-weight: 600;">
+                  {{ (movie.schedules?.length || 0) }} Active
+                </span>
+              </td>
+              <td style="padding: 0.75rem 0.5rem; text-align: right; white-space: nowrap;">
+                <a [routerLink]="['/admin/edit-movie', movie.id]" class="btn-action-edit" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.35rem 0.65rem; border-radius: 6px; font-size: 0.78rem; font-weight: 600; background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.25); text-decoration: none; margin-right: 0.4rem; cursor: pointer;">
+                  <svg class="ui-icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  Edit
+                </a>
+                <button (click)="deleteMovie(movie)" class="btn-action-delete" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.35rem 0.65rem; border-radius: 6px; font-size: 0.78rem; font-weight: 600; background: rgba(244, 63, 94, 0.12); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.25); cursor: pointer;">
+                  <svg class="ui-icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                  Delete
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

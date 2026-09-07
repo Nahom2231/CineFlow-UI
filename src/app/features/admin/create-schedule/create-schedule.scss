@@ -42,6 +42,8 @@
     margin: 0;
     color: #ffffff;
     letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
   }
 
   .subtitle {
@@ -90,8 +92,15 @@
     align-items: center;
     gap: 0.9rem;
 
-    .warning-icon {
-      font-size: 1.6rem;
+    .warning-icon-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: rgba(245, 158, 11, 0.18);
+      border-radius: 10px;
+      border: 1px solid rgba(245, 158, 11, 0.3);
     }
 
     .warning-text {
@@ -119,6 +128,12 @@
     box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
     transition: all 0.2s ease;
 
+    .btn-content-flex {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
     &:hover:not(:disabled) {
       background: #fbbf24;
       transform: translateY(-2px);
@@ -139,6 +154,9 @@
   margin-bottom: 2rem;
   font-size: 0.85rem;
   color: #34d399;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
 }
 
 .content-grid {
@@ -156,6 +174,7 @@
 .form-container {
   background: rgba(15, 23, 42, 0.8);
   backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
   padding: 2.25rem;
@@ -224,9 +243,10 @@
       .field-icon {
         position: absolute;
         left: 1rem;
-        font-size: 1rem;
         pointer-events: none;
         z-index: 2;
+        display: flex;
+        align-items: center;
       }
 
       input, select {
@@ -270,6 +290,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
+
+    .btn-content-flex {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
 
     &:hover:not(:disabled) {
       transform: translateY(-2px);
@@ -324,6 +350,7 @@
   .schedule-preview-card {
     background: rgba(15, 23, 42, 0.85);
     backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(16, 185, 129, 0.3);
     border-radius: 18px;
     padding: 1.75rem;
@@ -409,8 +436,138 @@
       padding-top: 0.75rem;
       border-top: 1px solid rgba(255, 255, 255, 0.06);
 
+      .preview-seats-info {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
       .status-live {
         color: #34d399;
+      }
+    }
+  }
+}
+
+/* Light Theme Overrides */
+[data-theme="light"],
+body.light-theme {
+  .create-schedule-page {
+    color: #0f172a;
+  }
+
+  .page-header {
+    border-bottom-color: rgba(226, 232, 240, 0.9);
+
+    .btn-back {
+      color: #64748b;
+      &:hover { color: #0284c7; }
+    }
+
+    h1 {
+      color: #0f172a;
+    }
+
+    .subtitle {
+      color: #475569;
+    }
+
+    .btn-view-catalog {
+      background: #ffffff;
+      border-color: #cbd5e1;
+      color: #0f172a;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+
+      &:hover {
+        background: #f1f5f9;
+        border-color: #94a3b8;
+      }
+    }
+  }
+
+  .form-container {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+
+    .schedule-form {
+      .form-group {
+        label {
+          color: #1e293b;
+        }
+
+        .input-container {
+          input, select {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            color: #0f172a;
+
+            &:focus {
+              background: #ffffff;
+              border-color: #0284c7;
+              box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+            }
+          }
+        }
+
+        .field-hint {
+          color: #64748b;
+        }
+      }
+    }
+  }
+
+  .preview-heading {
+    color: #475569;
+  }
+
+  .schedule-preview-card {
+    background: #ffffff;
+    border-color: #cbd5e1;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+
+    .preview-header {
+      .hall-tag {
+        color: #0284c7;
+      }
+      .price-tag {
+        background: #ecfdf5;
+        border-color: #6ee7b7;
+        color: #047857;
+      }
+    }
+
+    .preview-movie-title {
+      h4 {
+        color: #0f172a;
+      }
+      h5 {
+        color: #e11d48;
+      }
+    }
+
+    .preview-timing {
+      background: #f1f5f9;
+
+      .time-block, .date-block {
+        .label {
+          color: #64748b;
+        }
+        .time-val {
+          color: #0f172a;
+        }
+        .date-val {
+          color: #334155;
+        }
+      }
+    }
+
+    .preview-footer {
+      border-top-color: #e2e8f0;
+      color: #64748b;
+
+      .status-live {
+        color: #059669;
       }
     }
   }
@@ -436,4 +593,4 @@
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
-}
+}

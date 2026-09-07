@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { CineFlowApiService } from '../../../core/services/cineflow-api.service';
 import { CreateMovieDto } from '../../../core/models/CineFlow.model';
 
@@ -13,6 +13,9 @@ import { CreateMovieDto } from '../../../core/models/CineFlow.model';
   styleUrls: ['./create-movie.scss']
 })
 export class CreateMovie implements OnInit {
+  isEditing = false;
+  editingMovieId: string | null = null;
+
   directors: Array<{ id: string; name: string }> = [];
   suggestedDirectors: string[] = [
     'Christopher Nolan',
@@ -49,10 +52,18 @@ export class CreateMovie implements OnInit {
 
   constructor(
     private apiService: CineFlowApiService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    const movieIdParam = this.route.snapshot.paramMap.get('id');
+    if (movieIdParam) {
+      this.isEditing = true;
+      this.editingMovieId = movieIdParam;
+      this.loadMovieToEdit(movieIdParam);
+    }
+
     this.apiService.getDirectors().subscribe({
       next: (data: any) => {
         this.directors = data || [];
@@ -62,6 +73,32 @@ export class CreateMovie implements OnInit {
         }
       },
       error: () => (this.directors = [])
+    });
+  }
+
+  loadMovieToEdit(movieId: string): void {
+    this.loading = true;
+    this.apiService.getMovieById(movieId).subscribe({
+      next: (m) => {
+        this.loading = false;
+        if (m) {
+          this.movie = {
+            titleEnglish: m.titleEnglish || '',
+            titleAmharic: m.titleAmharic || '',
+            descriptionEnglish: m.descriptionEnglish || '',
+            descriptionAmharic: m.descriptionAmharic || '',
+            durationMinutes: m.durationMinutes || 120,
+            genre: m.genre || 'Action',
+            audioLanguage: m.audioLanguage || 'English',
+            directorName: m.directorName || '',
+            featuredImageUrl: m.featuredImageUrl || ''
+          };
+          this.imagePreviewUrl = m.featuredImageUrl || '';
+        }
+      },
+      error: () => {
+        this.loading = false;
+      }
     });
   }
 
@@ -158,21 +195,28 @@ export class CreateMovie implements OnInit {
       formData.append('FeaturedImageUrl', this.movie.featuredImageUrl);
     }
 
-    this.apiService.createMovie(formData).subscribe({
+    const request$: import('rxjs').Observable<any> = this.isEditing && this.editingMovieId
+      ? this.apiService.updateMovie(this.editingMovieId, formData)
+      : this.apiService.createMovie(formData);
+
+    request$.subscribe({
       next: () => {
         this.loading = false;
-        this.successMessage = '🎉 Movie published successfully to the CineFlow catalog!';
+        this.successMessage = this.isEditing
+          ? 'Movie details updated successfully!'
+          : 'Movie published successfully to the CineFlow catalog!';
         setTimeout(() => this.router.navigate(['/movies']), 1500);
       },
-      error: (err) => {
+      error: (err: any) => {
         this.loading = false;
-        if (err.error?.errors) {
+        if (err?.error?.errors) {
           const firstkey = Object.keys(err.error.errors)[0];
           this.errorMessage = `${firstkey}: ${err.error.errors[firstkey][0]}`;
         } else {
-          this.errorMessage = err.error?.message || 'Failed to create movie. Please verify your inputs.';
+          this.errorMessage = err?.error?.message || 'Failed to save movie. Please verify your inputs.';
         }
       }
     });
   }
 }
+
