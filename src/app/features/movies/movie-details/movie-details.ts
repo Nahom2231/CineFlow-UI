@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { CineFlowApiService } from '../../../core/services/cineflow-api.service';
 import { MovieResponseDto, ScheduleDto } from '../../../core/models/CineFlow.model';
 import { TranslationService } from '../../../core/services/translation.service';
+import { AuthService } from '../../../core/services/auth';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
@@ -18,6 +19,7 @@ export class MovieDetails implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private apiService = inject(CineFlowApiService);
   public translationService = inject(TranslationService);
+  public authService = inject(AuthService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private routeSub?: Subscription;
@@ -147,12 +149,14 @@ export class MovieDetails implements OnInit, OnDestroy {
   }
 
   editMovie(): void {
+    if (!this.authService.isAdmin()) return;
     if (this.movie) {
       this.router.navigate(['/admin/edit-movie', this.movie.id]);
     }
   }
 
   deleteMovie(): void {
+    if (!this.authService.isAdmin()) return;
     if (!this.movie) return;
     this.apiService.deleteMovie(this.movie.id).subscribe({
       next: () => {

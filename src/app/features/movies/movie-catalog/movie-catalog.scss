@@ -472,6 +472,51 @@
 }
 
 /* =========================================
+   CANCELLED MOVIES RESTORE BAR
+   ========================================= */
+.cancelled-restore-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.25rem;
+  margin-bottom: 1.5rem;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--radius-sm);
+  color: #fef3c7;
+  font-size: 0.9rem;
+
+  .restore-info {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 500;
+  }
+
+  .btn-restore-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.9rem;
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: 6px;
+    color: #fbbf24;
+    font-weight: 600;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(245, 158, 11, 0.35);
+      color: #ffffff;
+      border-color: #f59e0b;
+    }
+  }
+}
+
+/* =========================================
    MOVIE GRID & CARDS
    ========================================= */
 .movie-grid {
@@ -570,6 +615,34 @@
           transform: scale(1.15);
           box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
         }
+      }
+    }
+
+    .btn-card-cancel-x {
+      position: absolute;
+      top: 0.85rem;
+      right: 0.85rem;
+      z-index: 4;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: all 0.25s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+
+      &:hover {
+        background: rgba(239, 68, 68, 0.9);
+        border-color: #ef4444;
+        color: #ffffff;
+        transform: scale(1.15) rotate(90deg);
+        box-shadow: 0 4px 14px rgba(239, 68, 68, 0.5);
       }
     }
 
@@ -728,10 +801,56 @@
         font-size: 0.88rem;
         font-weight: 600;
         transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
 
         &:hover {
           background: rgba(255, 255, 255, 0.12);
           color: #ffffff;
+        }
+
+        &.btn-crud-cancel {
+          color: #cbd5e1;
+          border-color: rgba(255, 255, 255, 0.18);
+          background: rgba(255, 255, 255, 0.07);
+          padding: 0.75rem 0.65rem;
+          cursor: pointer;
+
+          &:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border-color: rgba(239, 68, 68, 0.5);
+          }
+        }
+
+        &.btn-crud-edit {
+          color: #38bdf8;
+          border-color: rgba(56, 189, 248, 0.3);
+          background: rgba(56, 189, 248, 0.1);
+          padding: 0.75rem 0.65rem;
+          cursor: pointer;
+
+          &:hover {
+            background: rgba(56, 189, 248, 0.22);
+            color: #e0f2fe;
+            border-color: rgba(56, 189, 248, 0.6);
+          }
+        }
+
+        &.btn-crud-del {
+          color: #f43f5e;
+          border-color: rgba(244, 63, 94, 0.3);
+          background: rgba(244, 63, 94, 0.1);
+          padding: 0.75rem 0.65rem;
+          cursor: pointer;
+
+          &:hover {
+            background: rgba(244, 63, 94, 0.22);
+            color: #ffe4e6;
+            border-color: rgba(244, 63, 94, 0.6);
+          }
         }
       }
     }
@@ -1076,6 +1195,47 @@
         background: #4f46e5 !important;
         color: #ffffff !important;
         border-color: #4338ca !important;
+      }
+    }
+
+    .btn-card-cancel-x {
+      background: rgba(255, 255, 255, 0.9) !important;
+      border-color: #cbd5e1 !important;
+      color: #475569 !important;
+
+      &:hover {
+        background: #ef4444 !important;
+        border-color: #ef4444 !important;
+        color: #ffffff !important;
+      }
+    }
+
+    .btn-info.btn-crud-cancel {
+      background: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
+      color: #475569 !important;
+
+      &:hover {
+        background: #fee2e2 !important;
+        border-color: #fca5a5 !important;
+        color: #dc2626 !important;
+      }
+    }
+  }
+
+  .cancelled-restore-bar {
+    background: #fffbeb !important;
+    border-color: #fcd34d !important;
+    color: #92400e !important;
+
+    .btn-restore-all {
+      background: #fef3c7 !important;
+      border-color: #f59e0b !important;
+      color: #b45309 !important;
+
+      &:hover {
+        background: #fde68a !important;
+        color: #78350f !important;
       }
     }
   }

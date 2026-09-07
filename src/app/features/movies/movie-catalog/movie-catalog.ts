@@ -30,6 +30,7 @@ export class MovieCatalog implements OnInit, OnDestroy {
   movies: MovieResponseDto[] = [];
   loading: boolean = false;
   hasRequestedShowtimes: boolean = false;
+  cancelledMovieIds = new Set<string>();
 
   // Hero carousel
   heroMovies: MovieResponseDto[] = [];
@@ -62,6 +63,9 @@ export class MovieCatalog implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // 0. Load cancelled movies dismissed by user
+    this.loadCancelledMovieIds();
+
     // 1. Initial immediate render from local store
     this.refreshCatalog();
     if (this.heroMovies.length > 0) {
@@ -83,9 +87,54 @@ export class MovieCatalog implements OnInit, OnDestroy {
     this.stopAutoSlide();
   }
 
+  loadCancelledMovieIds(): void {
+    try {
+      const raw = localStorage.getItem('cineflow_cancelled_movies');
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr)) {
+          this.cancelledMovieIds = new Set(arr);
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to load cancelled movies', e);
+    }
+  }
+
+  saveCancelledMovieIds(): void {
+    try {
+      localStorage.setItem('cineflow_cancelled_movies', JSON.stringify(Array.from(this.cancelledMovieIds)));
+    } catch (e) {
+      console.warn('Failed to save cancelled movies', e);
+    }
+  }
+
+  cancelMovieUser(event: Event, movie: MovieResponseDto): void {
+    event.stopPropagation();
+    event.preventDefault();
+    const title = this.translationService.dynamic(movie.titleEnglish, movie.titleAmharic);
+
+    this.cancelledMovieIds.add(movie.id);
+    this.saveCancelledMovieIds();
+
+    // Remove immediately from active view
+    this.movies = this.movies.filter(m => m.id !== movie.id);
+    this.heroMovies = this.heroMovies.filter(m => m.id !== movie.id);
+    this.notificationService.info(`"${title}" has been cancelled from your catalog view.`, 'Movie Dismissed');
+    this.cdr.detectChanges();
+  }
+
+  restoreCancelledMovies(): void {
+    this.cancelledMovieIds.clear();
+    this.saveCancelledMovieIds();
+    this.refreshCatalog();
+    this.notificationService.success('All cancelled movies have been restored to your catalog.', 'Catalog Restored');
+  }
+
   refreshCatalog(): void {
     this.allMovies = this.apiService.getAllLocalMovies();
-    this.heroMovies = this.allMovies.slice(0, Math.min(3, this.allMovies.length));
+    const visibleMovies = this.allMovies.filter(m => !this.cancelledMovieIds.has(m.id));
+    this.heroMovies = visibleMovies.slice(0, Math.min(3, visibleMovies.length));
     if (this.currentHeroIndex >= this.heroMovies.length) {
       this.currentHeroIndex = 0;
     }
@@ -101,7 +150,8 @@ export class MovieCatalog implements OnInit, OnDestroy {
       next: (data) => {
         if (data && data.length > 0) {
           this.allMovies = data;
-          this.heroMovies = this.allMovies.slice(0, Math.min(3, this.allMovies.length));
+          const visibleMovies = this.allMovies.filter(m => !this.cancelledMovieIds.has(m.id));
+          this.heroMovies = visibleMovies.slice(0, Math.min(3, visibleMovies.length));
           if (this.currentHeroIndex >= this.heroMovies.length) {
             this.currentHeroIndex = 0;
           }
@@ -125,6 +175,11 @@ export class MovieCatalog implements OnInit, OnDestroy {
 
   applyFiltersInstant(): void {
     let result = this.apiService.applyLocalFilters(this.allMovies, this.filters);
+
+    // Filter out movies cancelled by user
+    if (this.cancelledMovieIds.size > 0) {
+      result = result.filter(m => !this.cancelledMovieIds.has(m.id));
+    }
 
     if (this.selectedGenreChip === 'Watchlist') {
       const watchlistIds = this.apiService.getWatchlistIds();
@@ -312,11 +367,19 @@ export class MovieCatalog implements OnInit, OnDestroy {
 
   editMovieAdmin(event: Event, movie: MovieResponseDto): void {
     event.stopPropagation();
+    if (!this.authService.isAdmin()) {
+      this.notificationService.error('Only Admins are authorized to edit movies.', 'Permission Denied');
+      return;
+    }
     this.router.navigate(['/admin/edit-movie', movie.id]);
   }
 
   deleteMovieAdmin(event: Event, movie: MovieResponseDto): void {
     event.stopPropagation();
+    if (!this.authService.isAdmin()) {
+      this.notificationService.error('Only Admins are authorized to permanently delete movies.', 'Permission Denied');
+      return;
+    }
     const title = this.translationService.dynamic(movie.titleEnglish, movie.titleAmharic);
 
     // Optimistically update lists
