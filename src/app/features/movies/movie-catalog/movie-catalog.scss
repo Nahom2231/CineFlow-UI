@@ -25,8 +25,6 @@
   .hero-slide {
     position: absolute;
     inset: 0;
-    background-size: cover;
-    background-position: center;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s ease;
@@ -38,6 +36,23 @@
       opacity: 1;
       visibility: visible;
       transform: scale(1);
+    }
+
+    .hero-bg-image {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      transition: transform 1.2s ease;
+      z-index: 0;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(7, 9, 14, 0.95) 20%, rgba(7, 9, 14, 0.75) 60%, rgba(7, 9, 14, 0.3) 100%),
+                  linear-gradient(to top, rgba(7, 9, 14, 1) 0%, transparent 40%);
+      z-index: 1;
     }
   }
 
@@ -147,7 +162,7 @@
       align-items: center;
       gap: 0.6rem;
       padding: 0.95rem 2rem;
-      background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
       color: #ffffff;
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: var(--radius-sm);
@@ -155,12 +170,13 @@
       font-weight: 700;
       font-family: var(--font-heading);
       cursor: pointer;
-      box-shadow: 0 6px 25px rgba(99, 102, 241, 0.5);
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
       transition: all 0.25s ease;
 
       &:hover {
-        transform: translateY(-2px) scale(1.02);
-        box-shadow: 0 8px 30px rgba(168, 85, 247, 0.6);
+        transform: translateY(-2px);
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
       }
     }
 
@@ -1095,22 +1111,64 @@
     color: #475569 !important;
   }
 
+  .hero-section {
+    background: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06) !important;
+  }
+
   .hero-slide {
     background: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06) !important;
 
-    .hero-backdrop {
-      filter: brightness(0.95) saturate(1.1) !important;
+    .hero-bg-image {
+      opacity: 0.28 !important;
+      filter: none !important;
     }
 
     .hero-overlay {
-      background: linear-gradient(90deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.88) 45%, rgba(255, 255, 255, 0.45) 100%),
-                  linear-gradient(0deg, rgba(255, 255, 255, 0.92) 0%, transparent 40%) !important;
+      background: linear-gradient(to right, rgba(255, 255, 255, 0.98) 20%, rgba(255, 255, 255, 0.88) 60%, rgba(255, 255, 255, 0.45) 100%),
+                  linear-gradient(to top, rgba(255, 255, 255, 0.96) 0%, transparent 40%) !important;
+    }
+
+    .hero-badge {
+      background: #eef2ff !important;
+      border: 1px solid #c7d2fe !important;
+      color: #4338ca !important;
     }
 
     .hero-title {
       color: #0f172a !important;
+      text-shadow: none !important;
+    }
+
+    .hero-title-amharic {
+      color: #475569 !important;
+    }
+
+    .hero-meta {
+      .meta-pill {
+        background: #f8fafc !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #334155 !important;
+
+        &.rating {
+          background: #fef3c7 !important;
+          border-color: #fde68a !important;
+          color: #b45309 !important;
+        }
+
+        &.genre {
+          background: #ede9fe !important;
+          border-color: #ddd6fe !important;
+          color: #5b21b6 !important;
+        }
+
+        &.language, &.duration, &.director {
+          background: #f1f5f9 !important;
+          border-color: #cbd5e1 !important;
+          color: #334155 !important;
+        }
+      }
     }
 
     .hero-synopsis {
@@ -1118,70 +1176,76 @@
       text-shadow: none !important;
     }
 
-    .slide-badge {
-      background: rgba(79, 70, 229, 0.1) !important;
-      color: #4f46e5 !important;
-      border-color: rgba(79, 70, 229, 0.2) !important;
-    }
-
-    .spec-pill {
-      background: #f1f5f9 !important;
-      color: #0f172a !important;
-      border-color: #cbd5e1 !important;
-    }
-
-    .btn-hero-secondary {
-      background: #f1f5f9 !important;
-      border-color: #cbd5e1 !important;
-      color: #0f172a !important;
-
-      &:hover {
-        background: #e2e8f0 !important;
+    .hero-actions {
+      .btn-hero-primary {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3) !important;
       }
-    }
 
-    .hero-controls {
-      .hero-arrow {
+      .btn-hero-secondary {
         background: #ffffff !important;
-        border-color: #cbd5e1 !important;
+        border: 1px solid #cbd5e1 !important;
         color: #0f172a !important;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05) !important;
 
         &:hover {
-          background: #4f46e5 !important;
-          border-color: #4f46e5 !important;
-          color: #ffffff !important;
-        }
-      }
-
-      .hero-dots .dot-btn {
-        background: #cbd5e1 !important;
-
-        &.active {
-          background: #4f46e5 !important;
+          background: #f1f5f9 !important;
+          border-color: #94a3b8 !important;
         }
       }
     }
   }
 
-  .perks-bar {
-    background: #ffffff !important;
-    border-color: #e2e8f0 !important;
-    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
+  .hero-controls {
+    .hero-arrow {
+      background: #ffffff !important;
+      border: 1px solid #cbd5e1 !important;
+      color: #0f172a !important;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1) !important;
 
-    .perk-item {
-      .perk-icon-wrap {
+      &:hover {
+        background: #4f46e5 !important;
+        border-color: #4f46e5 !important;
+        color: #ffffff !important;
+      }
+    }
+
+    .hero-dots .dot-btn {
+      background: #cbd5e1 !important;
+
+      &.active {
+        background: #4f46e5 !important;
+      }
+    }
+  }
+
+  /* 4 Perks Cards in Light Mode */
+  .perks-section {
+    .perk-card {
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06) !important;
+
+      .perk-icon {
         background: #f1f5f9 !important;
-        border-color: #e2e8f0 !important;
+        border: 1px solid #e2e8f0 !important;
       }
 
-      .perk-text {
-        strong {
+      .perk-info {
+        h4 {
           color: #0f172a !important;
         }
 
-        span {
+        p {
           color: #64748b !important;
         }
+      }
+
+      &:hover {
+        background: #f8fafc !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08) !important;
       }
     }
   }
