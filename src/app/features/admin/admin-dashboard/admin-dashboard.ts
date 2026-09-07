@@ -1,8 +1,10 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { forkJoin, finalize } from 'rxjs';
+import { forkJoin, finalize, Subscription } from 'rxjs';
 import { CineFlowApiService } from '../../../core/services/cineflow-api.service';
+import { MovieResponseDto } from '../../../core/models/CineFlow.model';
+import { NotificationService } from '../../../core/services/notification.service';
 
 export interface DashboardStats {
   totalTicketsSold: number;
@@ -27,9 +29,11 @@ export interface RevenueData {
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.scss'
 })
-export class AdminDashboard implements OnInit {
+export class AdminDashboard implements OnInit, OnDestroy {
   private apiService = inject(CineFlowApiService);
+  private notificationService = inject(NotificationService);
   private cdr = inject(ChangeDetectorRef);
+  private moviesSub?: Subscription;
 
   stats: DashboardStats = {
     totalTicketsSold: 0,
@@ -43,10 +47,35 @@ export class AdminDashboard implements OnInit {
 
   weeklyRevenue: RevenueData[] = [];
   topMovies: Array<{ name: string; ticketsSold: number; revenue: number }> = [];
+  moviesList: MovieResponseDto[] = [];
   loading: boolean = true;
+  deletingMovieId: string | null = null;
 
   ngOnInit(): void {
     this.loadDashboardStats();
+    this.loadMovies();
+
+    this.moviesSub = this.apiService.moviesUpdated$.subscribe(() => {
+      this.loadMovies();
+      this.loadDashboardStats();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.moviesSub?.unsubscribe();
+  }
+
+  loadMovies(): void {
+    this.apiService.getFilteredMovies({}).subscribe({
+      next: (data) => {
+        this.moviesList = data || [];
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.moviesList = this.apiService.getAllLocalMovies();
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   loadDashboardStats(): void {
@@ -82,6 +111,28 @@ export class AdminDashboard implements OnInit {
       },
       error: (err) => {
         console.error('Failed to load dashboard data:', err);
+      }
+    });
+  }
+
+  deleteMovie(movie: MovieResponseDto): void {
+    const title = movie.titleEnglish || 'this movie';
+
+    this.deletingMovieId = movie.id;
+    // Optimistically remove from list immediately
+    this.moviesList = this.moviesList.filter(m => m.id !== movie.id);
+    this.notificationService.success(`"${title}" deleted from catalog.`, 'Movie Removed');
+    this.cdr.detectChanges();
+
+    this.apiService.deleteMovie(movie.id).subscribe({
+      next: () => {
+        this.deletingMovieId = null;
+        this.loadMovies();
+        this.loadDashboardStats();
+      },
+      error: () => {
+        this.deletingMovieId = null;
+        this.loadMovies();
       }
     });
   }

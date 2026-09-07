@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { CineFlowApiService } from '../../../core/services/cineflow-api.service';
 import { AuthService } from '../../../core/services/auth';
+import { NotificationService } from '../../../core/services/notification.service';
 
 export interface BookingHistory {
   ticketId: string;
@@ -28,6 +29,7 @@ export interface BookingHistory {
 export class BookingHistory implements OnInit {
   private apiService = inject(CineFlowApiService);
   private authService = inject(AuthService);
+  private notificationService = inject(NotificationService);
   private router = inject(Router);
 
   bookings: BookingHistory[] = [];
@@ -65,6 +67,21 @@ export class BookingHistory implements OnInit {
       return this.bookings;
     }
     return this.bookings.filter(b => b.status === this.activeTab);
+  }
+
+  cancelBooking(booking: BookingHistory): void {
+    // Optimistically update status
+    booking.status = 'cancelled';
+    this.notificationService.info(`Ticket pass #${booking.ticketId} has been cancelled.`, 'Booking Cancelled');
+
+    this.apiService.cancelBooking(booking.ticketId).subscribe({
+      next: () => {
+        this.loadBookings();
+      },
+      error: () => {
+        this.loadBookings();
+      }
+    });
   }
 
   downloadQR(booking: BookingHistory): void {

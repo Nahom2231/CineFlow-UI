@@ -146,6 +146,24 @@ export class MovieDetails implements OnInit, OnDestroy {
     this.router.navigate(['/movies']);
   }
 
+  editMovie(): void {
+    if (this.movie) {
+      this.router.navigate(['/admin/edit-movie', this.movie.id]);
+    }
+  }
+
+  deleteMovie(): void {
+    if (!this.movie) return;
+    this.apiService.deleteMovie(this.movie.id).subscribe({
+      next: () => {
+        this.router.navigate(['/movies']);
+      },
+      error: () => {
+        this.router.navigate(['/movies']);
+      }
+    });
+  }
+
   onImageError(event: Event): void {
     const target = event.target as HTMLImageElement;
     if (target) {

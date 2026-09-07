@@ -1,11 +1,13 @@
-import { Component, OnInit, inject, OnDestroy } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { CineFlowApiService } from '../../../core/services/cineflow-api.service';
 import { MovieResponseDto, MovieFilterParams, ScheduleDto } from '../../../core/models/CineFlow.model';
 import { TranslationService } from '../../../core/services/translation.service';
 import { NotificationService } from '../../../core/services/notification.service';
+import { AuthService } from '../../../core/services/auth';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
@@ -19,7 +21,10 @@ export class MovieCatalog implements OnInit, OnDestroy {
   private apiService = inject(CineFlowApiService);
   public translationService = inject(TranslationService);
   private notificationService = inject(NotificationService);
+  public authService = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
+  private moviesSub?: Subscription;
 
   allMovies: MovieResponseDto[] = [];
   movies: MovieResponseDto[] = [];
@@ -57,21 +62,35 @@ export class MovieCatalog implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // 1. Preload local/cached movies and display immediately
-    this.allMovies = this.apiService.getAllLocalMovies();
-    if (this.allMovies.length > 0) {
-      this.heroMovies = this.allMovies.slice(0, 3);
+    // 1. Initial immediate render from local store
+    this.refreshCatalog();
+    if (this.heroMovies.length > 0) {
       this.startAutoSlide();
-      this.hasRequestedShowtimes = true;
-      this.applyFiltersInstant();
     }
+    this.hasRequestedShowtimes = true;
 
     // 2. Fetch fresh updates in background seamlessly
     this.loadMovies(true);
+
+    // 3. Reactively sync whenever any movie is created, edited, or deleted anywhere in the app
+    this.moviesSub = this.apiService.moviesUpdated$.subscribe(() => {
+      this.refreshCatalog();
+    });
   }
 
   ngOnDestroy(): void {
+    this.moviesSub?.unsubscribe();
     this.stopAutoSlide();
+  }
+
+  refreshCatalog(): void {
+    this.allMovies = this.apiService.getAllLocalMovies();
+    this.heroMovies = this.allMovies.slice(0, Math.min(3, this.allMovies.length));
+    if (this.currentHeroIndex >= this.heroMovies.length) {
+      this.currentHeroIndex = 0;
+    }
+    this.applyFiltersInstant();
+    this.cdr.detectChanges();
   }
 
   loadMovies(silent: boolean = false): void {
@@ -82,8 +101,11 @@ export class MovieCatalog implements OnInit, OnDestroy {
       next: (data) => {
         if (data && data.length > 0) {
           this.allMovies = data;
-          if (this.heroMovies.length === 0) {
-            this.heroMovies = this.allMovies.slice(0, 3);
+          this.heroMovies = this.allMovies.slice(0, Math.min(3, this.allMovies.length));
+          if (this.currentHeroIndex >= this.heroMovies.length) {
+            this.currentHeroIndex = 0;
+          }
+          if (this.heroMovies.length > 0 && !this.autoSlideTimer) {
             this.startAutoSlide();
           }
           if (this.isSelectionActive) {
@@ -91,10 +113,12 @@ export class MovieCatalog implements OnInit, OnDestroy {
           }
         }
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.warn('Catalog background sync: using local catalog', err?.status);
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -284,6 +308,31 @@ export class MovieCatalog implements OnInit, OnDestroy {
 
   viewMovieDetails(movie: MovieResponseDto): void {
     this.router.navigate(['/movie', movie.id], { state: { movie } });
+  }
+
+  editMovieAdmin(event: Event, movie: MovieResponseDto): void {
+    event.stopPropagation();
+    this.router.navigate(['/admin/edit-movie', movie.id]);
+  }
+
+  deleteMovieAdmin(event: Event, movie: MovieResponseDto): void {
+    event.stopPropagation();
+    const title = this.translationService.dynamic(movie.titleEnglish, movie.titleAmharic);
+
+    // Optimistically update lists
+    this.allMovies = this.allMovies.filter(m => m.id !== movie.id);
+    this.movies = this.movies.filter(m => m.id !== movie.id);
+    this.heroMovies = this.heroMovies.filter(m => m.id !== movie.id);
+    this.notificationService.success(`"${title}" deleted from catalog.`, 'Movie Removed');
+
+    this.apiService.deleteMovie(movie.id).subscribe({
+      next: () => {
+        this.loadMovies(true);
+      },
+      error: () => {
+        this.loadMovies(true);
+      }
+    });
   }
 
   onImageError(event: Event): void {

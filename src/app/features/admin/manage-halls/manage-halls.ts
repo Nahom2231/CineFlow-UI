@@ -111,7 +111,7 @@ export class ManageHalls implements OnInit {
 
     this.apiService.createCinemaHall(this.newHall as CinemaHall).subscribe({
       next: () => {
-        this.message = '✓ Cinema hall created successfully!';
+        this.message = 'Cinema hall created successfully!';
         this.isSuccess = true;
         this.resetForm();
         this.showAddForm = false;
@@ -133,31 +133,29 @@ export class ManageHalls implements OnInit {
     const targetHall = this.halls.find(h => h.id === id);
     const hallName = targetHall ? targetHall.hallName : 'this hall';
 
-    if (confirm(`Are you sure you want to delete "${hallName}"?`)) {
-      // 1. Optimistically remove from UI immediately for 0ms lag
-      this.halls = this.halls.filter(h => String(h.id).toLowerCase() !== String(id).toLowerCase());
-      this.message = `✓ "${hallName}" deleted successfully!`;
-      this.isSuccess = true;
-      this.cdr.detectChanges();
+    // 1. Optimistically remove from UI immediately for 0ms lag
+    this.halls = this.halls.filter(h => String(h.id).toLowerCase() !== String(id).toLowerCase());
+    this.message = `"${hallName}" deleted successfully!`;
+    this.isSuccess = true;
+    this.cdr.detectChanges();
 
-      // 2. Execute deletion via service
-      this.apiService.deleteCinemaHall(id).subscribe({
-        next: () => {
-          this.loadHalls();
-          setTimeout(() => {
-            this.message = '';
-            this.cdr.detectChanges();
-          }, 3500);
-        },
-        error: () => {
-          this.loadHalls();
-          setTimeout(() => {
-            this.message = '';
-            this.cdr.detectChanges();
-          }, 3500);
-        }
-      });
-    }
+    // 2. Execute deletion via service
+    this.apiService.deleteCinemaHall(id).subscribe({
+      next: () => {
+        this.loadHalls();
+        setTimeout(() => {
+          this.message = '';
+          this.cdr.detectChanges();
+        }, 3500);
+      },
+      error: () => {
+        this.loadHalls();
+        setTimeout(() => {
+          this.message = '';
+          this.cdr.detectChanges();
+        }, 3500);
+      }
+    });
   }
 
   editHall(hall: CinemaHall): void {
@@ -184,7 +182,7 @@ export class ManageHalls implements OnInit {
     if (this.editingId) {
       this.apiService.updateCinemaHall(this.editingId, this.newHall as CinemaHall).subscribe({
         next: () => {
-          this.message = '✓ Cinema hall updated successfully!';
+          this.message = 'Cinema hall updated successfully!';
           this.isSuccess = true;
           this.resetForm();
           this.showAddForm = false;
