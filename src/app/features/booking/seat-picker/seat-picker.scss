@@ -1206,3 +1206,363 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* =========================================================
+   Light Mode Specific Overrides for Seat Picker (Strictly Bright)
+   ========================================================= */
+[data-theme="light"], body.light-theme {
+  .booking-experience {
+    color: #0f172a !important;
+  }
+
+  .booking-header {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+
+    .btn-back {
+      background: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+
+      &:hover {
+        background: #e2e8f0 !important;
+        color: #4f46e5 !important;
+      }
+    }
+
+    .movie-pill {
+      background: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05) !important;
+
+      .hall-badge {
+        color: #0f172a !important;
+      }
+
+      .time-badge {
+        color: #0284c7 !important;
+      }
+    }
+  }
+
+  .seat-picker-section {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06) !important;
+
+    .auditorium-header {
+      .main-title {
+        color: #0f172a !important;
+      }
+
+      .subtitle {
+        color: #475569 !important;
+      }
+
+      .timer-banner {
+        background: #fffbeb !important;
+        border-color: #fde68a !important;
+        box-shadow: 0 2px 10px rgba(245, 158, 11, 0.15) !important;
+
+        .timer-info {
+          .timer-label {
+            color: #92400e !important;
+
+            strong {
+              color: #78350f !important;
+            }
+          }
+
+          .timer-countdown {
+            color: #d97706 !important;
+          }
+        }
+      }
+    }
+
+    .screen-stage {
+      .curved-screen {
+        background: linear-gradient(90deg, transparent 0%, #0284c7 20%, #e0f2fe 50%, #0284c7 80%, transparent 100%) !important;
+        box-shadow: 0 8px 24px rgba(2, 132, 199, 0.25) !important;
+      }
+
+      .screen-label {
+        color: #64748b !important;
+      }
+    }
+
+    .seat-matrix {
+      .matrix-row {
+        &.vip-row-wrap {
+          background: #fffbeb !important;
+          border-color: #fde68a !important;
+        }
+
+        .row-label-badge {
+          background: #f1f5f9 !important;
+          border-color: #cbd5e1 !important;
+          color: #334155 !important;
+
+          &.vip {
+            background: #fef3c7 !important;
+            border-color: #f59e0b !important;
+            color: #92400e !important;
+          }
+        }
+      }
+    }
+
+    .seat-btn {
+      &.available:not(.vip):not(.selected):not(.occupied) {
+        background: #f8fafc !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #0f172a !important;
+
+        &:hover {
+          background: #e0f2fe !important;
+          border-color: #0284c7 !important;
+          color: #0369a1 !important;
+        }
+      }
+
+      &.vip:not(.selected):not(.occupied) {
+        background: #fef3c7 !important;
+        border: 1px solid #f59e0b !important;
+        color: #92400e !important;
+
+        .seat-icon {
+          color: #d97706 !important;
+        }
+
+        .seat-num {
+          color: #78350f !important;
+        }
+
+        &:hover {
+          background: #fde68a !important;
+          border-color: #d97706 !important;
+          color: #78350f !important;
+        }
+      }
+
+      &.occupied, &:disabled:not(.selected) {
+        background: #f1f5f9 !important;
+        border: 1px solid #e2e8f0 !important;
+        color: #94a3b8 !important;
+
+        .seat-num {
+          color: #94a3b8 !important;
+        }
+      }
+    }
+
+    .seat-legend {
+      border-top-color: #e2e8f0 !important;
+
+      .legend-item {
+        .legend-box.available {
+          background: #f8fafc !important;
+          border-color: #cbd5e1 !important;
+        }
+
+        .legend-box.vip {
+          background: #fef3c7 !important;
+          border-color: #f59e0b !important;
+        }
+
+        .legend-box.occupied {
+          background: #f1f5f9 !important;
+          border-color: #e2e8f0 !important;
+        }
+
+        .legend-info {
+          .legend-text {
+            color: #0f172a !important;
+          }
+
+          .legend-count {
+            color: #64748b !important;
+          }
+        }
+      }
+    }
+  }
+
+  .checkout-panel {
+    .ticket-preview-card {
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05) !important;
+
+      .preview-meta {
+        .preview-title-en {
+          color: #0f172a !important;
+        }
+
+        .preview-specs .spec-tag {
+          background: #f1f5f9 !important;
+          border-color: #cbd5e1 !important;
+          color: #334155 !important;
+        }
+      }
+    }
+
+    .selection-summary {
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05) !important;
+
+      .summary-row {
+        .summary-label {
+          color: #475569 !important;
+        }
+
+        .summary-val {
+          color: #0f172a !important;
+
+          &.vip-extra {
+            color: #d97706 !important;
+          }
+        }
+
+        .seat-badge-wrap .seat-highlight.unselected {
+          background: #f1f5f9 !important;
+          border-color: #cbd5e1 !important;
+          color: #64748b !important;
+        }
+
+        &.total-row {
+          .total-label {
+            color: #0f172a !important;
+          }
+
+          .total-price {
+            color: #0284c7 !important;
+            text-shadow: none !important;
+          }
+        }
+      }
+
+      .summary-divider {
+        background: #e2e8f0 !important;
+      }
+    }
+
+    .payment-box.chapa-dedicated-box {
+      background: #ffffff !important;
+      border: 1px solid #a7f3d0 !important;
+      box-shadow: 0 6px 24px rgba(16, 185, 129, 0.1) !important;
+
+      .chapa-brand-header {
+        border-bottom-color: #e2e8f0 !important;
+
+        .chapa-main-title {
+          color: #0f172a !important;
+        }
+      }
+
+      .chapa-desc {
+        color: #475569 !important;
+      }
+
+      .chapa-rails-list .rail-pill {
+        background: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+        color: #334155 !important;
+      }
+
+      .phone-input-group {
+        label {
+          color: #334155 !important;
+        }
+
+        .input-wrapper {
+          background: #ffffff !important;
+          border-color: #cbd5e1 !important;
+
+          .country-prefix {
+            background: #f8fafc !important;
+            border-right-color: #cbd5e1 !important;
+            color: #334155 !important;
+          }
+
+          input {
+            color: #0f172a !important;
+
+            &::placeholder {
+              color: #94a3b8 !important;
+            }
+          }
+        }
+
+        .quick-wallet-chips .wallet-chip {
+          background: #f1f5f9 !important;
+          border-color: #cbd5e1 !important;
+          color: #334155 !important;
+
+          &:hover {
+            background: #dcfce7 !important;
+            border-color: #86efac !important;
+            color: #15803d !important;
+          }
+        }
+      }
+    }
+  }
+
+  .payment-modal-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 25px 60px rgba(15, 23, 42, 0.2) !important;
+
+    .modal-header {
+      border-bottom-color: #e2e8f0 !important;
+
+      .amount-tag {
+        color: #0f172a !important;
+      }
+    }
+
+    .modal-body {
+      .modal-status-title {
+        color: #0f172a !important;
+      }
+
+      .modal-prompt-text {
+        color: #475569 !important;
+      }
+
+      .modal-txn-box {
+        background: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+
+        .txn-ref {
+          color: #0284c7 !important;
+        }
+      }
+
+      .modal-meta-grid .meta-cell {
+        background: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+
+        .c-val {
+          color: #0f172a !important;
+        }
+      }
+    }
+
+    .modal-footer {
+      border-top-color: #e2e8f0 !important;
+
+      .btn-cancel-modal {
+        border-color: #cbd5e1 !important;
+        color: #475569 !important;
+
+        &:hover {
+          background: #f1f5f9 !important;
+          color: #0f172a !important;
+        }
+      }
+    }
+  }
+}

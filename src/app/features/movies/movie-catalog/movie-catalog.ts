@@ -112,7 +112,6 @@ export class MovieCatalog implements OnInit, OnDestroy {
   cancelMovieUser(event: Event, movie: MovieResponseDto): void {
     event.stopPropagation();
     event.preventDefault();
-    const title = this.translationService.dynamic(movie.titleEnglish, movie.titleAmharic);
 
     this.cancelledMovieIds.add(movie.id);
     this.saveCancelledMovieIds();
@@ -120,7 +119,6 @@ export class MovieCatalog implements OnInit, OnDestroy {
     // Remove immediately from active view
     this.movies = this.movies.filter(m => m.id !== movie.id);
     this.heroMovies = this.heroMovies.filter(m => m.id !== movie.id);
-    this.notificationService.info(`"${title}" has been cancelled from your catalog view.`, 'Movie Dismissed');
     this.cdr.detectChanges();
   }
 

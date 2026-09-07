@@ -6,10 +6,12 @@
   --bg-surface: #0f1422;
   --bg-card: rgba(18, 25, 42, 0.75);
   --bg-card-hover: rgba(28, 38, 64, 0.9);
-  --bg-glass: rgba(255, 255, 255, 0.03);
+  --bg-glass: rgba(255, 255, 255, 0.04);
+  --bg-glass-strong: rgba(15, 23, 42, 0.85);
   
   --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-focus: rgba(99, 102, 241, 0.5);
+  --border-glass: rgba(255, 255, 255, 0.12);
+  --border-focus: rgba(99, 102, 241, 0.6);
   
   --primary: #6366f1;
   --primary-glow: rgba(99, 102, 241, 0.35);
@@ -30,6 +32,7 @@
   --radius-xl: 28px;
   
   --shadow-card: 0 12px 32px -4px rgba(0, 0, 0, 0.5), 0 4px 12px -2px rgba(0, 0, 0, 0.3);
+  --shadow-glass: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   --shadow-glow: 0 0 25px -3px var(--primary-glow);
 
   --bg-gradient: 
@@ -46,12 +49,14 @@
   
   --bg-main: #f8fafc;
   --bg-surface: #ffffff;
-  --bg-card: #ffffff;
+  --bg-card: rgba(255, 255, 255, 0.9);
   --bg-card-hover: #f1f5f9;
-  --bg-glass: #f1f5f9;
+  --bg-glass: rgba(255, 255, 255, 0.85);
+  --bg-glass-strong: #ffffff;
   
   --border-subtle: #cbd5e1;
-  --border-focus: #6366f1;
+  --border-glass: rgba(203, 213, 225, 0.8);
+  --border-focus: #4f46e5;
   
   --primary: #4f46e5;
   --primary-glow: rgba(79, 70, 229, 0.15);
@@ -72,9 +77,13 @@
   --radius-xl: 28px;
 
   --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+  --shadow-glass: 0 10px 30px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.8);
   --shadow-glow: 0 0 15px -3px rgba(79, 70, 229, 0.15);
 
-  --bg-gradient: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  --bg-gradient: 
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(99, 102, 241, 0.06) 0%, transparent 60%),
+    radial-gradient(circle at 90% 20%, rgba(6, 182, 212, 0.05) 0%, transparent 40%),
+    linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
 * {
@@ -124,7 +133,7 @@ a {
   text-decoration: none;
 }
 
-/* Common form inputs */
+/* Common form inputs with glass effect */
 input, select, textarea {
   width: 100%;
   padding: 0.85rem 1.1rem;
@@ -206,6 +215,8 @@ label {
   font-family: var(--font-heading);
   cursor: pointer;
   transition: all 0.25s ease;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 
   &:hover {
     background: var(--bg-card-hover);
@@ -217,17 +228,23 @@ label {
 /* Glass card styling */
 .glass-panel {
   background: var(--bg-card);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-glass);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 @keyframes pulseGlow {
@@ -237,6 +254,10 @@ label {
 
 .animate-fade-in {
   animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-pop {
+  animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* SVG Icon Utility Styling */
@@ -249,13 +270,21 @@ label {
   stroke-linecap: round;
   stroke-linejoin: round;
 
+  &.icon-xs {
+    width: 0.75em;
+    height: 0.75em;
+  }
   &.icon-sm {
     width: 0.9em;
     height: 0.9em;
   }
+  &.icon-md {
+    width: 1.15em;
+    height: 1.15em;
+  }
   &.icon-lg {
-    width: 1.4em;
-    height: 1.4em;
+    width: 1.45em;
+    height: 1.45em;
   }
   &.icon-xl {
     width: 2em;
@@ -277,13 +306,55 @@ label {
     color: #0284c7;
     stroke: #0284c7;
   }
+  &.icon-rose {
+    color: #f43f5e;
+    stroke: #f43f5e;
+  }
+  &.icon-cyan {
+    color: #06b6d4;
+    stroke: #06b6d4;
+  }
 }
 
 /* =========================================================
-   Global Light Mode Clean Overrides (Removal of dark shadows & Vibrant Colored Text)
+   Angular Material / M3 Design System Tokens & Surfaces
+   ========================================================= */
+:root {
+  --mat-elevation-z1: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  --mat-elevation-z2: 0 3px 6px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.12);
+  --mat-elevation-z3: 0 10px 20px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.10);
+  --mat-elevation-z4: 0 14px 28px rgba(0, 0, 0, 0.18), 0 10px 10px rgba(0, 0, 0, 0.12);
+  --mat-elevation-z5: 0 19px 38px rgba(0, 0, 0, 0.22), 0 15px 12px rgba(0, 0, 0, 0.15);
+  --mat-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="light"], body.light-theme {
+  --mat-elevation-z1: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --mat-elevation-z2: 0 3px 8px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.04);
+  --mat-elevation-z3: 0 8px 20px rgba(15, 23, 42, 0.08), 0 3px 6px rgba(15, 23, 42, 0.04);
+  --mat-elevation-z4: 0 12px 28px rgba(15, 23, 42, 0.10), 0 6px 10px rgba(15, 23, 42, 0.04);
+  --mat-elevation-z5: 0 16px 36px rgba(15, 23, 42, 0.12), 0 8px 14px rgba(15, 23, 42, 0.06);
+}
+
+/* Material Header Icon Alignment */
+h1, h2, h3, h4, h5, h6 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  .ui-icon {
+    display: inline-flex;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+}
+
+/* =========================================================
+   Global Light Mode Clean Overrides (Strictly Bright, Zero Dark Surfaces)
    ========================================================= */
 [data-theme="light"], body.light-theme {
-  /* Remove dark projector beam and ambient shadow overlays */
+  /* Deactivate dark ambient beams in light mode */
   .ambient-cinema-bg {
     display: none !important;
   }
@@ -292,38 +363,85 @@ label {
     color: #0f172a !important;
   }
 
+  p, span, label, td, th {
+    color: inherit;
+  }
+
   /* Clear light input borders and readable dark text */
   input, select, textarea {
     background-color: #ffffff !important;
     border-color: #cbd5e1 !important;
     color: #0f172a !important;
-    box-shadow: none !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
 
     &:focus {
       border-color: #4f46e5 !important;
       box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
     }
+
+    &::placeholder {
+      color: #94a3b8 !important;
+    }
   }
 
   /* Clear light secondary buttons */
   .btn-secondary {
-    background-color: #f1f5f9 !important;
+    background: #ffffff !important;
     border-color: #cbd5e1 !important;
     color: #0f172a !important;
-    box-shadow: none !important;
+    box-shadow: var(--mat-elevation-z1) !important;
 
     &:hover {
-      background-color: #e2e8f0 !important;
+      background: #f1f5f9 !important;
       border-color: #94a3b8 !important;
       color: #4f46e5 !important;
+      box-shadow: var(--mat-elevation-z2) !important;
     }
   }
 
-  /* Crisp high-contrast panels with zero heavy dark shadows */
-  .glass-panel, .card, .movie-card, .sidebar-panel, .modal-card {
+  /* Material Chip / Pill Styling in Light Mode */
+  .chip, .badge, .spec-pill, .genre-chip, .tab-btn {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #334155;
+  }
+
+  /* Crisp high-contrast panels with clean light backgrounds */
+  .glass-panel, 
+  .card, 
+  .movie-card, 
+  .sidebar-panel, 
+  .modal-card, 
+  .form-panel,
+  .auth-card,
+  .auth-card-panel,
+  .form-container,
+  .table-container,
+  .metric-card,
+  .action-card,
+  .analytics-panel,
+  .empty-state {
     background: #ffffff !important;
     border: 1px solid #e2e8f0 !important;
-    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04) !important;
+    box-shadow: var(--mat-elevation-z2) !important;
+  }
+
+  /* Report & Data Tables in Light Mode */
+  table {
+    thead th {
+      background: #f1f5f9 !important;
+      color: #0f172a !important;
+      border-bottom: 2px solid #cbd5e1 !important;
+    }
+
+    tbody td {
+      border-bottom: 1px solid #e2e8f0 !important;
+      color: #334155 !important;
+    }
+
+    tbody tr:hover {
+      background: #f8fafc !important;
+    }
   }
 
   /* Colored text highlights for Light Mode */
@@ -349,3 +467,4 @@ label {
     color: #0284c7 !important;
   }
 }
+

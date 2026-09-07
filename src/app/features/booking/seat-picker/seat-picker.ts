@@ -371,7 +371,7 @@ export class SeatPicker implements OnInit, OnDestroy {
     // Open transaction modal to inform customer of gateway connection
     this.isPaymentModalOpen = true;
     this.paymentStep = 'initiating';
-    this.paymentPromptMessage = `⚡ Connecting to Chapa Ethiopian Payment Gateway for ${paymentRequest.email}...`;
+    this.paymentPromptMessage = `Connecting to Chapa Ethiopian Payment Gateway for ${paymentRequest.email}...`;
     this.cdr.detectChanges();
 
     // Call CineFlow API / PaymentController Initialize Service
@@ -418,21 +418,27 @@ export class SeatPicker implements OnInit, OnDestroy {
         sessionStorage.setItem(`cineflow_pending_chapa_${finalRef}`, JSON.stringify(pendingDetails));
         sessionStorage.setItem(`cineflow_pending_chapa_${encryptedRef}`, JSON.stringify(pendingDetails));
 
-        // Real-time payment clearance flow -> automatically redirects forward to /ticket-confirmation
-        setTimeout(() => {
-          this.paymentStep = 'awaiting_pin';
-          this.paymentPromptMessage = `💳 Gateway handshake secured. Verifying Chapa clearance for ${this.totalAmount} ETB...`;
+        if (res.checkoutUrl) {
+          this.checkoutRedirectUrl = res.checkoutUrl;
+          this.paymentStep = 'verifying';
+          this.paymentPromptMessage = `Connecting to Chapa Checkout... Redirecting to payment page...`;
           this.cdr.detectChanges();
 
           setTimeout(() => {
-            this.paymentStep = 'verifying';
-            this.paymentPromptMessage = `🏦 Processing instant multi-bank clearance (Telebirr / CBE / Awash / Card)...`;
-            this.cdr.detectChanges();
+            if (res.checkoutUrl) {
+              window.location.href = res.checkoutUrl;
+            }
+          }, 600);
+        } else {
+          // Fallback simulation mode when no checkoutUrl is returned
+          this.paymentStep = 'verifying';
+          this.paymentPromptMessage = `Verifying clearance for ${this.totalAmount} ETB...`;
+          this.cdr.detectChanges();
 
-            // Finalize ticket booking and navigate directly forward to ticket confirmation pass
+          setTimeout(() => {
             this.executeTicketBooking(cleanPhone, finalRef);
           }, 800);
-        }, 600);
+        }
       },
       error: (err) => {
         this.isBooking = false;

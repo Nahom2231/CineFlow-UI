@@ -540,6 +540,11 @@
     border: 1px solid #e2e8f0 !important;
     box-shadow: 0 10px 40px rgba(15, 23, 42, 0.08) !important;
 
+    .backdrop-glow {
+      opacity: 0.1 !important;
+      filter: blur(40px) brightness(1.2) !important;
+    }
+
     .title-en {
       color: #0f172a !important;
     }

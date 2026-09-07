@@ -25,7 +25,10 @@
     <section class="seat-picker-section">
       <div class="auditorium-header">
         <div class="title-wrap">
-          <h1 class="main-title">{{ 'SEAT_PICKER_TITLE' | translate }}</h1>
+          <h1 class="main-title">
+            <svg class="ui-icon icon-rose" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/><circle cx="12" cy="13" r="2"/></svg>
+            {{ 'SEAT_PICKER_TITLE' | translate }}
+          </h1>
           <p class="subtitle">{{ 'SELECT_TIME_PROMPT' | translate }}</p>
         </div>
 
@@ -379,11 +382,17 @@
         <h3 class="modal-status-title">
           <span *ngIf="paymentStep === 'initiating'">Connecting to Chapa Payment Gateway...</span>
           <span *ngIf="paymentStep === 'awaiting_pin'">Securing Chapa Transaction Handshake...</span>
-          <span *ngIf="paymentStep === 'verifying'">Verifying Multi-Bank Clearance...</span>
+          <span *ngIf="paymentStep === 'verifying'">Redirecting to Chapa Checkout...</span>
           <span *ngIf="paymentStep === 'success'" style="color: #34d399;">Chapa Payment Approved & Verified!</span>
         </h3>
 
         <p class="modal-prompt-text">{{ paymentPromptMessage }}</p>
+
+        <div *ngIf="checkoutRedirectUrl" style="margin: 0.75rem 0; text-align: center;">
+          <a [href]="checkoutRedirectUrl" style="display: inline-block; background: #059669; color: #fff; padding: 0.6rem 1.2rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem;">
+            Proceed to Chapa Payment Page →
+          </a>
+        </div>
 
         <div class="modal-txn-box">
           <span class="label">Chapa Transaction Reference:</span>

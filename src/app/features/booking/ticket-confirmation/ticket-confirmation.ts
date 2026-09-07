@@ -39,9 +39,9 @@ export class TicketConfirmation implements OnInit {
 
   get seatTier(): string {
     if (this.seatNumber && (this.seatNumber.startsWith('D') || this.seatNumber.startsWith('E'))) {
-      return '👑 VIP Recliner';
+      return 'VIP Recliner';
     }
-    return '💺 Standard Seat';
+    return 'Standard Seat';
   }
 
   get vatAmount(): number {
@@ -95,6 +95,17 @@ export class TicketConfirmation implements OnInit {
 
     // 2. Check if returning directly from Chapa redirect (?tx_ref=... or ?trx_ref=...)
     if (txRef) {
+      const txnStatus = (qParams['status'] || '').toLowerCase();
+      if (txnStatus === 'cancel' || txnStatus === 'cancelled' || txnStatus === 'failed') {
+        this.notificationService.error('Payment was not completed on Chapa. Please choose your seat and try again.', 'Payment Cancelled');
+        const pendingStr = sessionStorage.getItem(`cineflow_pending_chapa_${txRef}`);
+        const pending = pendingStr ? JSON.parse(pendingStr) : null;
+        if (pending?.scheduleId) {
+          this.router.navigate(['/book', pending.scheduleId]);
+          return;
+        }
+      }
+
       this.loading = true;
       const pendingStr = sessionStorage.getItem(`cineflow_pending_chapa_${txRef}`);
       const pending = pendingStr ? JSON.parse(pendingStr) : null;
@@ -116,8 +127,43 @@ export class TicketConfirmation implements OnInit {
           this.bookingDateTime = new Date().toISOString();
           this.updateQrCode();
           this.loading = false;
+
+          // If pending booking details exist, persist ticket to backend DB
+          if (pending?.scheduleId && this.apiService.isGuid(pending.scheduleId)) {
+            this.apiService.bookTicket({
+              scheduleId: pending.scheduleId,
+              seatNumber: pending.seatNumber,
+              paymentPhoneNumber: pending.phoneNumber || '0911223344',
+              paymentProvider: 'chapa'
+            }).subscribe({
+              next: (bookRes) => {
+                if (bookRes?.ticketId) {
+                  this.ticketId = bookRes.ticketId;
+                  this.updateQrCode();
+                }
+                this.saveConfirmedBookingLocally();
+              },
+              error: (err) => {
+                console.warn('Backend ticket persistence notice:', err);
+                this.saveConfirmedBookingLocally();
+              }
+            });
+          } else {
+            this.saveConfirmedBookingLocally();
+          }
+
+          // Clean up session storage
+          try {
+            sessionStorage.removeItem(`cineflow_pending_chapa_${txRef}`);
+            if (pending?.encryptedReference) {
+              sessionStorage.removeItem(`cineflow_pending_chapa_${pending.encryptedReference}`);
+            }
+          } catch (e) {
+            console.warn('Could not clear sessionStorage:', e);
+          }
         },
         error: () => {
+          this.notificationService.error('Could not verify Chapa payment transaction with gateway.', 'Verification Error');
           this.loading = false;
         }
       });
@@ -247,6 +293,25 @@ export class TicketConfirmation implements OnInit {
   // Print Ticket
   printTicket(): void {
     window.print();
+  }
+
+  saveConfirmedBookingLocally(): void {
+    this.apiService.saveBookingLocally({
+      ticketId: this.ticketId,
+      movieTitle: this.movieTitle,
+      movieTitleAmharic: this.movieTitleAmharic,
+      seatNumber: this.seatNumber,
+      scheduleTime: this.scheduleTime,
+      cinemaHall: this.cinemaHall,
+      cinemaLocation: this.cinemaLocation,
+      ticketPrice: this.ticketPrice,
+      paymentProvider: 'Chapa Payment Gateway',
+      bookingDateTime: this.bookingDateTime || new Date().toISOString(),
+      qrCodeUrl: this.qrCodeUrl,
+      transactionReference: this.transactionReference,
+      customerEmail: this.customerEmail,
+      phoneNumber: this.customerPhone
+    });
   }
 
   // Navigate back to movies

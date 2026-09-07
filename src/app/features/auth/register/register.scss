@@ -253,6 +253,88 @@
   }
 }
 
+/* Light Theme Overrides */
+[data-theme="light"],
+body.light-theme {
+  .auth-page-container {
+    color: #0f172a;
+  }
+
+  .auth-card-panel {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+    .auth-header {
+      h2 {
+        color: #0f172a;
+      }
+      .subtitle {
+        color: #475569;
+      }
+    }
+
+    .auth-form {
+      .form-group {
+        label {
+          color: #1e293b;
+        }
+
+        .input-container {
+          .field-icon {
+            color: #94a3b8;
+          }
+
+          input {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            color: #0f172a;
+
+            &:focus {
+              background: #ffffff;
+              border-color: #e11d48;
+              box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.15);
+            }
+
+            &::placeholder {
+              color: #94a3b8;
+            }
+          }
+        }
+      }
+
+      .password-checklist {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+
+        .check-item {
+          color: #64748b;
+
+          &.valid {
+            color: #059669;
+
+            .icon {
+              color: #059669;
+            }
+          }
+        }
+      }
+
+      .auth-footer {
+        border-top-color: #e2e8f0;
+
+        p {
+          color: #64748b;
+        }
+
+        .btn-switch-auth {
+          color: #0284c7;
+        }
+      }
+    }
+  }
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
