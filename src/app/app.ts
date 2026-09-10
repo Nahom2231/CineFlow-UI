@@ -54,11 +54,7 @@ export class AppComponent {
   }
 
   toggleTheme(): void {
-    const newTheme = this.themeService.toggleTheme();
-    const modeName = newTheme === 'dark' 
-      ? this.translationService.t('THEME_DARK', 'Dark Mode') 
-      : this.translationService.t('THEME_LIGHT', 'Light Mode');
-    this.notificationService.info(`Switched to ${modeName}`, 'Theme Changed');
+    this.themeService.toggleTheme();
   }
 
   toggleLanguage(): void {

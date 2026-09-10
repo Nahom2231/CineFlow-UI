@@ -14,10 +14,16 @@ export class ThemeService {
   public currentTheme = signal<ThemeMode>(this.getInitialTheme());
 
   constructor() {
-    this.applyTheme('dark');
+    this.applyTheme(this.currentTheme());
   }
 
   private getInitialTheme(): ThemeMode {
+    if (typeof localStorage !== 'undefined') {
+      const saved = localStorage.getItem(this.STORAGE_KEY) as ThemeMode;
+      if (saved === 'dark' || saved === 'light') {
+        return saved;
+      }
+    }
     return 'dark';
   }
 
