@@ -661,7 +661,7 @@
 /* =========================================================
    Light Mode Explicit Overrides for App Shell (Zero Dark Sections)
    ========================================================= */
-[data-theme="light"], body.light-theme {
+:host-context([data-theme="light"]), :host-context(.light-theme), [data-theme="light"], body.light-theme {
   .app-header {
     background: rgba(255, 255, 255, 0.95) !important;
     border-bottom: 1px solid #e2e8f0 !important;

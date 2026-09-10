@@ -441,13 +441,13 @@ h1, h2, h3, h4, h5, h6 {
     }
   }
 
-  /* Colored text highlights for Light Mode */
+  /* Colored text highlights for Light Mode (Standard Saturation, High Contrast) */
   .text-primary, .title-en {
-    color: #3730a3 !important;
+    color: #1e1b4b !important;
   }
 
   .text-amharic, .title-am {
-    color: #be123c !important;
+    color: #9f1239 !important;
     font-weight: 700 !important;
   }
 
@@ -463,5 +463,230 @@ h1, h2, h3, h4, h5, h6 {
   .text-cyan, .spec-tag {
     color: #0284c7 !important;
   }
+
+  /* =====================================================
+     HERO SECTION IN LIGHT MODE (Pure White & Standard Saturation)
+     ===================================================== */
+  .hero-section {
+    background: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06) !important;
+
+    .hero-slide {
+      background: #ffffff !important;
+
+      .hero-bg-image {
+        opacity: 0.22 !important;
+        filter: none !important;
+      }
+
+      .hero-overlay {
+        background: linear-gradient(to right, rgba(255, 255, 255, 0.98) 25%, rgba(255, 255, 255, 0.88) 65%, rgba(255, 255, 255, 0.45) 100%),
+                    linear-gradient(to top, rgba(255, 255, 255, 0.96) 0%, transparent 40%) !important;
+      }
+
+      .hero-content {
+        .hero-badge {
+          background: #eef2ff !important;
+          border: 1px solid #c7d2fe !important;
+          color: #4338ca !important;
+        }
+
+        .hero-title {
+          color: #0f172a !important;
+          text-shadow: none !important;
+        }
+
+        .hero-title-amharic {
+          color: #475569 !important;
+        }
+
+        .hero-meta .meta-pill {
+          background: #f8fafc !important;
+          border: 1px solid #cbd5e1 !important;
+          color: #334155 !important;
+
+          &.rating {
+            background: #fef3c7 !important;
+            border-color: #fde68a !important;
+            color: #92400e !important;
+          }
+          &.genre {
+            background: #ede9fe !important;
+            border-color: #ddd6fe !important;
+            color: #5b21b6 !important;
+          }
+        }
+
+        .hero-synopsis {
+          color: #334155 !important;
+          text-shadow: none !important;
+          line-height: 1.6 !important;
+        }
+
+        .btn-hero-primary {
+          background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+          color: #ffffff !important;
+          box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3) !important;
+        }
+
+        .btn-hero-secondary {
+          background: #ffffff !important;
+          border: 1px solid #cbd5e1 !important;
+          color: #0f172a !important;
+          box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05) !important;
+
+          &:hover {
+            background: #f1f5f9 !important;
+            border-color: #94a3b8 !important;
+          }
+        }
+      }
+    }
+
+    .hero-controls {
+      .hero-arrow {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #0f172a !important;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1) !important;
+
+        &:hover {
+          background: #4f46e5 !important;
+          border-color: #4f46e5 !important;
+          color: #ffffff !important;
+        }
+      }
+
+      .hero-dots .dot-btn {
+        background: #cbd5e1 !important;
+
+        &.active {
+          background: #4f46e5 !important;
+        }
+      }
+    }
+  }
+
+  /* =====================================================
+     PERKS SECTION IN LIGHT MODE (Crisp White & Readable Text)
+     ===================================================== */
+  .perks-section {
+    .perk-card {
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06) !important;
+
+      .perk-icon {
+        background: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+      }
+
+      .perk-info {
+        h4 {
+          color: #0f172a !important;
+          font-weight: 700 !important;
+        }
+        p {
+          color: #475569 !important;
+        }
+      }
+
+      &:hover {
+        background: #f8fafc !important;
+        border-color: #cbd5e1 !important;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08) !important;
+      }
+    }
+  }
+
+  /* =====================================================
+     APP FOOTER IN LIGHT MODE (Pure White & Clear Readable Links)
+     ===================================================== */
+  .app-footer {
+    background: #ffffff !important;
+    border-top: 1px solid #e2e8f0 !important;
+    color: #0f172a !important;
+
+    .footer-brand {
+      .title {
+        color: #0f172a !important;
+        .highlight {
+          background: none !important;
+          -webkit-text-fill-color: #4f46e5 !important;
+          color: #4f46e5 !important;
+        }
+      }
+
+      .footer-desc {
+        color: #475569 !important;
+      }
+
+      .payment-badges .pay-pill {
+        background: #f8fafc !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #334155 !important;
+      }
+    }
+
+    .footer-links-group {
+      h4 {
+        color: #0f172a !important;
+        font-weight: 700 !important;
+      }
+
+      ul li {
+        color: #475569 !important;
+
+        a {
+          color: #475569 !important;
+
+          &:hover {
+            color: #4f46e5 !important;
+          }
+        }
+      }
+    }
+
+    .footer-bottom {
+      border-top: 1px solid #e2e8f0 !important;
+      color: #64748b !important;
+    }
+  }
+
+  /* =====================================================
+     GLOWING SPARK CARD HOVER PHYSICS & STANDARDIZED SATURATION
+     ===================================================== */
+  .movie-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06) !important;
+
+    &:hover {
+      border-color: #818cf8 !important;
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.1), 0 0 20px rgba(99, 102, 241, 0.18) !important;
+    }
+
+    .card-body {
+      .movie-title {
+        color: #0f172a !important;
+        font-weight: 700 !important;
+      }
+
+      .movie-title-amharic {
+        color: #64748b !important;
+      }
+
+      .movie-specs .spec-item {
+        color: #475569 !important;
+      }
+
+      .movie-desc {
+        color: #475569 !important;
+        line-height: 1.5 !important;
+      }
+    }
+  }
 }
+
 

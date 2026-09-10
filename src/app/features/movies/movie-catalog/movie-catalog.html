@@ -124,110 +124,6 @@
     </div>
   </section>
 
-  <!-- DeepSeek-Style CineFlow AI Neural Discovery Bar -->
-  <section class="ai-discovery-section glass-panel" id="ai-discovery-section">
-    <div class="ai-aurora-bg"></div>
-    <div class="ai-content-wrap">
-      <div class="ai-top-badge-row">
-        <div class="ai-status-pill">
-          <span class="ai-pulse-dot"></span>
-          <span class="ai-pill-title">CineFlow AI 3.0</span>
-          <span class="ai-latency-tag">⚡ DeepMatch Engine</span>
-        </div>
-        <div class="ai-meta-tag">
-          <svg class="ui-icon icon-cyan icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          Semantic Neural Search
-        </div>
-      </div>
-
-      <div class="ai-headline-block">
-        <h2 class="ai-gradient-title">Ask CineFlow AI What to Watch</h2>
-        <p class="ai-sub-text">
-          Describe your mood, favorite plot twists, or preferred cinema sound to get instant AI-matched movie recommendations
-        </p>
-      </div>
-
-      <!-- Interactive AI Prompt Box with Border-Beam -->
-      <div class="ai-input-container">
-        <div class="ai-input-glow"></div>
-        <div class="ai-input-box">
-          <div class="ai-sparkles-icon">
-            <svg class="ui-icon icon-cyan icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
-            </svg>
-          </div>
-          <input 
-            id="ai-prompt-input"
-            type="text" 
-            [(ngModel)]="aiPrompt" 
-            (keyup.enter)="runAiSearch()"
-            placeholder="Ask AI: e.g. 'intense sci-fi thriller with mind-bending twists' or 'funny family comedy'..."
-            class="ai-text-input"
-          />
-          <button 
-            type="button" 
-            class="btn-ai-submit" 
-            (click)="runAiSearch()"
-            [disabled]="isAiThinking || !aiPrompt.trim()"
-          >
-            <span *ngIf="!isAiThinking" class="btn-ai-inner">
-              <svg class="ui-icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              Run AI Match
-            </span>
-            <span *ngIf="isAiThinking" class="btn-ai-inner">
-              <span class="ai-spinner-dot"></span>
-              Thinking...
-            </span>
-          </button>
-          <button *ngIf="aiPrompt" class="btn-ai-clear" (click)="clearAiMatch()" title="Clear AI Query">✕</button>
-        </div>
-      </div>
-
-      <!-- Quick AI Preset Prompts -->
-      <div class="ai-presets-row">
-        <span class="presets-label">
-          <svg class="ui-icon icon-gold icon-xs" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          Trending AI Prompts:
-        </span>
-        <div class="preset-chips-scroll">
-          <button 
-            *ngFor="let p of aiPresetPrompts" 
-            type="button" 
-            class="ai-preset-bubble" 
-            [class.active]="activeAiQuery === p.query"
-            (click)="applyAiPrompt(p.query)"
-          >
-            <span class="spark-dot">✦</span>
-            {{ p.label }}
-          </button>
-        </div>
-      </div>
-
-      <!-- Thinking Indicator Wave -->
-      <div *ngIf="isAiThinking" class="ai-thinking-indicator animate-fade-in">
-        <div class="ai-neural-wave">
-          <span></span><span></span><span></span><span></span><span></span>
-        </div>
-        <span class="thinking-text">🧠 CineFlow AI is analyzing plots, directors, genres, and cinema schedules...</span>
-      </div>
-
-      <!-- Active AI Results Status Banner -->
-      <div *ngIf="activeAiQuery && !isAiThinking" class="ai-active-results-banner animate-fade-in" id="ai-results-anchor">
-        <div class="banner-left">
-          <span class="ai-badge-sm">
-            <svg class="ui-icon icon-cyan icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            AI Active Filter
-          </span>
-          <span class="banner-query">Prompt: “{{ activeAiQuery }}”</span>
-          <span class="banner-count">({{ movies.length }} matching films found)</span>
-        </div>
-        <button class="btn-clear-ai-filter" (click)="clearAiMatch()">
-          Reset AI Match ✕
-        </button>
-      </div>
-    </div>
-  </section>
-
   <!-- Main Catalog Section -->
   <section class="catalog-section" id="movies-catalog">
     <div class="section-header">
@@ -358,11 +254,9 @@
           />
           
           <div class="poster-badges">
-            <span *ngIf="getAiMatchPercentage(movie.id) as matchRate" class="badge ai-match-badge animate-pop">
-              <svg class="ui-icon icon-cyan icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              {{ matchRate }}% AI Match
+            <span class="badge card-sparkle-badge">
+              <span class="sparkle-star">✦</span> {{ movie.genre }}
             </span>
-            <span class="badge genre-badge">{{ movie.genre }}</span>
             <span class="badge lang-badge">{{ movie.audioLanguage }}</span>
             <button 
               type="button"
@@ -549,20 +443,6 @@
       </div>
     </div>
   </section>
-
-  <!-- DeepSeek-Style Floating AI Concierge Button -->
-  <button 
-    type="button" 
-    class="btn-floating-ai" 
-    (click)="scrollToAiDiscovery()"
-    title="Ask CineFlow AI for smart movie recommendations"
-    aria-label="Ask CineFlow AI"
-  >
-    <span class="floating-pulse"></span>
-    <svg class="ui-icon icon-cyan icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
-    </svg>
-    <span class="floating-label">CineFlow AI</span>
-  </button>
 </div>
+
 
