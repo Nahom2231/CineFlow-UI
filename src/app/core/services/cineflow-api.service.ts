@@ -17,7 +17,9 @@ import {
   providedIn: 'root'
 })
 export class CineFlowApiService {
-  private readonly baseUrl = 'http://localhost:5066/api/v1';
+  private readonly baseUrl = (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1')
+    ? 'https://cineflow-foro.onrender.com/api/v1'
+    : 'http://localhost:5066/api/v1';
 
   // Reactive event notifier so all components instantly update when a movie is added, edited, or deleted
   private moviesUpdatedSubject = new BehaviorSubject<number>(Date.now());
@@ -1207,7 +1209,7 @@ export class CineFlowApiService {
       catchError(() => of({
         publicKey: 'CHAPUBK_TEST-DEMOKEY',
         baseUrl: 'https://api.chapa.co',
-        callbackUrl: 'http://localhost:5066/api/v1/Payment/callback'
+        callbackUrl: `${this.baseUrl}/Payment/callback`
       }))
     );
   }

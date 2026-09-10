@@ -9,7 +9,9 @@ import { LoginRequest, RegisterRequest, AuthResponse, ResetPasswordRequest } fro
 })
 export class AuthService {
   private http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:5066/api/v1/Auth';
+  private readonly apiUrl = (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1')
+    ? 'https://cineflow-foro.onrender.com/api/v1/Auth'
+    : 'http://localhost:5066/api/v1/Auth';
   private loggedIn$ = new BehaviorSubject<boolean>(this.hasValidToken());
 
   register(credentials: RegisterRequest): Observable<{ message: string }> {
