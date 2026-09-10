@@ -96,7 +96,6 @@ export class AppComponent {
   logout(): void {
     this.authService.logout();
     this.closeMobileMenu();
-    this.notificationService.success('Signed out successfully', 'Logged Out');
     this.router.navigate(['/movies']);
   }
 }

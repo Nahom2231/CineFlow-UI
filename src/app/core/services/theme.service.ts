@@ -14,19 +14,10 @@ export class ThemeService {
   public currentTheme = signal<ThemeMode>(this.getInitialTheme());
 
   constructor() {
-    this.applyTheme(this.currentTheme());
-    this.listenToSystemPreference();
+    this.applyTheme('dark');
   }
 
   private getInitialTheme(): ThemeMode {
-    const saved = localStorage.getItem(this.STORAGE_KEY) as ThemeMode;
-    if (saved === 'dark' || saved === 'light') {
-      return saved;
-    }
-    // Default to dark mode for cinema experience, or system preference
-    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-      return 'light';
-    }
     return 'dark';
   }
 
@@ -59,20 +50,6 @@ export class ThemeService {
     } else {
       document.body.classList.add('light-theme');
       document.body.classList.remove('dark-theme');
-    }
-  }
-
-  private listenToSystemPreference(): void {
-    if (typeof window !== 'undefined' && window.matchMedia) {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      mediaQuery.addEventListener('change', (e) => {
-        const saved = localStorage.getItem(this.STORAGE_KEY);
-        // Only auto-switch if user hasn't explicitly set a preference
-        if (!saved) {
-          const newTheme: ThemeMode = e.matches ? 'dark' : 'light';
-          this.setTheme(newTheme);
-        }
-      });
     }
   }
 }
