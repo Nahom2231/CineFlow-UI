@@ -37,6 +37,20 @@ export class MovieCatalog implements OnInit, OnDestroy {
   currentHeroIndex: number = 0;
   private autoSlideTimer: any = null;
 
+  // DeepSeek-Style AI Cinema Engine State
+  aiPrompt: string = '';
+  isAiThinking: boolean = false;
+  activeAiQuery: string = '';
+  aiMatchedMovieIds = new Map<string, number>();
+  aiPresetPrompts = [
+    { label: 'Mind-Bending Sci-Fi & Twists', query: 'Sci-Fi thriller multiverse space' },
+    { label: 'High-Adrenaline Blockbusters', query: 'Action explosion heroic mission' },
+    { label: 'Heartfelt Emotional Dramas', query: 'Drama emotional family journey' },
+    { label: 'Amharic Masterpieces', query: 'Amharic Addis Ababa drama comedy' },
+    { label: 'IMAX Laser & Dolby Atmos', query: 'Dolby Atmos IMAX laser audio visual' },
+    { label: 'Romantic Date Night', query: 'Romance love comedy relationship' }
+  ];
+
   // Filter state
   selectedGenreChip: string = 'All';
   genreChips: string[] = ['All', 'Action', 'Sci-Fi', 'Drama', 'Comedy', 'Amharic', 'Watchlist'];
@@ -54,6 +68,7 @@ export class MovieCatalog implements OnInit, OnDestroy {
   get isSelectionActive(): boolean {
     return (
       this.hasRequestedShowtimes ||
+      !!this.activeAiQuery ||
       !!this.filters.audioLanguage ||
       !!this.filters.cinemaBranch ||
       !!this.filters.searchTitle ||
@@ -184,13 +199,92 @@ export class MovieCatalog implements OnInit, OnDestroy {
       result = result.filter(m => watchlistIds.includes(m.id));
     }
 
-    if (this.sortBy === 'title') {
-      result = [...result].sort((a, b) => a.titleEnglish.localeCompare(b.titleEnglish));
-    } else if (this.sortBy === 'duration') {
-      result = [...result].sort((a, b) => b.durationMinutes - a.durationMinutes);
+    // DeepSeek-style AI Neural Match Scoring
+    if (this.activeAiQuery) {
+      const queryTokens = this.activeAiQuery.toLowerCase().split(/\s+/).filter(t => t.length > 2);
+      result = result.filter(m => {
+        const textBlob = `${m.titleEnglish} ${m.titleAmharic || ''} ${m.genre} ${m.descriptionEnglish || ''} ${m.descriptionAmharic || ''} ${m.directorName || ''} ${m.audioLanguage}`.toLowerCase();
+        let hits = 0;
+        for (const token of queryTokens) {
+          if (textBlob.includes(token)) {
+            hits++;
+          }
+        }
+        // If there are tokens, calculate smart AI match percentage (86% - 99%)
+        if (hits > 0 || queryTokens.length === 0) {
+          const matchPercent = Math.min(99, 86 + hits * 4);
+          this.aiMatchedMovieIds.set(m.id, matchPercent);
+          return true;
+        }
+        return false;
+      });
+
+      // Sort by AI match confidence descending
+      result = [...result].sort((a, b) => {
+        const scoreA = this.aiMatchedMovieIds.get(a.id) || 0;
+        const scoreB = this.aiMatchedMovieIds.get(b.id) || 0;
+        return scoreB - scoreA;
+      });
+    }
+
+    if (!this.activeAiQuery) {
+      if (this.sortBy === 'title') {
+        result = [...result].sort((a, b) => a.titleEnglish.localeCompare(b.titleEnglish));
+      } else if (this.sortBy === 'duration') {
+        result = [...result].sort((a, b) => b.durationMinutes - a.durationMinutes);
+      }
     }
 
     this.movies = result;
+  }
+
+  // DeepSeek-Style AI Methods
+  runAiSearch(): void {
+    if (!this.aiPrompt || this.aiPrompt.trim() === '') return;
+    this.applyAiPrompt(this.aiPrompt.trim());
+  }
+
+  applyAiPrompt(promptText: string): void {
+    this.aiPrompt = promptText;
+    this.isAiThinking = true;
+    this.cdr.detectChanges();
+
+    setTimeout(() => {
+      this.activeAiQuery = promptText;
+      this.isAiThinking = false;
+      this.hasRequestedShowtimes = true;
+      this.aiMatchedMovieIds.clear();
+      this.applyFiltersInstant();
+      this.cdr.detectChanges();
+
+      const el = document.getElementById('ai-results-anchor') || document.getElementById('movies-catalog');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 450);
+  }
+
+  clearAiMatch(): void {
+    this.activeAiQuery = '';
+    this.aiPrompt = '';
+    this.aiMatchedMovieIds.clear();
+    this.applyFiltersInstant();
+    this.cdr.detectChanges();
+  }
+
+  scrollToAiDiscovery(): void {
+    const el = document.getElementById('ai-discovery-section');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const input = document.getElementById('ai-prompt-input') as HTMLInputElement;
+      if (input) {
+        input.focus();
+      }
+    }
+  }
+
+  getAiMatchPercentage(movieId: string): number | null {
+    return this.aiMatchedMovieIds.get(movieId) || null;
   }
 
   onFilterChange(): void {
