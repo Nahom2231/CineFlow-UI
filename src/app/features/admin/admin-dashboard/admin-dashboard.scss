@@ -517,7 +517,7 @@
 /* =========================================================
    Light Mode Overrides for Admin Dashboard (Strictly Bright)
    ========================================================= */
-[data-theme="light"], body.light-theme {
+:host-context([data-theme="light"]), :host-context(.light-theme), [data-theme="light"], body.light-theme {
   .admin-dashboard-page {
     color: #0f172a !important;
   }

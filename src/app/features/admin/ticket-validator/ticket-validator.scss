@@ -486,6 +486,8 @@
 }
 
 /* Light Theme Overrides */
+:host-context([data-theme="light"]),
+:host-context(.light-theme),
 [data-theme="light"],
 body.light-theme {
   .ticket-validator-page {

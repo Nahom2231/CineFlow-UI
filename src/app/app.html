@@ -183,6 +183,8 @@
       <button (click)="logout()" class="btn-logout w-100">{{ 'NAV_SIGN_OUT' | translate }}</button>
     </div>
   </div>
+  <!-- Ambient Flowing Header Wave Stripe -->
+  <div class="nav-wave-strip" aria-hidden="true"></div>
 </header>
 
 <main class="app-main">
@@ -190,6 +192,13 @@
 </main>
 
 <footer class="app-footer">
+  <!-- Organic Cinema Flow Wave Divider -->
+  <div class="footer-wave-wrapper" aria-hidden="true">
+    <svg class="wave-svg" viewBox="0 0 1440 60" preserveAspectRatio="none">
+      <path class="wave-layer-back" d="M0,15 C240,45 480,5 720,30 C960,55 1200,10 1440,25 L1440,60 L0,60 Z"></path>
+      <path class="wave-layer-front" d="M0,30 C320,5 540,45 840,20 C1120,5 1320,35 1440,15 L1440,60 L0,60 Z"></path>
+    </svg>
+  </div>
   <div class="footer-container">
     <div class="footer-brand">
       <div class="brand-logo footer-logo">

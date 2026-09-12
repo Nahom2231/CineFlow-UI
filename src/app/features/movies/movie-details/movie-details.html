@@ -57,6 +57,7 @@
           <div class="title-wrap">
             <h1 class="title-en">{{ translationService.dynamic(movie.titleEnglish, movie.titleAmharic) }}</h1>
             <h2 class="title-am" *ngIf="movie.titleAmharic && translationService.getLanguage() === 'en'">{{ movie.titleAmharic }}</h2>
+            <div class="cine-wave-accent" aria-hidden="true"></div>
           </div>
 
           <div class="meta-chips">
@@ -105,6 +106,7 @@
           {{ 'SELECT_CINEMA_HALL' | translate }}
         </h2>
         <p class="section-sub">{{ 'SELECT_TIME_PROMPT' | translate }}</p>
+        <div class="cine-wave-accent" aria-hidden="true"></div>
       </div>
 
       <!-- Showtimes Grid -->

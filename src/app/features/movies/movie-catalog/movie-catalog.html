@@ -77,12 +77,21 @@
       </div>
       <button class="hero-arrow next" (click)="nextHero()" aria-label="Next Slide">›</button>
     </div>
+
+    <!-- Cinematic Flowing Wave Transition -->
+    <div class="hero-wave-divider" aria-hidden="true">
+      <svg class="wave-svg" viewBox="0 0 1440 75" preserveAspectRatio="none">
+        <path class="wave-layer-back" d="M0,20 C320,60 640,5 960,40 C1200,68 1360,30 1440,20 L1440,75 L0,75 Z"></path>
+        <path class="wave-layer-front" d="M0,40 C280,12 560,55 840,26 C1120,4 1340,50 1440,30 L1440,75 L0,75 Z"></path>
+      </svg>
+    </div>
   </section>
 
   <!-- Cinema Perks / Feature Highlights Bar -->
   <section class="perks-section">
     <div class="perks-container">
       <div class="perk-card">
+        <div class="perk-wave-glow" aria-hidden="true"></div>
         <div class="perk-icon">
           <svg class="ui-icon icon-zap icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         </div>
@@ -93,6 +102,7 @@
       </div>
 
       <div class="perk-card">
+        <div class="perk-wave-glow" aria-hidden="true"></div>
         <div class="perk-icon">
           <svg class="ui-icon icon-gold icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
         </div>
@@ -103,6 +113,7 @@
       </div>
 
       <div class="perk-card">
+        <div class="perk-wave-glow" aria-hidden="true"></div>
         <div class="perk-icon">
           <svg class="ui-icon icon-primary icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
         </div>
@@ -113,6 +124,7 @@
       </div>
 
       <div class="perk-card">
+        <div class="perk-wave-glow" aria-hidden="true"></div>
         <div class="perk-icon">
           <svg class="ui-icon icon-rose icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/></svg>
         </div>
@@ -134,9 +146,10 @@
           {{ 'CATALOG_TITLE' | translate }}
         </h2>
         <p class="section-subtitle">{{ 'CATALOG_SUBTITLE' | translate }}</p>
+        <div class="cine-wave-accent" aria-hidden="true"></div>
       </div>
       <div class="header-right" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-        <a routerLink="/admin/create-movie" class="btn-secondary" style="background: rgba(225, 29, 72, 0.15); border-color: rgba(225, 29, 72, 0.4); color: #f43f5e;">
+        <a routerLink="/admin/create-movie" class="btn-secondary btn-action-accent">
           <svg class="ui-icon icon-rose icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           {{ 'NAV_ADD_MOVIE' | translate }}
         </a>
@@ -291,6 +304,13 @@
           </div>
         </div>
 
+        <!-- Flowing Wave Card Separator -->
+        <div class="card-wave-separator" aria-hidden="true">
+          <svg class="card-wave-svg" viewBox="0 0 500 24" preserveAspectRatio="none">
+            <path d="M0,0 C150,22 350,2 500,16 L500,24 L0,24 Z" class="card-wave-fill"></path>
+          </svg>
+        </div>
+
         <!-- Movie Details Body -->
         <div class="card-body">
           <div class="title-block" (click)="viewMovieDetails(movie)" style="cursor: pointer;">
@@ -356,6 +376,9 @@
             </ng-container>
           </div>
         </div>
+
+        <!-- Ambient Liquid Wave Glow Ribbon -->
+        <div class="card-wave-glow" aria-hidden="true"></div>
       </div>
     </div>
 

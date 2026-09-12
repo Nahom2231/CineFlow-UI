@@ -687,6 +687,640 @@ h1, h2, h3, h4, h5, h6 {
       }
     }
   }
+
+  /* =====================================================
+     ALL PAGES LIGHT MODE ZERO-DARK VISIBILITY OVERRIDES
+     ===================================================== */
+  /* 1. Movie Details Page */
+  .movie-details-page {
+    background: #f8fafc !important;
+    color: #0f172a !important;
+
+    .top-nav-bar {
+      border-bottom-color: #e2e8f0 !important;
+    }
+
+    .movie-hero {
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      box-shadow: 0 10px 40px rgba(15, 23, 42, 0.06) !important;
+
+      .backdrop-glow {
+        opacity: 0.1 !important;
+      }
+
+      .crew-info-box {
+        background: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+
+        .crew-item .label {
+          color: #64748b !important;
+        }
+
+        .crew-item .val {
+          color: #0f172a !important;
+        }
+      }
+
+      .synopsis-box {
+        h3 {
+          color: #0f172a !important;
+        }
+        .synopsis-text {
+          color: #334155 !important;
+        }
+      }
+    }
+
+    .showtimes-booking-container {
+      .showtime-card {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
+
+        .time-val {
+          color: #0f172a !important;
+        }
+
+        .date-val {
+          color: #475569 !important;
+        }
+
+        &.active {
+          background: #eef2ff !important;
+          border-color: #4f46e5 !important;
+          box-shadow: 0 0 0 2px #4f46e5 !important;
+        }
+      }
+
+      .booking-action-bar {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08) !important;
+      }
+    }
+  }
+
+  /* 2. Seat Picker & Booking Experience */
+  .booking-experience {
+    background: #f8fafc !important;
+    color: #0f172a !important;
+
+    .booking-header {
+      background: rgba(255, 255, 255, 0.95) !important;
+      border-bottom: 1px solid #e2e8f0 !important;
+
+      .btn-back {
+        background: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+        color: #0f172a !important;
+      }
+
+      .movie-pill {
+        background: #ffffff !important;
+        border-color: #e2e8f0 !important;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05) !important;
+
+        .hall-badge {
+          color: #0f172a !important;
+        }
+      }
+    }
+
+    .seat-picker-section {
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06) !important;
+
+      .auditorium-header .main-title {
+        color: #0f172a !important;
+      }
+
+      .screen-stage .screen-label {
+        color: #64748b !important;
+      }
+
+      .screen-stage .curved-screen {
+        background: linear-gradient(90deg, transparent 0%, #0284c7 20%, #e0f2fe 50%, #0284c7 80%, transparent 100%) !important;
+        box-shadow: 0 6px 20px rgba(2, 132, 199, 0.25) !important;
+      }
+
+      .matrix-row .row-label-badge {
+        background: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+        color: #334155 !important;
+
+        &.vip {
+          background: #fef3c7 !important;
+          border-color: #f59e0b !important;
+          color: #92400e !important;
+        }
+      }
+
+      .seat-btn.available:not(.vip):not(.selected):not(.occupied) {
+        background: #f8fafc !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #0f172a !important;
+
+        &:hover {
+          background: #e0f2fe !important;
+          border-color: #0284c7 !important;
+          color: #0369a1 !important;
+        }
+      }
+
+      .seat-btn.vip:not(.selected):not(.occupied) {
+        background: #fef3c7 !important;
+        border: 1px solid #f59e0b !important;
+        color: #92400e !important;
+      }
+
+      .seat-btn.occupied, .seat-btn:disabled:not(.selected) {
+        background: #f1f5f9 !important;
+        border: 1px solid #e2e8f0 !important;
+        color: #94a3b8 !important;
+      }
+
+      .seat-legend {
+        border-top-color: #e2e8f0 !important;
+
+        .legend-item .legend-box.available {
+          background: #f8fafc !important;
+          border-color: #cbd5e1 !important;
+        }
+        .legend-item .legend-info .legend-text {
+          color: #0f172a !important;
+        }
+      }
+    }
+
+    .checkout-panel {
+      .ticket-preview-card,
+      .selection-summary,
+      .payment-box {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 6px 24px rgba(15, 23, 42, 0.06) !important;
+      }
+
+      .preview-meta .preview-title-en {
+        color: #0f172a !important;
+      }
+
+      .selection-summary .summary-row {
+        .summary-label {
+          color: #475569 !important;
+        }
+        .summary-val {
+          color: #0f172a !important;
+        }
+        &.total-row .total-label {
+          color: #0f172a !important;
+        }
+        &.total-row .total-price {
+          color: #0284c7 !important;
+          text-shadow: none !important;
+        }
+      }
+
+      .payment-box {
+        .payment-title {
+          color: #0f172a !important;
+        }
+
+        .provider-selector .provider-tab {
+          background: #f8fafc !important;
+          border-color: #cbd5e1 !important;
+          color: #0f172a !important;
+
+          &.active {
+            background: #eef2ff !important;
+            border-color: #4f46e5 !important;
+            color: #4338ca !important;
+          }
+        }
+      }
+    }
+
+    .payment-modal-card {
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      box-shadow: 0 25px 60px rgba(15, 23, 42, 0.15) !important;
+
+      .modal-header, .modal-footer {
+        border-color: #e2e8f0 !important;
+      }
+
+      .modal-body .modal-status-title {
+        color: #0f172a !important;
+      }
+
+      .modal-body .modal-prompt-text {
+        color: #475569 !important;
+      }
+
+      .modal-txn-box {
+        background: #f8fafc !important;
+        border-color: #e2e8f0 !important;
+      }
+    }
+  }
+
+  /* 3. Ticket Confirmation Page */
+  .ticket-confirmation-container {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 10px 40px rgba(15, 23, 42, 0.08) !important;
+    color: #0f172a !important;
+
+    .notch {
+      background: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+    }
+
+    .confirmation-header h1 {
+      color: #0f172a !important;
+    }
+
+    .qr-section {
+      background: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+
+      .qr-display {
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06) !important;
+      }
+
+      .qr-info {
+        color: #475569 !important;
+      }
+    }
+
+    .ticket-details {
+      background: #ffffff !important;
+      border-color: #e2e8f0 !important;
+
+      .detail-section {
+        border-color: #e2e8f0 !important;
+
+        .label {
+          color: #64748b !important;
+        }
+
+        .value {
+          color: #0f172a !important;
+        }
+
+        &.movie-hero-detail .movie-title {
+          color: #0f172a !important;
+        }
+      }
+    }
+
+    .info-box {
+      background: #f0f9ff !important;
+      border-left-color: #0284c7 !important;
+
+      h4 {
+        color: #0369a1 !important;
+      }
+
+      ul li {
+        color: #334155 !important;
+      }
+    }
+  }
+
+  /* 4. Booking History Page */
+  .booking-history-page {
+    background: #f8fafc !important;
+    color: #0f172a !important;
+
+    .page-header {
+      border-color: #e2e8f0 !important;
+
+      h1 {
+        color: #0f172a !important;
+      }
+      .subtitle {
+        color: #475569 !important;
+      }
+    }
+
+    .ticket-card, .booking-card {
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06) !important;
+
+      .ticket-header, .booking-header {
+        background: #f8fafc !important;
+        border-bottom-color: #e2e8f0 !important;
+
+        .movie-title {
+          color: #0f172a !important;
+        }
+      }
+
+      .ticket-body, .booking-body {
+        background: #ffffff !important;
+        color: #334155 !important;
+      }
+    }
+  }
+
+  /* 5. Authentication Pages (Login & Register) */
+  .auth-page-container, .login-container, .register-container {
+    background: #f8fafc !important;
+    color: #0f172a !important;
+
+    .auth-card, .auth-card-panel {
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      box-shadow: 0 10px 40px rgba(15, 23, 42, 0.08) !important;
+
+      h2 {
+        color: #0f172a !important;
+      }
+      .subtitle {
+        color: #475569 !important;
+      }
+    }
+  }
+
+  /* 6. Admin Hub & Management Pages */
+  .admin-dashboard-page,
+  .ticket-validator-page,
+  .manage-halls-page,
+  .revenue-report-page,
+  .create-movie-page,
+  .create-schedule-page {
+    background: #f8fafc !important;
+    color: #0f172a !important;
+
+    .page-header, .dashboard-header-bar {
+      border-bottom-color: #e2e8f0 !important;
+
+      h1 {
+        color: #0f172a !important;
+      }
+      .subtitle {
+        color: #475569 !important;
+      }
+    }
+
+    .stat-card,
+    .metric-card,
+    .chart-panel,
+    .hall-card,
+    .scanner-card,
+    .validation-result,
+    .form-card,
+    .schedule-card,
+    .report-card {
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06) !important;
+
+      h2, h3, h4, .stat-value, .metric-value {
+        color: #0f172a !important;
+      }
+
+      p, .stat-label, .metric-label, .card-desc {
+        color: #475569 !important;
+      }
+    }
+  }
+
+  /* Action buttons in light mode */
+  .btn-action-accent {
+    background: #fff1f2 !important;
+    border: 1px solid #fecdd3 !important;
+    color: #e11d48 !important;
+
+    &:hover {
+      background: #ffe4e6 !important;
+      border-color: #fda4af !important;
+    }
+  }
 }
+
+/* =========================================================
+   CINEFLOW WAVE STYLING SYSTEM (Liquid Motion & Ambient Flow)
+   ========================================================= */
+
+/* 1. Header Animated Wave Stripe */
+.nav-wave-strip {
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #6366f1 0%, #06b6d4 25%, #f43f5e 50%, #f59e0b 75%, #6366f1 100%);
+  background-size: 200% 100%;
+  animation: waveStripeFlow 6s linear infinite;
+  opacity: 0.85;
+}
+
+@keyframes waveStripeFlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* 2. Hero Section Bottom Wave Transition */
+.hero-wave-divider {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  z-index: 10;
+  pointer-events: none;
+
+  .wave-svg {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 60px;
+
+    .wave-layer-back {
+      fill: rgba(15, 23, 42, 0.55);
+      animation: waveDriftBack 8s ease-in-out infinite alternate;
+    }
+
+    .wave-layer-front {
+      fill: var(--bg-main, #07090e);
+      animation: waveDriftFront 6s ease-in-out infinite alternate;
+    }
+  }
+}
+
+[data-theme="light"], body.light-theme {
+  .hero-wave-divider .wave-svg {
+    .wave-layer-back {
+      fill: rgba(226, 232, 240, 0.7) !important;
+    }
+    .wave-layer-front {
+      fill: #f8fafc !important;
+    }
+  }
+}
+
+/* 3. Footer Organic Wave Divider */
+.footer-wave-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  margin-bottom: -1px;
+
+  .wave-svg {
+    display: block;
+    width: 100%;
+    height: 48px;
+
+    .wave-layer-back {
+      fill: rgba(30, 41, 59, 0.4);
+      animation: waveDriftBack 9s ease-in-out infinite alternate;
+    }
+
+    .wave-layer-front {
+      fill: var(--bg-surface, #0f1422);
+      animation: waveDriftFront 7s ease-in-out infinite alternate;
+    }
+  }
+}
+
+[data-theme="light"], body.light-theme {
+  .footer-wave-wrapper .wave-svg {
+    .wave-layer-back {
+      fill: rgba(226, 232, 240, 0.6) !important;
+    }
+    .wave-layer-front {
+      fill: #ffffff !important;
+    }
+  }
+}
+
+@keyframes waveDriftBack {
+  0% { transform: translateX(0) scaleY(1); }
+  100% { transform: translateX(-25px) scaleY(1.15); }
+}
+
+@keyframes waveDriftFront {
+  0% { transform: translateX(0) scaleY(1); }
+  100% { transform: translateX(30px) scaleY(0.9); }
+}
+
+/* 4. Section Title Cine-Wave Accent Ribbon */
+.cine-wave-accent {
+  width: 72px;
+  height: 4px;
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #6366f1 0%, #06b6d4 50%, #f43f5e 100%);
+  background-size: 200% 100%;
+  animation: waveStripeFlow 4s ease infinite;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+}
+
+[data-theme="light"], body.light-theme {
+  .cine-wave-accent {
+    background: linear-gradient(90deg, #4f46e5 0%, #0284c7 50%, #e11d48 100%);
+    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
+  }
+}
+
+/* 5. Movie Card Flowing Wave Separator & Liquid Glow */
+.card-wave-separator {
+  position: relative;
+  width: 100%;
+  height: 20px;
+  margin-top: -20px;
+  z-index: 3;
+  pointer-events: none;
+  overflow: hidden;
+
+  .card-wave-svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+
+    .card-wave-fill {
+      fill: var(--bg-card, rgba(18, 25, 42, 0.85));
+      transition: fill 0.3s ease;
+    }
+  }
+}
+
+.card-wave-glow {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #6366f1 0%, #06b6d4 25%, #f43f5e 50%, #f59e0b 75%, #6366f1 100%);
+  background-size: 300% 100%;
+  animation: cardWaveShimmer 4s ease infinite;
+  opacity: 0.65;
+  z-index: 5;
+  transition: height 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease;
+}
+
+.movie-card:hover .card-wave-glow {
+  height: 5px;
+  opacity: 1;
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.7);
+}
+
+/* 6. Perk Cards Liquid Wave Motion */
+.perk-card {
+  position: relative;
+  overflow: hidden;
+
+  .perk-wave-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #f59e0b 0%, #f43f5e 33%, #06b6d4 66%, #6366f1 100%);
+    background-size: 250% 100%;
+    animation: cardWaveShimmer 5s linear infinite;
+    opacity: 0.75;
+    transition: height 0.3s ease, opacity 0.3s ease;
+  }
+
+  &:hover .perk-wave-glow {
+    height: 5px;
+    opacity: 1;
+  }
+}
+
+/* Light Theme Adaptations for Card Waves */
+[data-theme="light"], body.light-theme {
+  .card-wave-separator .card-wave-svg .card-wave-fill {
+    fill: #ffffff !important;
+  }
+
+  .card-wave-glow {
+    background: linear-gradient(90deg, #4f46e5 0%, #0284c7 25%, #e11d48 50%, #d97706 75%, #4f46e5 100%) !important;
+    opacity: 0.85;
+  }
+
+  .movie-card:hover .card-wave-glow {
+    box-shadow: 0 0 12px rgba(79, 70, 229, 0.35) !important;
+  }
+
+  .perk-card .perk-wave-glow {
+    background: linear-gradient(90deg, #d97706 0%, #e11d48 33%, #0284c7 66%, #4f46e5 100%) !important;
+  }
+}
+
+@keyframes cardWaveShimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+
 
 

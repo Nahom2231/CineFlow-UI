@@ -1210,7 +1210,7 @@
 /* =========================================================
    Light Mode Specific Overrides for Seat Picker (Strictly Bright)
    ========================================================= */
-[data-theme="light"], body.light-theme {
+:host-context([data-theme="light"]), :host-context(.light-theme), [data-theme="light"], body.light-theme {
   .booking-experience {
     color: #0f172a !important;
   }
