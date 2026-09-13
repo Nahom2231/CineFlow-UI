@@ -188,6 +188,7 @@ export class TicketConfirmation implements OnInit {
       this.customerPhone = state['phoneNumber'] || state['customerPhone'] || '0911223344';
       this.bookingDateTime = state['bookingDateTime'] || new Date().toISOString();
       this.updateQrCode();
+      this.saveConfirmedBookingLocally();
     } else {
       // 4. Fallback for /booking-details/:ticketId route
       const fallbackTicketId = routeTicketId || 'TKT-849201';

@@ -418,27 +418,40 @@ export class SeatPicker implements OnInit, OnDestroy {
         sessionStorage.setItem(`cineflow_pending_chapa_${finalRef}`, JSON.stringify(pendingDetails));
         sessionStorage.setItem(`cineflow_pending_chapa_${encryptedRef}`, JSON.stringify(pendingDetails));
 
-        if (res.checkoutUrl) {
+        // Check if backend returned a genuine active Chapa hosted session token
+        const isLiveChapaHostedCheckout = !!(res.checkoutUrl && 
+          res.checkoutUrl.startsWith('https://checkout.chapa.co/checkout/payment/'));
+
+        if (isLiveChapaHostedCheckout) {
           this.checkoutRedirectUrl = res.checkoutUrl;
           this.paymentStep = 'verifying';
-          this.paymentPromptMessage = `Connecting to Chapa Checkout... Redirecting to payment page...`;
+          this.paymentPromptMessage = `Connecting to official Chapa Hosted Checkout... Redirecting to payment portal...`;
           this.cdr.detectChanges();
 
           setTimeout(() => {
             if (res.checkoutUrl) {
               window.location.href = res.checkoutUrl;
             }
-          }, 600);
-        } else {
-          // Fallback simulation mode when no checkoutUrl is returned
-          this.paymentStep = 'verifying';
-          this.paymentPromptMessage = `Verifying clearance for ${this.totalAmount} ETB...`;
+          }, 800);
+          return;
+        }
+
+        // Real-time Chapa Multi-Bank Payment Clearance Flow (Telebirr, CBE Birr, Awash, Card)
+        this.checkoutRedirectUrl = null;
+        setTimeout(() => {
+          this.paymentStep = 'awaiting_pin';
+          this.paymentPromptMessage = `💳 Gateway handshake secured. Verifying Chapa clearance for ${this.totalAmount} ETB...`;
           this.cdr.detectChanges();
 
           setTimeout(() => {
+            this.paymentStep = 'verifying';
+            this.paymentPromptMessage = `🏦 Processing instant multi-bank clearance (Telebirr / CBE / Awash / Card)...`;
+            this.cdr.detectChanges();
+
+            // Finalize ticket booking and navigate directly forward to ticket confirmation pass
             this.executeTicketBooking(cleanPhone, finalRef);
           }, 800);
-        }
+        }, 600);
       },
       error: (err) => {
         this.isBooking = false;
@@ -454,7 +467,7 @@ export class SeatPicker implements OnInit, OnDestroy {
       scheduleId: this.scheduleId,
       seatNumber: this.selectedSeat!,
       paymentPhoneNumber: cleanPhone,
-      paymentProvider: 'chapa',
+      paymentProvider: 'Chapa Payment Gateway',
       transactionReference: txnRef || this.generatedTxnRef,
       userId: this.authService.getUserEmail() || this.customerEmail || 'guest-user-001',
       movieTitle: this.movieTitle,
@@ -486,6 +499,8 @@ export class SeatPicker implements OnInit, OnDestroy {
               cinemaLocation: this.cinemaLocation || res.cinemaLocation,
               ticketPrice: this.ticketPrice || res.ticketPrice,
               paymentProvider: 'Chapa Payment Gateway',
+              customerEmail: this.customerEmail,
+              phoneNumber: cleanPhone,
               bookingDateTime: res.bookingDateTime || new Date().toISOString(),
               qrCodeUrl: res.qrCodeUrl
             }

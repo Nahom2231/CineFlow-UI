@@ -1156,8 +1156,7 @@ export class CineFlowApiService {
           success: true,
           message: 'Payment initialized successfully (Simulation Mode)',
           reference: ref,
-          encryptedReference: `ENC-${ref}`,
-          checkoutUrl: `https://checkout.chapa.co/checkout/web/pay/${ref}`
+          encryptedReference: `ENC-${ref}`
         });
       })
     );

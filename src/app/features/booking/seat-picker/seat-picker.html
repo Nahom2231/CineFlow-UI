@@ -383,7 +383,7 @@
         <h3 class="modal-status-title">
           <span *ngIf="paymentStep === 'initiating'">Connecting to Chapa Payment Gateway...</span>
           <span *ngIf="paymentStep === 'awaiting_pin'">Securing Chapa Transaction Handshake...</span>
-          <span *ngIf="paymentStep === 'verifying'">Redirecting to Chapa Checkout...</span>
+          <span *ngIf="paymentStep === 'verifying'">{{ checkoutRedirectUrl ? 'Redirecting to Chapa Checkout...' : 'Clearing Multi-Bank Payment...' }}</span>
           <span *ngIf="paymentStep === 'success'" style="color: #34d399;">Chapa Payment Approved & Verified!</span>
         </h3>
 
