@@ -17,9 +17,7 @@ import {
   providedIn: 'root'
 })
 export class CineFlowApiService {
-  private readonly baseUrl = (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1')
-    ? 'https://cineflow-foro.onrender.com/api/v1'
-    : 'http://localhost:5066/api/v1';
+  private readonly baseUrl = 'https://cineflow-foro.onrender.com/api/v1';
 
   // Reactive event notifier so all components instantly update when a movie is added, edited, or deleted
   private moviesUpdatedSubject = new BehaviorSubject<number>(Date.now());
@@ -1786,7 +1784,7 @@ export class CineFlowApiService {
     let totalUpcomingSchedules = 0;
     for (const m of allMovies) {
       if (m.schedules && Array.isArray(m.schedules)) {
-        const future = m.schedules.filter((s: any) => !s.startTime || new Date(s.startTime).getTime() >= (nowTime - 3600000));
+        const future = m.schedules.filter((s: any) => s && (!s.startTime || new Date(s.startTime).getTime() >= (nowTime - 3600000)));
         totalUpcomingSchedules += future.length;
       }
     }

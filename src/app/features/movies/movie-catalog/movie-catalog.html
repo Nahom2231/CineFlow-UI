@@ -390,7 +390,7 @@
                 title="Book this showtime directly"
               >
                 <svg class="ui-icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                {{ sch.startTime | date:'shortTime' }} • {{ sch.price }} ETB
+                {{ sch?.startTime | date:'shortTime' }} • {{ sch?.price }} ETB
               </button>
             </div>
           </div>

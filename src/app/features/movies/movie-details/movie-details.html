@@ -123,13 +123,13 @@
           </div>
 
           <div class="time-block">
-            <span class="time-val">{{ schedule.startTime | date:'hh:mm a' }}</span>
-            <span class="date-val">{{ schedule.startTime | date:'EEE, MMM d' }}</span>
+            <span class="time-val">{{ schedule?.startTime | date:'hh:mm a' }}</span>
+            <span class="date-val">{{ schedule?.startTime | date:'EEE, MMM d' }}</span>
           </div>
 
           <div class="price-row">
             <span class="price-label">Price / ዋጋ:</span>
-            <span class="price-amount">{{ schedule.price || 300 }} ETB</span>
+            <span class="price-amount">{{ schedule?.price || 300 }} ETB</span>
           </div>
 
           <div class="select-indicator">
@@ -156,15 +156,15 @@
         <div class="booking-summary">
           <div class="summary-col">
             <span class="summary-label">Selected Hall</span>
-            <strong class="summary-val">{{ selectedSchedule.cinemaHallName || 'Grand Bole Screen' }}</strong>
+            <strong class="summary-val">{{ selectedSchedule?.cinemaHallName || 'Grand Bole Screen' }}</strong>
           </div>
           <div class="summary-col">
             <span class="summary-label">Date & Time</span>
-            <strong class="summary-val">{{ selectedSchedule.startTime | date:'EEE, MMM d, hh:mm a' }}</strong>
+            <strong class="summary-val">{{ selectedSchedule?.startTime | date:'EEE, MMM d, hh:mm a' }}</strong>
           </div>
           <div class="summary-col">
             <span class="summary-label">Admission</span>
-            <strong class="summary-val price-highlight">{{ selectedSchedule.price || 300 }} ETB</strong>
+            <strong class="summary-val price-highlight">{{ selectedSchedule?.price || 300 }} ETB</strong>
           </div>
         </div>
 

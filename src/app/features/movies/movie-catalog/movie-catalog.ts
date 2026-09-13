@@ -275,17 +275,18 @@ export class MovieCatalog implements OnInit, OnDestroy {
   }
 
   getRelevantSchedules(movie: MovieResponseDto): ScheduleDto[] {
-    if (!movie.schedules || movie.schedules.length === 0) return [];
+    if (!movie?.schedules || movie.schedules.length === 0) return [];
+    const validSchedules = movie.schedules.filter((s) => s && s.startTime);
     if (!this.filters.cinemaBranch || this.filters.cinemaBranch.trim() === '') {
-      return movie.schedules;
+      return validSchedules;
     }
     const branch = this.filters.cinemaBranch.toLowerCase().trim();
-    const matched = movie.schedules.filter((s) => {
+    const matched = validSchedules.filter((s) => {
       const hall = (s.cinemaHallName || '').toLowerCase();
       const id = (s.cinemaHallId || '').toLowerCase();
       return hall.includes(branch) || id.includes(branch);
     });
-    return matched.length > 0 ? matched : movie.schedules;
+    return matched.length > 0 ? matched : validSchedules;
   }
 
   setHeroIndex(index: number): void {
