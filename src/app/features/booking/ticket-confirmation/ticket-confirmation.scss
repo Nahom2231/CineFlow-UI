@@ -12,6 +12,19 @@
   color: #f8fafc;
   overflow: hidden;
 
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #6366f1 0%, #06b6d4 25%, #f43f5e 50%, #f59e0b 75%, #6366f1 100%);
+    background-size: 300% 100%;
+    animation: cardWaveShimmer 4s ease infinite;
+    z-index: 10;
+  }
+
   /* Cinema Notches on Left & Right */
   .notch {
     position: absolute;

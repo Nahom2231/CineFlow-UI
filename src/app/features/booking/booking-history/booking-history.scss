@@ -160,17 +160,25 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 3px;
+      height: 4px;
+      background-size: 250% 100%;
+      animation: cardWaveShimmer 4s ease infinite;
+      transition: height 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    &:hover::after {
+      height: 5px;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.6);
     }
 
     &.status-upcoming::after {
-      background: linear-gradient(90deg, #10b981, #059669);
+      background: linear-gradient(90deg, #10b981, #06b6d4, #10b981);
     }
     &.status-completed::after {
-      background: linear-gradient(90deg, #38bdf8, #0284c7);
+      background: linear-gradient(90deg, #38bdf8, #6366f1, #38bdf8);
     }
     &.status-cancelled::after {
-      background: linear-gradient(90deg, #f43f5e, #e11d48);
+      background: linear-gradient(90deg, #f43f5e, #f59e0b, #f43f5e);
     }
 
     .card-top-row {

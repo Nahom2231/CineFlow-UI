@@ -1123,45 +1123,7 @@ h1, h2, h3, h4, h5, h6 {
   100% { background-position: 200% 50%; }
 }
 
-/* 2. Hero Section Bottom Wave Transition */
-.hero-wave-divider {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  overflow: hidden;
-  line-height: 0;
-  z-index: 10;
-  pointer-events: none;
 
-  .wave-svg {
-    position: relative;
-    display: block;
-    width: 100%;
-    height: 60px;
-
-    .wave-layer-back {
-      fill: rgba(15, 23, 42, 0.55);
-      animation: waveDriftBack 8s ease-in-out infinite alternate;
-    }
-
-    .wave-layer-front {
-      fill: var(--bg-main, #07090e);
-      animation: waveDriftFront 6s ease-in-out infinite alternate;
-    }
-  }
-}
-
-[data-theme="light"], body.light-theme {
-  .hero-wave-divider .wave-svg {
-    .wave-layer-back {
-      fill: rgba(226, 232, 240, 0.7) !important;
-    }
-    .wave-layer-front {
-      fill: #f8fafc !important;
-    }
-  }
-}
 
 /* 3. Footer Organic Wave Divider */
 .footer-wave-wrapper {
@@ -1229,25 +1191,67 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* 5. Movie Card Flowing Wave Separator & Liquid Glow */
+/* 5. Movie Card Live Undulating Wave Separator & Liquid Glow */
 .card-wave-separator {
   position: relative;
   width: 100%;
-  height: 20px;
-  margin-top: -20px;
-  z-index: 3;
+  height: 26px;
+  margin-top: -26px;
+  z-index: 4;
   pointer-events: none;
   overflow: hidden;
 
-  .card-wave-svg {
-    display: block;
-    width: 100%;
+  .wave-stream {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200%;
     height: 100%;
 
-    .card-wave-fill {
-      fill: var(--bg-card, rgba(18, 25, 42, 0.85));
-      transition: fill 0.3s ease;
+    .card-wave-svg {
+      display: block;
+      width: 100%;
+      height: 100%;
     }
+
+    &.wave-stream-back {
+      animation: rollWaveStream 7s linear infinite;
+      opacity: 0.7;
+
+      .wave-fill-glow {
+        fill: rgba(6, 182, 212, 0.45);
+      }
+    }
+
+    &.wave-stream-mid {
+      animation: rollWaveStreamReverse 5s linear infinite;
+      opacity: 0.6;
+
+      .wave-fill-accent {
+        fill: rgba(244, 63, 94, 0.35);
+      }
+    }
+
+    &.wave-stream-front {
+      animation: rollWaveStream 9s linear infinite;
+      opacity: 1;
+
+      .wave-fill-body {
+        fill: var(--bg-card, #12192a);
+        transition: fill 0.3s ease;
+      }
+    }
+  }
+}
+
+.movie-card:hover .card-wave-separator {
+  .wave-stream.wave-stream-back {
+    animation-duration: 3.5s;
+    opacity: 0.95;
+  }
+  .wave-stream.wave-stream-mid {
+    animation-duration: 2.5s;
+    opacity: 0.85;
   }
 }
 
@@ -1256,49 +1260,126 @@ h1, h2, h3, h4, h5, h6 {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 3px;
+  height: 4px;
   background: linear-gradient(90deg, #6366f1 0%, #06b6d4 25%, #f43f5e 50%, #f59e0b 75%, #6366f1 100%);
   background-size: 300% 100%;
   animation: cardWaveShimmer 4s ease infinite;
-  opacity: 0.65;
+  opacity: 0.75;
   z-index: 5;
   transition: height 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease;
 }
 
 .movie-card:hover .card-wave-glow {
-  height: 5px;
+  height: 6px;
   opacity: 1;
-  box-shadow: 0 0 16px rgba(99, 102, 241, 0.7);
+  box-shadow: 0 0 18px rgba(99, 102, 241, 0.8);
 }
 
-/* 6. Perk Cards Liquid Wave Motion */
+/* 6. Perk Cards Live Rolling Wave Motion */
 .perk-card {
   position: relative;
   overflow: hidden;
 
-  .perk-wave-glow {
+  .perk-wave-flow {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 3px;
-    background: linear-gradient(90deg, #f59e0b 0%, #f43f5e 33%, #06b6d4 66%, #6366f1 100%);
-    background-size: 250% 100%;
-    animation: cardWaveShimmer 5s linear infinite;
-    opacity: 0.75;
-    transition: height 0.3s ease, opacity 0.3s ease;
+    height: 14px;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 3;
+
+    .wave-stream {
+      width: 200%;
+      height: 100%;
+      animation: rollWaveStream 6s linear infinite;
+
+      .perk-wave-svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+
+        .perk-wave-path {
+          opacity: 0.85;
+
+          &.perk-wave-zap { fill: #f59e0b; }
+          &.perk-wave-gold { fill: #eab308; }
+          &.perk-wave-primary { fill: #6366f1; }
+          &.perk-wave-rose { fill: #f43f5e; }
+        }
+      }
+    }
   }
 
-  &:hover .perk-wave-glow {
-    height: 5px;
-    opacity: 1;
+  &:hover .perk-wave-flow .wave-stream {
+    animation-duration: 3s;
   }
 }
 
-/* Light Theme Adaptations for Card Waves */
+/* 7. Hero Bottom Live Wave Motion */
+.hero-wave-divider {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  overflow: hidden;
+  line-height: 0;
+  z-index: 10;
+  pointer-events: none;
+
+  .wave-stream {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+
+    .hero-wave-svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    &.wave-stream-back {
+      animation: rollWaveStream 14s linear infinite;
+      opacity: 0.6;
+      .wave-layer-back {
+        fill: rgba(99, 102, 241, 0.4);
+      }
+    }
+
+    &.wave-stream-front {
+      animation: rollWaveStreamReverse 10s linear infinite;
+      opacity: 1;
+      .wave-layer-front {
+        fill: var(--bg-main, #07090e);
+      }
+    }
+  }
+}
+
+/* Light Theme Adaptations for Card & Hero Waves */
 [data-theme="light"], body.light-theme {
-  .card-wave-separator .card-wave-svg .card-wave-fill {
+  .hero-wave-divider .wave-stream.wave-stream-front .wave-layer-front {
+    fill: #f8fafc !important;
+  }
+
+  .hero-wave-divider .wave-stream.wave-stream-back .wave-layer-back {
+    fill: rgba(203, 213, 225, 0.85) !important;
+  }
+
+  .card-wave-separator .wave-stream.wave-stream-front .wave-fill-body {
     fill: #ffffff !important;
+  }
+
+  .card-wave-separator .wave-stream.wave-stream-back .wave-fill-glow {
+    fill: rgba(2, 132, 199, 0.35) !important;
+  }
+
+  .card-wave-separator .wave-stream.wave-stream-mid .wave-fill-accent {
+    fill: rgba(225, 29, 72, 0.25) !important;
   }
 
   .card-wave-glow {
@@ -1307,12 +1388,19 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .movie-card:hover .card-wave-glow {
-    box-shadow: 0 0 12px rgba(79, 70, 229, 0.35) !important;
+    box-shadow: 0 0 14px rgba(79, 70, 229, 0.4) !important;
   }
+}
 
-  .perk-card .perk-wave-glow {
-    background: linear-gradient(90deg, #d97706 0%, #e11d48 33%, #0284c7 66%, #4f46e5 100%) !important;
-  }
+/* Master Continuous Wave Motion Keyframes */
+@keyframes rollWaveStream {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes rollWaveStreamReverse {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
 }
 
 @keyframes cardWaveShimmer {
@@ -1320,6 +1408,7 @@ h1, h2, h3, h4, h5, h6 {
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+
 
 
 
