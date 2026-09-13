@@ -12,6 +12,7 @@ import {
   ValidateTicketCommand,
   CinemaHall
 } from '../models/CineFlow.model';
+import * as QRCode from 'qrcode';
 
 @Injectable({
   providedIn: 'root'
@@ -1533,12 +1534,6 @@ export class CineFlowApiService {
 
   public getNetworkHost(): string {
     if (typeof window !== 'undefined' && window.location) {
-      const hostname = window.location.hostname;
-      const port = window.location.port ? `:${window.location.port}` : ':4200';
-      if (hostname === 'localhost' || hostname === '127.0.0.1') {
-        // Active Wi-Fi IPv4 address for local phone testing on same Wi-Fi
-        return `http://192.168.187.182${port}`;
-      }
       return window.location.origin;
     }
     return 'http://localhost:4200';
@@ -1566,6 +1561,21 @@ export class CineFlowApiService {
 
   public createSvgQrDataUri(ticketId: string, details?: any): string {
     const verifyUrl = this.getTicketVerificationUrl(ticketId, details);
+    try {
+      let svgStr = '';
+      (QRCode as any).toString(verifyUrl, {
+        type: 'svg',
+        margin: 2,
+        color: { dark: '#0f172a', light: '#ffffff' }
+      }, (err: any, str: string) => {
+        if (!err && str) svgStr = str;
+      });
+      if (svgStr) {
+        return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}`;
+      }
+    } catch (e) {
+      console.warn('Local QRCode generation warning, using fallback:', e);
+    }
     return `https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=10&color=0f172a&bgcolor=ffffff&data=${encodeURIComponent(verifyUrl)}`;
   }
 

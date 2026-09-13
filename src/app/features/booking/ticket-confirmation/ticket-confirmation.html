@@ -26,7 +26,10 @@
   <div class="qr-section">
     <div class="qr-wrapper">
       <div class="qr-display">
-        <img [src]="qrCodeUrl" alt="Scannable Ticket QR Code" class="qr-code" />
+        <img *ngIf="qrCodeUrl" [src]="qrCodeUrl" alt="Scannable Ticket QR Code" class="qr-code" (error)="updateQrCode()" />
+        <div *ngIf="!qrCodeUrl" style="width: 220px; height: 220px; display: flex; align-items: center; justify-content: center;">
+          <div class="spinner-border text-primary" role="status"></div>
+        </div>
       </div>
       <div class="qr-watermark">CINEFLOW VERIFIED PASS</div>
     </div>

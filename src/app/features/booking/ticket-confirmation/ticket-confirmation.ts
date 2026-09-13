@@ -73,6 +73,10 @@ export class TicketConfirmation implements OnInit {
     const txRef = qParams['tx_ref'] || qParams['trx_ref'] || qParams['reference'];
     const routeTicketId = this.route.snapshot.paramMap.get('ticketId');
 
+    // Pre-initialize a valid ticket ID and QR code so the image is never blank/broken during loading
+    this.ticketId = routeTicketId || ('TKT-' + Math.floor(100000 + Math.random() * 900000));
+    this.updateQrCode();
+
     // 1. Check if URL contains query parameters with ticket details (from QR scan on phone)
     if (qParams['m'] || qParams['s'] || qParams['h']) {
       this.ticketId = routeTicketId || qParams['ref'] || ('TKT-' + Math.floor(100000 + Math.random() * 900000));
