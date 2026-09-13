@@ -423,7 +423,7 @@ export class SeatPicker implements OnInit, OnDestroy {
           res.checkoutUrl.startsWith('https://checkout.chapa.co/checkout/payment/'));
 
         if (isLiveChapaHostedCheckout) {
-          this.checkoutRedirectUrl = res.checkoutUrl;
+          this.checkoutRedirectUrl = res.checkoutUrl || '';
           this.paymentStep = 'verifying';
           this.paymentPromptMessage = `Connecting to official Chapa Hosted Checkout... Redirecting to payment portal...`;
           this.cdr.detectChanges();
@@ -437,7 +437,7 @@ export class SeatPicker implements OnInit, OnDestroy {
         }
 
         // Real-time Chapa Multi-Bank Payment Clearance Flow (Telebirr, CBE Birr, Awash, Card)
-        this.checkoutRedirectUrl = null;
+        this.checkoutRedirectUrl = '';
         setTimeout(() => {
           this.paymentStep = 'awaiting_pin';
           this.paymentPromptMessage = `💳 Gateway handshake secured. Verifying Chapa clearance for ${this.totalAmount} ETB...`;
